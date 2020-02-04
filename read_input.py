@@ -13,9 +13,9 @@ from os import path, access, R_OK
 from csv import reader
 
 
-def set_csv_file_path_from_argv_1():
+def set_csv_path_from_argv1():
    try:
-      csv_file_path = str(sys.argv[1])
+      csv_file_path = sys.argv[1]
    except IndexError:
       print('Please provide the path to a CSV-file as argument.')
    if not path.exists(csv_file_path):
@@ -32,4 +32,4 @@ def set_csv_file_path_from_argv_1():
 
 
 if __name__=="__main__":
-   set_csv_file_path_from_argv_1();
+   set_csv_path_from_argv1();
