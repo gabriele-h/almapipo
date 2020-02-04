@@ -13,7 +13,13 @@ from os import path, access, R_OK
 from csv import reader
 
 
-def set_csv_path_from_argv1():
+def main():
+   csv_path = set_csv_path_from_argv1();
+   id_list = read_csv_contents_to_list(csv_path);
+   print(id_list)
+
+
+def set_csv_path_from_argv1() -> str:
    try:
       csv_file_path = sys.argv[1]
    except IndexError:
@@ -32,4 +38,4 @@ def set_csv_path_from_argv1():
 
 
 if __name__=="__main__":
-   set_csv_path_from_argv1();
+   main()
