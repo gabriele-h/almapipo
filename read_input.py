@@ -21,20 +21,27 @@ def main():
 
 def set_csv_path_from_argv1() -> str:
    try:
-      csv_file_path = sys.argv[1]
+      argv1 = sys.argv[1]
    except IndexError:
-      print('Please provide the path to a CSV-file as argument.')
-   if not path.exists(csv_file_path):
-      print('File ' + csv_file_path + ' does not exist.')
-   elif not access(csv_file_path, R_OK):
-      print('File ' + csv_file_path + ' is not readable.')
-   elif csv_file_path[:4] != '.csv':
-      print('File ' + csv_file_path + ' does not seem to be a csv-file.')
+      print('Please provide CSV-file as argument.')
+   else:
+      if not path.exists(argv1):
+         print(f'File {argv} does not exist.')
+      elif not access(argv1, R_OK):
+         print(f'File {argv1} is not readable.')
+      elif argv1[-4:] != '.csv':
+         print(f'File {argv1} does not seem to be a csv-file?')
+      else:
+         return sys.argv[1]
 
-#with open(csv_file_path, newline="") as csv_file:
-#   csv_reader = csv.reader(csv_file, delimiter=' ', quotechar='"')
-#   for row in csv_reader:
-#      print(', '.join(row))
+
+def read_csv_contents_to_list(csv_path) -> list:
+   id_list = []
+   with open(csv_path, newline="") as csv_file:
+      csv_reader = reader(csv_file, delimiter=';', quotechar='"')
+      for row in csv_reader:
+         id_list.append(row[0])
+   return id_list
 
 
 if __name__=="__main__":
