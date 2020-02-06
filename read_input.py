@@ -1,4 +1,4 @@
-"""Read and check IDs from CSV and return as list
+"""Read info from CSV and return as list
 
 The expected input for this is a csv file of
 Alma IDs in the first column and potentially information
@@ -8,15 +8,19 @@ The output contains a list of both IDs and required
 manipulations.
 """
 
+import re
 import sys
 from os import path, access, R_OK
 from csv import reader
 
+alma_id_pattern_str = "^(22|23|53|61|62|81|99)\d{2,}3332$"
+pattern = re.compile(alma_id_pattern_str)
+
 
 def main():
-   csv_path = set_csv_path_from_argv1();
-   id_list = read_csv_contents_to_list(csv_path);
-   print(id_list)
+   csv_path = set_csv_path_from_argv1()
+   id_list = read_csv_contents_to_list(csv_path)
+   print(does_list_contain_alma_ids_only(id_list))
 
 
 def set_csv_path_from_argv1() -> str:
@@ -42,6 +46,15 @@ def read_csv_contents_to_list(csv_path) -> list:
       for row in csv_reader:
          id_list.append(row[0])
    return id_list
+
+
+def does_list_contain_alma_ids_only(id_list) -> bool:
+   ids_only = True
+   for identifier in id_list:
+      if not pattern.match(identifier):
+         ids_only = False
+         print(f"String found in list that is not an ID: {identifier}.")
+   return ids_only
 
 
 if __name__=="__main__":
