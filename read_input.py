@@ -49,11 +49,13 @@ def read_csv_contents_to_list(csv_path) -> list:
 
 
 def does_list_contain_alma_ids_only(id_list) -> bool:
-   ids_only = True
    for identifier in id_list:
-      if not pattern.match(identifier):
-         ids_only = False
+      if not pattern.fullmatch(identifier):
          print(f"String found in list that is not an ID: {identifier}.")
+   ids_only = all(pattern.fullmatch(identifier) for identifier in id_list)
+   if not id_list:
+      ids_only = False
+      print("The list given is empty.")
    return ids_only
 
 
