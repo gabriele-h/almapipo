@@ -13,7 +13,7 @@ import sys
 from os import path, access, R_OK
 from csv import reader
 
-alma_id_pattern_str = "^(22|23|53|61|62|81|99)\d{2,}3332$"
+alma_id_pattern_str = r"^(22|23|53|61|62|81|99)\d{2,}3332$"
 pattern = re.compile(alma_id_pattern_str)
 
 
