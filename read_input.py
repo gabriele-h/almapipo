@@ -20,7 +20,8 @@ pattern = re.compile(alma_id_pattern_str)
 def main():
    csv_path = set_csv_path_from_argv1()
    id_list = read_csv_contents_to_list(csv_path)
-   print(does_list_contain_alma_ids_only(id_list))
+   alma_ids_only = does_list_contain_alma_ids_only(id_list)
+   print(f"Does list contain Alma-IDs only? {alma_ids_only}")
 
 
 def set_csv_path_from_argv1() -> str:
