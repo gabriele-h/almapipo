@@ -18,10 +18,11 @@ pattern = re.compile(alma_id_pattern_str)
 
 
 def main():
+   print("Use as commandline-tool only to test a given list of IDs.")
+   print("Provide the csv-file you want to test as ARGV1.")
+   print("---")
    csv_path = set_csv_path_from_argv1()
    id_list = read_csv_contents_to_list(csv_path)
-   alma_ids_only = does_list_contain_alma_ids_only(id_list)
-   print(f"Does list contain Alma-IDs only? {alma_ids_only}")
 
 
 def set_csv_path_from_argv1() -> str:
@@ -49,15 +50,18 @@ def read_csv_contents_to_list(csv_path) -> list:
    return id_list
 
 
-def does_list_contain_alma_ids_only(id_list) -> bool:
-   for identifier in id_list:
-      if not pattern.fullmatch(identifier):
-         print(f"String found in list that is not an ID: {identifier}.")
-   ids_only = all(pattern.fullmatch(identifier) for identifier in id_list)
-   if not id_list:
-      ids_only = False
-      print("The list given is empty.")
-   return ids_only
+def is_this_an_alma_id(identifier) -> bool:
+   if not pattern.fullmatch(identifier):
+      is_alma_id = False
+      print(f"String found in list that is not an ID: {identifier}.")
+   elif not identifier:
+      is_alma_id = False
+      print("No identifier given.")
+   elif pattern.fullmatch(identifier):
+      is_alma_id = True
+   else:
+      print("Something went utterly wrong.")
+   return is_alma_id
 
 
 if __name__=="__main__":
