@@ -1,3 +1,9 @@
+# env Variables
+
+The following env variables need to be set:
+* ALMA\_REST\_LOGFILE\_DIR - where you want your logs saved
+* ALMA\_REST\_ID\_INSTUTIONAL\_SUFFIX - the last four digits of your Alma IDs, e. g. MMS-ID
+
 # read\_input.py
 
 Read a CSV- or TSV-file and return information for further handling by other modules.
