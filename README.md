@@ -10,7 +10,7 @@ When used from commandline with csv-path as argv1 the script will check file val
 actually only check if the first column is a valid Alma ID. For further information
 on how the according regular expression came into existence have a look at SvG's very useful
 Alma record number cheat sheet:
-https://knowledge.exlibrisgroup.com/Alma/Community\_Knowledge/How\_to\_-\_A\_cheat\_sheet\_for\_Alma\_record\_numbers
+https://knowledge.exlibrisgroup.com/Alma/Community_Knowledge/How_to_-_A_cheat_sheet_for_Alma_record_numbers
 
 Be aware that **only rows with valid Alma IDs in the first column will be kept for further processing!*
 
