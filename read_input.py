@@ -12,6 +12,7 @@ import re
 import sys
 from os import access, environ, path, R_OK
 from csv import DictReader
+from typing import Iterable
 
 alma_id_suffix = environ['ALMA_ID_INSTUTIONAL_SUFFIX']
 
@@ -24,7 +25,10 @@ def main():
    print("Provide the csv-file (semicolon-separated) or tsv-file as ARGV1.")
    print("---")
    csv_path = set_csv_path_from_argv1()
-   lists_from_csv = read_csv_contents_to_list(csv_path)
+   generator_from_csv = read_csv_contents(csv_path)
+   first_row = next(generator_from_csv)
+   print("---")
+   print(f"First valid row of csv-file: {first_row}")
 
 def set_csv_path_from_argv1() -> str:
    try:
@@ -42,8 +46,7 @@ def set_csv_path_from_argv1() -> str:
          return sys.argv[1]
 
 
-def read_csv_contents_to_list(csv_path) -> list:
-   list_of_dicts=[]
+def read_csv_contents(csv_path) -> Iterable[str]:
    if csv_path[-4:] == '.csv':
       delimit = ';'
    elif csv_path[-4:] == '.tsv':
@@ -51,8 +54,11 @@ def read_csv_contents_to_list(csv_path) -> list:
    with open(csv_path, newline="") as csv_file:
       csv_reader = DictReader(csv_file, delimiter=delimit)
       for row in csv_reader:
-         list_of_dicts.append(row)
-   return list_of_dicts
+         first_column_value = list(row.values())[0]
+         if is_this_an_alma_id(first_column_value):
+            yield row
+         else:
+            pass
 
 
 def is_this_an_alma_id(identifier) -> bool:
