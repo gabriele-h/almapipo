@@ -10,10 +10,12 @@ manipulations.
 
 import re
 import sys
-from os import path, access, R_OK
+from os import access, environ, path, R_OK
 from csv import DictReader
 
-alma_id_pattern_str = r"^(22|23|53|61|62|81|99)\d{2,}3332$"
+alma_id_suffix = environ['ALMA_ID_INSTUTIONAL_SUFFIX']
+
+alma_id_pattern_str = r"^(22|23|53|61|62|81|99)\d{2,}"+alma_id_suffix+"$"
 pattern = re.compile(alma_id_pattern_str)
 
 
