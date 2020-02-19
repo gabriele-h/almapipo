@@ -54,7 +54,10 @@ def read_csv_contents_to_list(csv_path) -> list:
 
 
 def is_this_an_alma_id(identifier) -> bool:
-   if not pattern.fullmatch(identifier):
+   if type(identifier) != str:
+      is_alma_id = False
+      print(f"Please provide ID as a string.")
+   elif not pattern.fullmatch(identifier):
       is_alma_id = False
       print(f"String found in list that is not an ID: {identifier}.")
    elif not identifier:
