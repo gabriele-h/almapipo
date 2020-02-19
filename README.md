@@ -2,7 +2,7 @@
 
 The following env variables need to be set:
 * ALMA\_REST\_LOGFILE\_DIR - where you want your logs saved
-* ALMA\_REST\_ID\_INSTUTIONAL\_SUFFIX - the last four digits of your Alma IDs, e. g. MMS-ID
+* ALMA\_REST\_ID\_INSTUTIONAL\_SUFFIX - the last four digits of your Alma IDs
 
 # read\_input.py
 
