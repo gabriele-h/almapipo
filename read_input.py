@@ -29,6 +29,7 @@ def main():
    print("---")
    print(f"First valid row of csv-file: {first_row}")
 
+
 def set_csv_path_from_argv1() -> str:
    try:
       argv1 = sys.argv[1]
