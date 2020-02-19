@@ -8,22 +8,17 @@ The output contains a list of both IDs and required
 manipulations.
 """
 
-import logging
 import re
 import sys
 from os import access, environ, path, R_OK
 from csv import DictReader
 from typing import Iterable
 
+import logfile_setup
+
 # Logfile
-logfile_dir_path = environ['ALMA_REST_LOGFILE_DIR']
-logfile_path = logfile_dir_path + 'alma_rest.log'
-logger_read_input = logging.getLogger('read_input')
-logfile_handler = logging.FileHandler(logfile_path)
-log_format_string = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-log_formatter = logging.Formatter(log_format_string)
-logfile_handler.setFormatter(log_formatter)
-logger_read_input.addHandler(logfile_handler)
+logger_read_input = logfile_setup.create_logger('read_input')
+logfile_setup.log_to_file(logger_read_input)
 
 # Pattern for Alma ID check
 alma_id_suffix = environ['ALMA_REST_ID_INSTUTIONAL_SUFFIX']
@@ -31,10 +26,7 @@ alma_id_pattern_str = r"^(22|23|53|61|62|81|99)\d{2,}"+alma_id_suffix+"$"
 pattern = re.compile(alma_id_pattern_str)
 
 def main():
-   # Duplicate log to stdout if called from commandline
-   log_console = logging.StreamHandler()
-   log_console.setFormatter(log_formatter)
-   logger_read_input.addHandler(log_console)
+   logfile_setup.log_to_stdout(logger_read_input)
 
    print("Use as commandline-tool only to test a given list of IDs.")
    print("---")
