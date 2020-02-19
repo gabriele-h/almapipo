@@ -22,7 +22,6 @@ pattern = re.compile(alma_id_pattern_str)
 
 def main():
    print("Use as commandline-tool only to test a given list of IDs.")
-   print("Provide the csv-file (semicolon-separated) or tsv-file as ARGV1.")
    print("---")
    csv_path = set_csv_path_from_argv1()
    generator_from_csv = read_csv_contents(csv_path)
@@ -34,10 +33,10 @@ def set_csv_path_from_argv1() -> str:
    try:
       argv1 = sys.argv[1]
    except IndexError:
-      print('Please provide CSV-file as argument.')
+      print('ERROR: Please provide CSV-file as argument.')
    else:
       if not path.exists(argv1):
-         print(f'File {argv1} does not exist.')
+         print(f'ERROR: File {argv1} does not exist.')
       elif not access(argv1, R_OK):
          print(f'File {argv1} is not readable.')
       elif argv1[-4:] != '.csv' and argv1[-4:] != '.tsv':
@@ -64,17 +63,15 @@ def read_csv_contents(csv_path) -> Iterable[str]:
 def is_this_an_alma_id(identifier) -> bool:
    if type(identifier) != str:
       is_alma_id = False
-      print(f"Please provide ID as a string.")
+      print(f"WARNING: Please provide ID as a string.")
    elif not pattern.fullmatch(identifier):
       is_alma_id = False
-      print(f"String found in list that is not an ID: {identifier}.")
+      print(f"WARNING: Identifier is not a valid Alma ID: '{identifier}'")
    elif not identifier:
       is_alma_id = False
-      print("No identifier given.")
+      print("ERROR: No identifier given.")
    elif pattern.fullmatch(identifier):
       is_alma_id = True
-   else:
-      print("Something went utterly wrong.")
    return is_alma_id
 
 
