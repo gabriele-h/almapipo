@@ -26,6 +26,9 @@ alma_id_pattern_str = r"^(22|23|53|61|62|81|99)\d{2,}"+alma_id_suffix+"$"
 pattern = re.compile(alma_id_pattern_str)
 
 def main():
+   """When used from commandline, the read_input will only validate
+   the contents of the file provided via arg1 and output some information
+   in that regard."""
    logfile_setup.log_to_stdout(logger_read_input)
 
    print("Use as commandline-tool only to test a given list of IDs.")
@@ -38,6 +41,7 @@ def main():
 
 
 def set_csv_path_from_argv1() -> str:
+   """Only relevant if read_input is run from commandline."""
    try:
       argv1 = sys.argv[1]
    except IndexError:
@@ -50,6 +54,8 @@ def set_csv_path_from_argv1() -> str:
 
 
 def check_file_path(pathstring) -> bool:
+   """Checks filepath for existence, readability and whether the file is
+   ending with either .csv or .tsv"""
    if not path.exists(pathstring):
       logger_read_input.error(f'File {pathstring} does not exist.')
    elif not access(pathstring, R_OK):
@@ -61,6 +67,9 @@ def check_file_path(pathstring) -> bool:
 
 
 def read_csv_contents(csv_path) -> Iterable[str]:
+   """Feeds the contents of a CSV file into a generator via DictReader.
+   If the first column does not match an Alma ID, the whole row
+   will be discarded."""
    logger_read_input.info(f"Reading file {csv_path} into generator.")
    if csv_path[-4:] == '.csv':
       delimit = ';'
@@ -73,10 +82,12 @@ def read_csv_contents(csv_path) -> Iterable[str]:
          if is_this_an_alma_id(first_column_value):
             yield row
          else:
-            pass
+            logger_read_input.warn(f"The following row was discarded: {row}")
 
 
 def is_this_an_alma_id(identifier) -> bool:
+   """Expected input is a string of an identifier. This function checks
+   if the ID provided matches the expected pattern of Alma IDs."""
    if type(identifier) != str:
       is_alma_id = False
       logger_read_input.warn("Please provide ID as a string.")
