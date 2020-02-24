@@ -40,9 +40,9 @@ def setup_db_connection():
 def define_table_job_status_per_id() -> Table:
    table_definition = Table('job_status_per_id', metadata,
            Column('alma_id', String()),
-           Column('status', String()),
-           Column('create_date', Date()),
-           Column('action', String())
+           Column('job_status', String()),
+           Column('job_date', Date()),
+           Column('job_action', String())
    )
    return table_definition
 
