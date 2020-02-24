@@ -21,13 +21,13 @@ metadata = MetaData()
 
 
 def main():
-   engine = setup_db_connection()
+   engine = setup_db_engine()
    print(type(engine))
    db_job_status_per_id = define_table_job_status_per_id()
    print(engine.connect().execute(select([db_job_status_per_id])))
 
 
-def setup_db_connection():
+def setup_db_engine():
    db_user = environ["ALMA_REST_DB_USER"]
    db_pw = environ["ALMA_REST_DB_PW"]
    db_url = environ["ALMA_REST_DB_URL"]
