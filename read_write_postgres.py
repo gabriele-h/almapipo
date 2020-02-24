@@ -6,9 +6,11 @@ The PostgreSQL DB is intended to do the following:
 * Store which start time of the job triggered the DB-entry
 """
 
+from datetime import datetime
 from os import environ
 
 from sqlalchemy import Column, create_engine, Date, MetaData, select, String, Table
+from sqlalchemy.dialects.postgresql import JSON, JSONB
 
 import logfile_setup
 
@@ -45,6 +47,22 @@ def define_table_job_status_per_id() -> Table:
            Column('job_action', String())
    )
    return table_definition
+
+
+def define_table_source_csv() -> Table:
+   table_definition = Table('source_csv', metadata,
+           Column('job_id', Date()),
+           Column('csv_line', JSON)
+   )
+   return table_definition
+
+
+def copy_lines_to_csv_source_table(csv_line, engine):
+   table_source_csv = define_table_source_csv()
+   timestamp = datetime.now()
+   ins = table_source_csv.insert().values(job_id=timestamp, csv_line=csv_line)
+   conn = engine.connect()
+   result = conn.execute(ins)
 
 
 if __name__=="__main__":
