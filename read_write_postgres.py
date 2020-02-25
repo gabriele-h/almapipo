@@ -6,6 +6,7 @@ The PostgreSQL DB is intended to do the following:
 * Store which start time of the job triggered the DB-entry
 """
 
+import logging
 from datetime import datetime
 from os import environ
 
@@ -18,10 +19,8 @@ import logfile_setup
 job_id = datetime.now()
 
 # Logfile
-logger_read_write_postgres = logfile_setup.create_logger('read_write_postgres')
-logfile_setup.log_to_file(logger_read_write_postgres)
-
-logger_read_write_postgres.info(f"Starting with Job-ID {job_id}")
+logger = logging.getLogger(__name__)
+logger.info(f"Starting with Job-ID {job_id}")
 
 # Basic shortenings for SQLAlchemy
 metadata = MetaData()
