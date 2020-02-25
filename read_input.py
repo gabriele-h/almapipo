@@ -53,7 +53,7 @@ def set_csv_path_from_argv1() -> str:
          sys.exit('Exiting: Check for file-path failed.')
 
 
-def check_file_path(pathstring) -> bool:
+def check_file_path(path: str) -> bool:
    """Checks filepath for existence, readability and whether the file is
    ending with either .csv or .tsv"""
    if not path.exists(pathstring):
@@ -66,7 +66,7 @@ def check_file_path(pathstring) -> bool:
       return True
 
 
-def read_csv_contents(csv_path) -> Iterable[str]:
+def read_csv_contents(csv_path: str, validation: bool) -> Iterable[str]:
    """Feeds the contents of a CSV file into a generator via DictReader.
    If the first column does not match an Alma ID, the whole row
    will be discarded."""
@@ -79,13 +79,14 @@ def read_csv_contents(csv_path) -> Iterable[str]:
       csv_reader = DictReader(csv_file, delimiter=delimit)
       for row in csv_reader:
          first_column_value = list(row.values())[0]
-         if is_this_an_alma_id(first_column_value):
+         if is_this_an_alma_id(first_column_value) \
+                 or validation == False:
             yield row
          else:
             logger.warn(f"The following row was discarded: {row}")
 
 
-def is_this_an_alma_id(identifier) -> bool:
+def is_this_an_alma_id(identifier: str) -> bool:
    """Expected input is a string of an identifier. This function checks
    if the ID provided matches the expected pattern of Alma IDs."""
    if type(identifier) != str:
