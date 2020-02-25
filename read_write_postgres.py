@@ -14,9 +14,14 @@ from sqlalchemy.dialects.postgresql import JSON, JSONB
 
 import logfile_setup
 
+# Timestamp for the Script-Run as inserted in the database
+job_id = datetime.now()
+
 # Logfile
 logger_read_write_postgres = logfile_setup.create_logger('read_write_postgres')
 logfile_setup.log_to_file(logger_read_write_postgres)
+
+logger_read_write_postgres.info(f"Starting with Job-ID {job_id}")
 
 # Basic shortenings for SQLAlchemy
 metadata = MetaData()
@@ -58,9 +63,11 @@ def define_table_source_csv() -> Table:
 
 
 def copy_lines_to_csv_source_table(csv_line, engine):
+   """For a CSV-line formatted as an ordered dictionary
+   create an entry in the database that identifies the job
+   responsible for the entry (job_id)."""
    table_source_csv = define_table_source_csv()
-   timestamp = datetime.now()
-   ins = table_source_csv.insert().values(job_id=timestamp, csv_line=csv_line)
+   ins = table_source_csv.insert().values(job_id=job_id, csv_line=csv_line)
    conn = engine.connect()
    result = conn.execute(ins)
 
