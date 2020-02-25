@@ -26,5 +26,17 @@ on how the according regular expression came into existence have a look at SvG's
 Alma record number cheat sheet:
 https://knowledge.exlibrisgroup.com/Alma/Community_Knowledge/How_to_-_A_cheat_sheet_for_Alma_record_numbers
 
+### Usage example
+```
+$ python3 read_input.py ../input/testsample.csv
+Use as commandline-tool only to test a given list of IDs.
+---
+2020-02-25 15:38:59,136 - __main__ - INFO - Reading file ../input/testsample.csv into generator.
+2020-02-25 15:38:59,136 - __main__ - WARNING - Identifier is not a valid Alma ID: 'value1'
+2020-02-25 15:38:59,136 - __main__ - WARNING - The following row was discarded: OrderedDict([('header1', 'value1'), ('header2', 'value2')])
+---
+First valid row of csv-file: OrderedDict([('header1', '990024144550201234'), ('header2', 'foobar')])
+```
+
 ## Author
 Gabriele Höfler
