@@ -38,5 +38,11 @@ Use as commandline-tool only to test a given list of IDs.
 First valid row of csv-file: OrderedDict([('header1', '990024144550201234'), ('header2', 'foobar')])
 ```
 
+# read\_write\_postgres.py
+
+Will do the following:
+* Insert lines from input CSV file into the table source\_csv
+* Insert valid Alma IDs into table job\_status\_per\_id and set status to "new"
+
 ## Author
 Gabriele Höfler
