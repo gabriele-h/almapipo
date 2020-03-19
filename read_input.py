@@ -21,7 +21,7 @@ import logfile_setup
 logger = logging.getLogger(__name__)
 
 # Pattern for Alma ID check
-alma_id_suffix = environ['ALMA_REST_ID_INSTUTIONAL_SUFFIX']
+alma_id_suffix = environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX']
 alma_id_pattern_str = r"^(22|23|53|61|62|81|99)\d{2,}"+alma_id_suffix+"$"
 pattern = re.compile(alma_id_pattern_str)
 
@@ -34,7 +34,7 @@ def main():
    print("Use as commandline-tool only to test a given list of IDs.")
    print("---")
    csv_path = set_csv_path_from_argv1()
-   generator_from_csv = read_csv_contents(csv_path)
+   generator_from_csv = read_csv_contents(csv_path, True)
    first_row = next(generator_from_csv)
    print("---")
    print(f"First valid row of csv-file: {first_row}")
@@ -54,7 +54,7 @@ def set_csv_path_from_argv1() -> str:
 
 
 def check_file_path(path: str) -> bool:
-   """Checks filepath for existence, readability and whether the file is
+   """Checks file path for existence, readability and whether the file is
    ending with either .csv or .tsv"""
    if not path.exists(pathstring):
       logger.error(f'File {pathstring} does not exist.')
@@ -75,6 +75,9 @@ def read_csv_contents(csv_path: str, validation: bool) -> Iterable[str]:
       delimit = ';'
    elif csv_path[-4:] == '.tsv':
       delimit = '\t'
+   else:
+      logger.error(f"Extension of the given file not expected (csv for semicolon, tsv for tabs).")
+      sys.exit(1)
    with open(csv_path, newline="") as csv_file:
       csv_reader = DictReader(csv_file, delimiter=delimit)
       for row in csv_reader:
@@ -100,6 +103,9 @@ def is_this_an_alma_id(identifier: str) -> bool:
       logger.error("No identifier given.")
    elif pattern.fullmatch(identifier):
       is_alma_id = True
+   else:
+      is_alma_id = False
+      logger.warn(f"Identifier not valid for unknown reasons: '{identifier}'")
    return is_alma_id
 
 
