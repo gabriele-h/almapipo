@@ -1,13 +1,16 @@
 # env Variables
 
 The following env variables need to be set:
-* ALMA\_REST\_LOGFILE\_DIR - where you want your logs saved
-* ALMA\_REST\_ID\_INSTITUTIONAL\_SUFFIX - the last four digits of your Alma IDs
-* ALMA\_REST\_DB - name of your psql database
-* ALMA\_REST\_DB\_USER - name of your psql user
-* ALMA\_REST\_DB\_PW - password of your psql user
 
-# read\_input.py
+```bash
+export ALMA_REST_LOGFILE_DIR=             # where you want your logs saved
+export ALMA_REST_ID_INSTITUTIONAL_SUFFIX= # the last four digits of your Alma IDs
+export ALMA_REST_DB=                      # name of your psql database
+export ALMA_REST_DB_USER=                 # name of your psql user
+export ALMA_REST_DB_PW=                   # password of your psql user
+```
+
+# `read_input.py`
 
 Read a CSV- or TSV-file and return information for further handling by other modules.
 
@@ -23,10 +26,12 @@ Also be aware that
 When used from commandline with csv-path as argv1 the script will check file validity.
 It will check if the first column is a valid Alma ID. For further information
 on how the according regular expression came into existence have a look at SvG's very useful
-Alma record number cheat sheet:
-https://knowledge.exlibrisgroup.com/Alma/Community_Knowledge/How_to_-_A_cheat_sheet_for_Alma_record_numbers
+[Alma record number cheat sheet][1].
+
+[1]: https://knowledge.exlibrisgroup.com/Alma/Community_Knowledge/How_to_-_A_cheat_sheet_for_Alma_record_numbers
 
 ### Usage example
+
 ```
 $ python3 read_input.py ../input/testsample.csv
 Use as commandline-tool only to test a given list of IDs.
@@ -38,11 +43,13 @@ Use as commandline-tool only to test a given list of IDs.
 First valid row of csv-file: OrderedDict([('header1', '990024144550201234'), ('header2', 'foobar')])
 ```
 
-# read\_write\_postgres.py
+# `read_write_postgres.py`
 
 Will do the following:
-* Insert lines from input CSV file into the table source\_csv
-* Insert valid Alma IDs into table job\_status\_per\_id and set status to "new"
+
+* Insert lines from input CSV file into the table `source_csv`
+* Insert valid Alma IDs into table `job_status_per_id` and set status to "new"
 
 ## Author
+
 Gabriele Höfler
