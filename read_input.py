@@ -13,7 +13,7 @@ import re
 import sys
 from os import access, environ, path, R_OK
 from csv import DictReader
-from typing import Iterable
+from typing import Iterator
 
 import logfile_setup
 
@@ -54,20 +54,20 @@ def set_csv_path_from_argv1() -> str:
             sys.exit('Exiting: Check for file-path failed.')
 
 
-def check_file_path(path: str) -> bool:
+def check_file_path(file_path: str) -> bool:
     """Checks file path for existence, readability and whether the file is
     ending with either .csv or .tsv"""
-    if not path.exists(pathstring):
-        logger.error(f'File {pathstring} does not exist.')
-    elif not access(pathstring, R_OK):
-        logger.error(f'File {pathstring} is not readable.')
-    elif pathstring[-4:] != '.csv' and pathstring[-4:] != '.tsv':
-        logger.error(f'File {pathstring} does not seem to be a csv- or tsv-file?')
+    if not path.exists(file_path):
+        logger.error(f'File {file_path} does not exist.')
+    elif not access(file_path, R_OK):
+        logger.error(f'File {file_path} is not readable.')
+    elif file_path[-4:] != '.csv' and file_path[-4:] != '.tsv':
+        logger.error(f'File {file_path} does not seem to be a csv- or tsv-file?')
     else:
         return True
 
 
-def read_csv_contents(csv_path: str, validation: bool) -> Iterable[str]:
+def read_csv_contents(csv_path: str, validation: bool) -> Iterator[str]:
     """Feeds the contents of a CSV file into a generator via DictReader.
     If the first column does not match an Alma ID, the whole row
     will be discarded."""
@@ -84,10 +84,10 @@ def read_csv_contents(csv_path: str, validation: bool) -> Iterable[str]:
         for row in csv_reader:
             first_column_value = list(row.values())[0]
             if is_this_an_alma_id(first_column_value) \
-                    or validation == False:
+                    or not validation:
                 yield row
             else:
-                logger.warn(f"The following row was discarded: {row}")
+                logger.warning(f"The following row was discarded: {row}")
 
 
 def is_this_an_alma_id(identifier: str) -> bool:
@@ -95,10 +95,10 @@ def is_this_an_alma_id(identifier: str) -> bool:
     if the ID provided matches the expected pattern of Alma IDs."""
     if type(identifier) != str:
         is_alma_id = False
-        logger.warn("Please provide ID as a string.")
+        logger.warning("Please provide ID as a string.")
     elif not pattern.fullmatch(identifier):
         is_alma_id = False
-        logger.warn(f"Identifier is not a valid Alma ID: '{identifier}'")
+        logger.warning(f"Identifier is not a valid Alma ID: '{identifier}'")
     elif not identifier:
         is_alma_id = False
         logger.error("No identifier given.")
@@ -106,7 +106,7 @@ def is_this_an_alma_id(identifier: str) -> bool:
         is_alma_id = True
     else:
         is_alma_id = False
-        logger.warn(f"Identifier not valid for unknown reasons: '{identifier}'")
+        logger.warning(f"Identifier not valid for unknown reasons: '{identifier}'")
     return is_alma_id
 
 
