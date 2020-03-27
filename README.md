@@ -2,7 +2,7 @@
 
 The following env variables need to be set:
 * ALMA\_REST\_LOGFILE\_DIR - where you want your logs saved
-* ALMA\_REST\_ID\_INSTUTIONAL\_SUFFIX - the last four digits of your Alma IDs
+* ALMA\_REST\_ID\_INSTITUTIONAL\_SUFFIX - the last four digits of your Alma IDs
 * ALMA\_REST\_DB - name of your psql database
 * ALMA\_REST\_DB\_USER - name of your psql user
 * ALMA\_REST\_DB\_PW - password of your psql user

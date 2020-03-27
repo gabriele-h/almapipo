@@ -9,13 +9,13 @@ log_formatter = logging.Formatter(log_format_string)
 logfile_dir_path = environ['ALMA_REST_LOGFILE_DIR']
 logfile_path = logfile_dir_path + 'alma_rest.log'
 logging.basicConfig(
-       format=log_format_string,
-       filename=logfile_path,
-       level=logging.INFO
+    format=log_format_string,
+    filename=logfile_path,
+    level=logging.INFO
 )
 
 
-def log_to_stdout(created_logger):
-   log_console = logging.StreamHandler()
-   log_console.setFormatter(log_formatter)
-   created_logger.addHandler(log_console)
+def log_to_stdout(created_logger: logging.logger):
+    log_console = logging.StreamHandler()
+    log_console.setFormatter(log_formatter)
+    created_logger.addHandler(log_console)
