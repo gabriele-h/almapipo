@@ -1,8 +1,10 @@
-"""Read info from CSV and return as list
+"""Read info from CSV/TSV and return as list
 
-The expected input for this is a csv file of
+The expected input for this is a csv or tsv file with
 Alma IDs in the first column and potentially information
-on required manipulations in the following columns.
+on required manipulations in the following columns. The
+file needs to have a header, csv needs to be
+semicolon-delimited.
 
 The output contains a list of both IDs and required
 manipulations.
@@ -27,9 +29,12 @@ pattern = re.compile(alma_id_pattern_str)
 
 
 def main():
-    """When used from commandline, the read_input will only validate
-    the contents of the file provided via arg1 and output some information
-    in that regard."""
+    """
+    When used from commandline, read_input will only validate
+    the contents of the file provided via argv1 and output the
+    the first valid line or information on why it failed to do so.
+    :return: None
+    """
     logfile_setup.log_to_stdout(logger)
 
     print("Use as commandline-tool only to test a given list of IDs.")
@@ -42,7 +47,10 @@ def main():
 
 
 def set_csv_path_from_argv1() -> str:
-    """Only relevant if read_input is run from commandline."""
+    """
+    Only relevant if read_input is run from commandline.
+    :return: String of the file-path provided as argv1.
+    """
     try:
         argv1 = sys.argv[1]
     except IndexError:
@@ -55,8 +63,12 @@ def set_csv_path_from_argv1() -> str:
 
 
 def check_file_path(file_path: str) -> bool:
-    """Checks file path for existence, readability and whether the file is
-    ending with either .csv or .tsv"""
+    """
+    Checks file path for existence, readability and whether the file is
+    ending on either .csv or .tsv
+    :param file_path: Absolute or relative path to the csv/tsv file.
+    :return: Boolean to indicate if the provided file exists, is readable and ends on .csv or .tsv.
+    """
     if not path.exists(file_path):
         logger.error(f'File {file_path} does not exist.')
     elif not access(file_path, R_OK):
@@ -67,10 +79,16 @@ def check_file_path(file_path: str) -> bool:
         return True
 
 
-def read_csv_contents(csv_path: str, validation: bool) -> Iterator[str]:
-    """Feeds the contents of a CSV file into a generator via DictReader.
+def read_csv_contents(csv_path: str, validation: bool = True) -> Iterator[str]:
+    """
+    Feeds the contents of a csv or tsv file into a generator via DictReader.
     If the first column does not match an Alma ID, the whole row
-    will be discarded."""
+    will be discarded. This validation can be overridden with the
+    second param of the function set to False.
+    :param csv_path: Relative or absolute path to a csv or tsv file.
+    :param validation: If set to "False", first column values will verified as Alma-IDs.
+    :return: Generator of csv/tsv file lines as dictionaries.
+    """
     logger.info(f"Reading file {csv_path} into generator.")
     if csv_path[-4:] == '.csv':
         delimit = ';'
@@ -91,8 +109,12 @@ def read_csv_contents(csv_path: str, validation: bool) -> Iterator[str]:
 
 
 def is_this_an_alma_id(identifier: str) -> bool:
-    """Expected input is a string of an identifier. This function checks
-    if the ID provided matches the expected pattern of Alma IDs."""
+    """
+    Expected input is a string of an identifier. This function checks
+    if the ID provided matches the expected pattern of Alma IDs.
+    :param identifier: String to be verified as an Alma-ID.
+    :return: Boolean indicating the status of the verification.
+    """
     if type(identifier) != str:
         is_alma_id = False
         logger.warning("Please provide ID as a string.")

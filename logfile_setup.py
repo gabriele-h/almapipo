@@ -15,7 +15,12 @@ logging.basicConfig(
 )
 
 
-def log_to_stdout(created_logger: logging.logger):
+def log_to_stdout(created_logger) -> None:
+    """
+    For scripts called from commandline, provide ability to log directly to standard out.
+    :param created_logger: Logger of the invoking script.
+    :return: None
+    """
     log_console = logging.StreamHandler()
     log_console.setFormatter(log_formatter)
     created_logger.addHandler(log_console)
