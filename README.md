@@ -1,3 +1,25 @@
+# About
+The scenario which is addressed in this package is the following:
+A set of Alma-records needs to be manipulated (created, deleted, updated).
+
+The Alma-IDs of the records are known and saved in a **semicolon or tab
+delimited file**. The first column of that file needs to be the Alma-ID.
+All other columns may (as of now) contain whatever content the person
+doing the manipulation deems necessary.
+
+In a **PostgreSQL database** both the input used as well as the
+status of the manipulation are saved on a per-line or per-record basis.
+
+Another module of the package will handle the actual manipulation of
+records in Alma via API. If the manipulation is successful, the status for that
+record will be changed from "new" to "done" in the database. If anything
+goes wrong, the status will be set to "error".
+
+# Requirements
+* Python 3.7 or higher, see requirements.txt for Python packages
+* A PostgreSQL database with read and write access
+* Ability to set environment variables
+
 # env Variables
 
 The following env variables need to be set:
