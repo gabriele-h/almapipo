@@ -7,7 +7,7 @@ delimited file**. The first column of that file needs to be the Alma-ID.
 All other columns may (as of now) contain whatever content the person
 doing the manipulation deems necessary.
 
-In a **PostgreSQL database** both the input used as well as the
+In a **database** both the input used as well as the
 status of the manipulation are saved on a per-line or per-record basis.
 
 Another module of the package will handle the actual manipulation of
@@ -17,8 +17,8 @@ goes wrong, the status will be set to "error".
 
 # Requirements
 * Python 3.7 or higher, see requirements.txt for Python packages
-* A PostgreSQL database with read and write access
-* Ability to set environment variables
+* A PostgreSQL, MySQL or SQLite database with read and write access
+* An Alma API-key with the necessary permissions for your operations
 
 # env Variables
 
@@ -30,6 +30,7 @@ export ALMA_REST_ID_INSTITUTIONAL_SUFFIX= # the last four digits of your Alma ID
 export ALMA_REST_DB=                      # name of your psql database
 export ALMA_REST_DB_USER=                 # name of your psql user
 export ALMA_REST_DB_PW=                   # password of your psql user
+export ALMA_REST_DB_DIALECT=              # supported values 'postgresql', 'mysql' or 'sqlite'
 ```
 
 # `read_input.py`
@@ -65,7 +66,7 @@ Use as commandline-tool only to test a given list of IDs.
 First valid row of csv-file: OrderedDict([('header1', '990024144550201234'), ('header2', 'foobar')])
 ```
 
-# `read_write_postgres.py`
+# `read_write_db.py`
 
 Will do the following:
 
