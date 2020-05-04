@@ -15,7 +15,8 @@ import logging
 from os import environ
 
 # more sqlalchemy setup below with conditions
-from sqlalchemy import Column, Date, MetaData, String, Table
+from sqlalchemy import Column, Date, Integer, MetaData, String
+from sqlalchemy.ext.declarative import declarative_base
 
 # noinspection PyUnresolvedReferences
 import logfile_setup
@@ -27,13 +28,10 @@ logger = logging.getLogger(__name__)
 db_dialect = environ["ALMA_REST_DB_DIALECT"]
 
 if db_dialect == "postgresql":
-    # noinspection PyUnresolvedReferences
-    from sqlalchemy.db_dialects.postgresql import JSON
+    from sqlalchemy.dialects.postgresql import JSON
 elif db_dialect == "mysql":
-    # noinspection PyUnresolvedReferences
-    from sqlalchemy.db_dialects.mysql import JSON
+    from sqlalchemy.dialects.mysql import JSON
 elif db_dialect == "sqlite":
-    # noinspection PyUnresolvedReferences
     from sqlalchemy.dialects.sqlite import JSON
 else:
     logger.error("No valid db_dialect given.")
@@ -42,6 +40,7 @@ else:
 metadata = MetaData()
 
 
+# Connection setup
 def prepare_connection_params_from_env():
     """
     Set up the engine for connections to the PostgreSQL database.
@@ -61,29 +60,23 @@ def prepare_connection_params_from_env():
     return connection_params
 
 
-class TableDefiner:
-    """ Definitions of all tables used."""
+# Table setup
+Base = declarative_base()
 
-    @staticmethod
-    def define_job_status_per_id() -> Table:
-        """
-        :return: Definition of the database table job_status_per_id.
-        """
-        table_definition = Table('job_status_per_id', metadata,
-                                 Column('alma_id', String()),
-                                 Column('job_status', String()),
-                                 Column('job_date', Date()),
-                                 Column('job_action', String())
-                                 )
-        return table_definition
 
-    @staticmethod
-    def define_source_csv() -> Table:
-        """
-        :return: Definition of the database table source_csv.
-        """
-        table_definition = Table('source_csv', metadata,
-                                 Column('job_id', Date()),
-                                 Column('csv_line', JSON)
-                                 )
-        return table_definition
+class JobStatusPerId(Base):
+    __tablename__ = 'job_status_per_id'
+
+    job_date = Column(Date, primary_key=True)
+    alma_id = Column(String)
+    job_status = Column(String)
+    job_action = Column(String)
+
+
+class SourceCsv(Base):
+    __tablename__ = 'source_csv'
+
+    primary_key = Column(Integer, primary_key=True)
+    job_date = Column(Date)
+    file_name = Column(String)
+    csv_line = Column(JSON)

@@ -32,11 +32,11 @@ def main():
     logfile_setup.log_to_stdout(logger)
 
     connection_params = db_setup.prepare_connection_params_from_env()
-    db_engine = create_engine(connection_params)
+    db_engine = create_engine(connection_params, echo=True)
 
-    job_status_per_id = db_setup.TableDefiner.define_job_status_per_id()
+    job_status_per_id = db_setup.JobStatusPerId
     logger.info(db_engine.connect().execute(select([job_status_per_id])))
-    source_csv = db_setup.TableDefiner.define_source_csv()
+    source_csv = db_setup.SourceCsv
     logger.info(db_engine.connect().execute(select([source_csv])))
 
 
