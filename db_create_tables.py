@@ -1,6 +1,6 @@
 """Create necessary tables
 
-Only used for initial setup of DB-tables. Checks for existence.
+Only used for initial setup of DB-tables.
 """
 
 from sqlalchemy import create_engine
