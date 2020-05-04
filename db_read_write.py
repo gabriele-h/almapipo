@@ -7,7 +7,7 @@ The DB is intended to do the following:
 """
 
 import logging
-import connect_db
+import db_connect
 from datetime import datetime
 from typing import OrderedDict
 
@@ -33,7 +33,7 @@ def main():
     :return: None
     """
     logfile_setup.log_to_stdout(logger)
-    db_engine = connect_db.setup_db_engine()
+    db_engine = db_connect.setup_db_engine()
     print(type(db_engine))
     db_job_status_per_id = define_table_job_status_per_id()
     print(db_engine.connect().execute(select([db_job_status_per_id])))
@@ -69,7 +69,7 @@ def copy_lines_to_csv_source_table(csv_line: OrderedDict, db_engine: engine):
     create an entry in the database that identifies the job
     responsible for the entry (job_id).
     :param csv_line: Ordered dictionary of values from a line of the input file.
-    :param db_engine: database engine as created via connect_db.py
+    :param db_engine: database engine as created via db_connect.py
     :return: None
     """
     table_source_csv = define_table_source_csv()

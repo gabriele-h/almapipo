@@ -2,7 +2,7 @@
 
 import pytest
 
-import read_input
+import input_read
 
 
 class TestDoesStringEqualAlmaID:
@@ -16,20 +16,20 @@ class TestDoesStringEqualAlmaID:
    not_a_string = 1234567
 
    def test_alma_ids_only(self):
-      bool = all(read_input.is_this_an_alma_id(id) for id in self.set_of_alma_ids)
+      bool = all(input_read.is_this_an_alma_id(id) for id in self.set_of_alma_ids)
       assert bool == True
    
    def test_containing_other(self):
-      bool = read_input.is_this_an_alma_id(self.not_an_alma_id)
+      bool = input_read.is_this_an_alma_id(self.not_an_alma_id)
       assert bool == False
    
    def test_empty(self):
-      bool = read_input.is_this_an_alma_id(self.string_empty)
+      bool = input_read.is_this_an_alma_id(self.string_empty)
       assert bool == False
 
    def test_number_not_string(self):
-      bool = read_input.is_this_an_alma_id(self.not_a_string)
+      bool = input_read.is_this_an_alma_id(self.not_a_string)
       assert bool == False
 
    def test_set_not_string_either(self):
-      bool = read_input.is_this_an_alma_id(self.set_of_alma_ids)
+      bool = input_read.is_this_an_alma_id(self.set_of_alma_ids)
