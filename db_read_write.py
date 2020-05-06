@@ -37,9 +37,10 @@ def main():
     db_engine.connect()
 
 
-def import_csv_file_to_source_csv_table(file_path: str):
+def import_csv_to_db_tables(file_path: str):
     """
     Imports a whole csv or tsv file to the table source_csv.
+    Imports valid Alma-IDs to table job_status_per_id.
     Checks for file existence first.
     :param file_path: Path to the CSV file to be imported.
     :return: None
@@ -49,21 +50,34 @@ def import_csv_file_to_source_csv_table(file_path: str):
         csv_generator = input_read.read_csv_contents(file_path)
         for csv_line in csv_generator:
             # noinspection PyTypeChecker
-            add_line_to_session_for_source_csv_table(csv_line, session)
+            add_csv_line_to_session(csv_line, session)
         session.commit()
+    else:
+        logger.error('No valid file path provided.')
 
 
-def add_line_to_session_for_source_csv_table(csv_line: OrderedDict, session: Session):
+def add_csv_line_to_session(csv_line: OrderedDict, session: Session):
     """
     For an ordered Dictionary of values retrieved from a csv/tsv file
     create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
+    Adds one line to source_csv and one to job_status_per_id.
     :param csv_line: Ordered dictionary of values from a line of the input file.
     :param session: DB session to add the data to.
     :return: None
     """
-    line_for_table_source_csv = db_setup.SourceCsv(job_timestamp=job_timestamp, csv_line=csv_line)
+    line_for_table_source_csv = db_setup.SourceCsv(
+        job_timestamp=job_timestamp,
+        csv_line=csv_line
+    )
+    line_for_table_job_status_per_id = db_setup.JobStatusPerId(
+        job_timestamp=job_timestamp,
+        alma_id=csv_line[0],
+        job_status='new',
+        job_action=''
+    )
     session.add(line_for_table_source_csv)
+    session.add(line_for_table_job_status_per_id)
 
 
 def create_db_session():
