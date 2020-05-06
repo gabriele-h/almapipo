@@ -27,9 +27,9 @@ The following env variables need to be set:
 ```bash
 export ALMA_REST_LOGFILE_DIR=             # where you want your logs saved
 export ALMA_REST_ID_INSTITUTIONAL_SUFFIX= # the last four digits of your Alma IDs
-export ALMA_REST_DB=                      # name of your psql database
-export ALMA_REST_DB_USER=                 # name of your psql user
-export ALMA_REST_DB_PW=                   # password of your psql user
+export ALMA_REST_DB=                      # name of your database
+export ALMA_REST_DB_USER=                 # name of your user, not needed for sqlite
+export ALMA_REST_DB_PW=                   # password of your user, not needed for sqlite
 export ALMA_REST_DB_DIALECT=              # supported values 'postgresql', 'mysql' or 'sqlite'
 export ALMA_REST_API_KEY=                 # API key as per developmers.exlibrisgroup.com
 export ALMA_REST_API_BASE_URL=            # Base URL for your Alma instance
