@@ -37,7 +37,7 @@ def main():
     db_engine.connect()
 
 
-def import_csv_to_db_tables(file_path: str, action: str = ''):
+def import_csv_to_db_tables(file_path: str, action: str = '', validation: bool = True):
     """
     Imports a whole csv or tsv file to the table source_csv.
     Imports valid Alma-IDs to table job_status_per_id.
@@ -45,12 +45,13 @@ def import_csv_to_db_tables(file_path: str, action: str = ''):
     NOTE: If no action (GET, PUT, POST or DELETE) is provided,
     it will default to an empty string.
     :param file_path: Path to the CSV file to be imported.
-    :param action: REST action - GET, PUT, POST or DELETE
+    :param action: REST action - GET, PUT, POST or DELETE, defaults to empty string.
+    :param validation: If set to "False", the first column will not be checked for validity. Defaults to True.
     :return: None
     """
     if input_read.check_file_path(file_path):
         session = create_db_session()
-        csv_generator = input_read.read_csv_contents(file_path)
+        csv_generator = input_read.read_csv_contents(file_path, validation)
         for csv_line in csv_generator:
             # noinspection PyTypeChecker
             add_csv_line_to_session(csv_line, session, action)

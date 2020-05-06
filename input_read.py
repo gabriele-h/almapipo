@@ -87,7 +87,7 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterator[str]:
     will be discarded. This validation can be overridden with the
     second param of the function set to False.
     :param csv_path: Relative or absolute path to a csv or tsv file.
-    :param validation: If set to "False", first column values will verified as Alma-IDs.
+    :param validation: If set to "False", the first column will not be checked for validity.
     :return: Generator of csv/tsv file lines as dictionaries.
     """
     logger.info(f"Reading file {csv_path} into generator.")
