@@ -38,12 +38,12 @@ def main():
 
 
 def import_csv_file_to_source_csv_table(file_path: str):
-    session = create_db_session()
     if input_read.check_file_path(file_path):
+        session = create_db_session()
         csv_generator = input_read.read_csv_contents(file_path)
         for csv_line in csv_generator:
             add_line_to_session_for_source_csv_table(csv_line, session)
-    session.commit()
+        session.commit()
 
 
 def add_line_to_session_for_source_csv_table(csv_line: OrderedDict, session: sessionmaker):
