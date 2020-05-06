@@ -3,3 +3,4 @@ venv
 alma_rest.egg-info/
 *.swp
 .idea
+input/
