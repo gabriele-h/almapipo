@@ -33,7 +33,7 @@ export ALMA_REST_DB_PW=                   # password of your psql user
 export ALMA_REST_DB_DIALECT=              # supported values 'postgresql', 'mysql' or 'sqlite'
 ```
 
-# `read_input.py`
+# `input_read.py`
 
 Read a CSV- or TSV-file and return information for further handling by other modules.
 
@@ -56,7 +56,7 @@ on how the according regular expression came into existence have a look at SvG's
 ### Usage example
 
 ```
-$ python3 read_input.py ../input/testsample.csv
+$ python3 input_read.py ../input/testsample.csv
 Use as commandline-tool only to test a given list of IDs.
 ---
 2020-02-25 15:38:59,136 - __main__ - INFO - Reading file ../input/testsample.csv into generator.
