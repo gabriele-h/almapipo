@@ -37,12 +37,15 @@ def main():
     db_engine.connect()
 
 
-def import_csv_to_db_tables(file_path: str):
+def import_csv_to_db_tables(file_path: str, action: str = ''):
     """
     Imports a whole csv or tsv file to the table source_csv.
     Imports valid Alma-IDs to table job_status_per_id.
     Checks for file existence first.
+    NOTE: If no action (GET, PUT, POST or DELETE) is provided,
+    it will default to an empty string.
     :param file_path: Path to the CSV file to be imported.
+    :param action: REST action - GET, PUT, POST or DELETE
     :return: None
     """
     if input_read.check_file_path(file_path):
@@ -50,13 +53,13 @@ def import_csv_to_db_tables(file_path: str):
         csv_generator = input_read.read_csv_contents(file_path)
         for csv_line in csv_generator:
             # noinspection PyTypeChecker
-            add_csv_line_to_session(csv_line, session)
+            add_csv_line_to_session(csv_line, session, action)
         session.commit()
     else:
         logger.error('No valid file path provided.')
 
 
-def add_csv_line_to_session(csv_line: OrderedDict, session: Session):
+def add_csv_line_to_session(csv_line: OrderedDict, session: Session, action: str = ''):
     """
     For an ordered Dictionary of values retrieved from a csv/tsv file
     create an entry in the database that identifies the job
@@ -64,6 +67,7 @@ def add_csv_line_to_session(csv_line: OrderedDict, session: Session):
     Adds one line to source_csv and one to job_status_per_id.
     :param csv_line: Ordered dictionary of values from a line of the input file.
     :param session: DB session to add the data to.
+    :param action: REST action - GET, PUT, POST or DELETE
     :return: None
     """
     line_for_table_source_csv = db_setup.SourceCsv(
@@ -72,9 +76,9 @@ def add_csv_line_to_session(csv_line: OrderedDict, session: Session):
     )
     line_for_table_job_status_per_id = db_setup.JobStatusPerId(
         job_timestamp=job_timestamp,
-        alma_id=csv_line[0],
+        alma_id=list(csv_line.values())[0],
         job_status='new',
-        job_action=''
+        job_action=action
     )
     session.add(line_for_table_source_csv)
     session.add(line_for_table_job_status_per_id)
