@@ -37,7 +37,7 @@ def main():
     """
     logfile_setup.log_to_stdout(logger)
 
-    print("Use as commandline-tool only to test a given list of IDs.")
+    print("Use as commandline-tool only to test a given list of IDs for validity.")
     print("---")
     csv_path = set_csv_path_from_argv1()
     generator_from_csv = read_csv_contents(csv_path, True)
@@ -55,6 +55,7 @@ def set_csv_path_from_argv1() -> str:
         argv1 = sys.argv[1]
     except IndexError:
         logger.error('Please provide CSV-file as argument.')
+        sys.exit(1)
     else:
         if check_file_path(argv1):
             return sys.argv[1]
