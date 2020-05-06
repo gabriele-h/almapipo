@@ -15,7 +15,7 @@ import logging
 from os import environ
 
 # more sqlalchemy setup below with conditions
-from sqlalchemy import Column, DateTime, Integer, MetaData, String
+from sqlalchemy import Column, DateTime, Integer, MetaData, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 
 # noinspection PyUnresolvedReferences
@@ -80,3 +80,12 @@ class SourceCsv(Base):
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime)
     csv_line = Column(JSON)
+
+
+class FetchedRecords(Base):
+    __tablename__ = 'fetched_records'
+
+    primary_key = Column(Integer, primary_key=True)
+    job_timestamp = Column(DateTime)
+    alma_id = Column(Integer)
+    alma_record = Column(Text)
