@@ -10,8 +10,8 @@ import logging
 from datetime import datetime
 from typing import OrderedDict
 
-from sqlalchemy import create_engine, engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
 import db_setup
 import input_read
@@ -38,6 +38,12 @@ def main():
 
 
 def import_csv_file_to_source_csv_table(file_path: str):
+    """
+    Imports a whole csv or tsv file to the table source_csv.
+    Checks for file existence first.
+    :param file_path: Path to the CSV file to be imported.
+    :return: None
+    """
     if input_read.check_file_path(file_path):
         session = create_db_session()
         csv_generator = input_read.read_csv_contents(file_path)
@@ -46,7 +52,7 @@ def import_csv_file_to_source_csv_table(file_path: str):
         session.commit()
 
 
-def add_line_to_session_for_source_csv_table(csv_line: OrderedDict, session: sessionmaker):
+def add_line_to_session_for_source_csv_table(csv_line: OrderedDict, session: Session):
     """
     For an ordered Dictionary of values retrieved from a csv/tsv file
     create an entry in the database that identifies the job
@@ -65,8 +71,8 @@ def create_db_session():
     :return: Session for connection to the DB.
     """
     db_engine = create_db_engine()
-    Session = sessionmaker(bind=db_engine)
-    session = Session()
+    DBSession = sessionmaker(bind=db_engine)
+    session = DBSession()
     return session
 
 
