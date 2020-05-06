@@ -7,13 +7,14 @@ The DB is intended to do the following:
 """
 
 import logging
-import db_setup
 from datetime import datetime
 from typing import OrderedDict
 
 from sqlalchemy import create_engine, engine
 from sqlalchemy.orm import sessionmaker
 
+import db_setup
+import input_read
 import logfile_setup
 
 # Timestamp for the Script-Run as inserted in the database
