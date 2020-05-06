@@ -18,11 +18,11 @@ import input_read
 import logfile_setup
 
 # Timestamp for the Script-Run as inserted in the database
-job_id = datetime.now()
+job_timestamp = datetime.now()
 
 # Logfile
 logger = logging.getLogger(__name__)
-logger.info(f"Starting with Job-ID {job_id}")
+logger.info(f"Starting with Job-ID {job_timestamp}")
 
 
 def main():
@@ -45,8 +45,7 @@ def copy_lines_to_source_csv_table(csv_line: OrderedDict):
     :param csv_line: Ordered dictionary of values from a line of the input file.
     :return: None
     """
-    session = create_db_session()
-    line_for_table_source_csv = db_setup.SourceCsv(job_date=job_id, csv_line=csv_line)
+    line_for_table_source_csv = db_setup.SourceCsv(job_timestamp=job_timestamp, csv_line=csv_line)
     session.add(line_for_table_source_csv)
     session.commit()
 
