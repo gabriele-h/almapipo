@@ -37,17 +37,26 @@ def main():
     db_engine.connect()
 
 
-def copy_lines_to_source_csv_table(csv_line: OrderedDict):
+def import_csv_file_to_source_csv_table(file_path: str):
+    session = create_db_session()
+    if input_read.check_file_path(file_path):
+        csv_generator = input_read.read_csv_contents(file_path)
+        for csv_line in csv_generator:
+            add_line_to_session_for_source_csv_table(csv_line, session)
+    session.commit()
+
+
+def add_line_to_session_for_source_csv_table(csv_line: OrderedDict, session: sessionmaker):
     """
     For an ordered Dictionary of values retrieved from a csv/tsv file
     create an entry in the database that identifies the job
     responsible for the entry (job_id).
     :param csv_line: Ordered dictionary of values from a line of the input file.
+    :param session: DB session to add the data to.
     :return: None
     """
     line_for_table_source_csv = db_setup.SourceCsv(job_timestamp=job_timestamp, csv_line=csv_line)
     session.add(line_for_table_source_csv)
-    session.commit()
 
 
 def create_db_session():
