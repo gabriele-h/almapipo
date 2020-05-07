@@ -32,7 +32,26 @@ def main():
     db_engine.connect()
 
 
-def get_list_of_ids_for_job_with_status(status: str, session: Session, job_timestamp: datetime):
+def update_job_status_for_alma_id(status: str, alma_id: str, job_timestamp: datetime, session: Session):
+    """
+    For a given alma_id and job_timestamp update the job_status in table job_status_per_id.
+    :param status: New status to be set.
+    :param alma_id: Alma ID to set the status for.
+    :param job_timestamp: Job for which the status should be changed.
+    :param session: Session to be used for the manipulation.
+    :return: None
+    """
+    list_of_matched_rows = session.query(
+        db_setup.JobStatusPerId
+    ).filter_by(
+        job_timestamp=job_timestamp
+    ).filter_by(
+        alma_id=alma_id
+    )
+    list_of_matched_rows[0].job_status = status
+
+
+def get_list_of_ids_for_job_with_status(status: str, job_timestamp: datetime, session: Session):
     """
     From table job_status_per_id get all Alma IDs that match the status
     given as the parameter.
