@@ -1,7 +1,14 @@
 """Query the Alma API for a single BIB record
 """
 
+from logging import getLogger
+
 import rest_create_session
+# noinspection PyUnresolvedReferences
+import logfile_setup
+
+# Logfile
+logger = getLogger(__name__)
 
 
 def get_bib_by_mms_id(mms_id: str):
@@ -10,9 +17,6 @@ def get_bib_by_mms_id(mms_id: str):
     :param mms_id: Unique ID of Alma BIB records.
     :return: Record data in JSON format.
     """
-    with rest_create_session.create_alma_api_session() as session:
-        alma_url = rest_create_session.api_base_url+f'/bibs/{mms_id}'
-        alma_response = session.get(alma_url)
-        if alma_response.status_code == "200":
-            alma_record = alma_response.content
+    logger.info(f'Trying to fetch BIB with mms_id {mms_id}.')
+    alma_record = rest_create_session.make_api_call(f'/bibs/{mms_id}')
     return alma_record
