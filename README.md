@@ -55,7 +55,7 @@ on how the according regular expression came into existence have a look at SvG's
 
 [1]: https://knowledge.exlibrisgroup.com/Alma/Community_Knowledge/How_to_-_A_cheat_sheet_for_Alma_record_numbers
 
-### Usage Example
+### Usage Example Bash
 
 ```
 $ python3 input_read.py ../input/testsample.csv
@@ -75,10 +75,39 @@ Will do the following:
 * Insert lines from input CSV file into the table `source_csv`
 * Insert valid Alma IDs into table `job_status_per_id` and set status to "new"
 
-Please note that this script uses SQLAlchemy which will log every interaction
-with the database, including all SQL-statements. This might lead to huge
+Please note that this script uses **SQLAlchemy** which will **log every interaction
+with the database, including all SQL-statements**. This might lead to huge
 log files, but it also makes the actual interactions with the database
 more transparent.
+
+## Read CSV File Into Tables `source_csv` and `job_status_per_id`
+
+A convenience function makes it possible to read a whole CSV-file into
+both relevant database tables. It takes two parameters:
+* Path to the CSV- or TSV-file
+* Intended action for the records listed ('POST', 'GET', 'PUT' or 'DELETE'). **Note:** If none is provided
+this will default to an empty string.
+
+### Usage Example Python Console
+
+The following example prepares a simple 'GET' action for one record with additional
+information provided in the CSV-file.
+
+```
+>>> import db_read_write
+>>> db_read_write.import_csv_to_db_tables('./input/test.csv', 'GET')
+2020-05-07 08:47:18,380 INFO sqlalchemy.engine.base.Engine SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+2020-05-07 08:47:18,380 INFO sqlalchemy.engine.base.Engine ()
+2020-05-07 08:47:18,380 INFO sqlalchemy.engine.base.Engine SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+2020-05-07 08:47:18,381 INFO sqlalchemy.engine.base.Engine ()
+2020-05-07 08:47:18,381 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2020-05-07 08:47:18,382 INFO sqlalchemy.engine.base.Engine INSERT INTO source_csv (job_timestamp, csv_line) VALUES (?, ?)
+2020-05-07 08:47:18,382 INFO sqlalchemy.engine.base.Engine ('2020-05-07 08:46:41.724602', '{"Item Id": "221234567890123", "Inventory Number": "I-1234", "Inventory Date": "2020-05-07", "Stat
+istics Note 1": "My test"}')
+2020-05-07 08:47:18,390 INFO sqlalchemy.engine.base.Engine INSERT INTO job_status_per_id (job_timestamp, alma_id, job_status, job_action) VALUES (?, ?, ?, ?)
+2020-05-07 08:47:18,390 INFO sqlalchemy.engine.base.Engine ('2020-05-07 08:46:41.724602', '221234567890123', 'new', 'GET')
+2020-05-07 08:47:18,391 INFO sqlalchemy.engine.base.Engine COMMIT
+```
 
 ## Check DB Connectivity From Commandline
 
@@ -86,7 +115,7 @@ When used from commandline without any arguments this script will simply make a 
 whether the database is reachable and writeable. This is done via SQLAlchemy and will
 not give any custom feedback. Also it will be included in the logfile.
 
-### Usage Example
+### Usage Example Bash
 
 ```
 $ python3 db_read_write.py
