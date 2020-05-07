@@ -38,8 +38,8 @@ See https://docs.python.org/3/library/venv.html for further info.
 
 ## Install All From `requirements.txt`
 
-```
-(venv)$ pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
 ```
 
 ## env Variables
@@ -57,11 +57,47 @@ export ALMA_REST_API_KEY=                 # API key as per developmers.exlibrisg
 export ALMA_REST_API_BASE_URL=            # Base URL for your Alma API calls, usually ending with 'v1'
 ```
 
-## db_create_tables.py
+## `db_create_tables.py`
 
 This script needs to be **run only once** when starting to
 use the package, as it creates all necessary tables in the
 database.
+
+# `alma_rest.py`
+
+Main part making use of most of the other modules.
+
+## Get BIB Records and Save in `fetched_records`
+
+Adds CSV Lines to `source_csv` and `job_status_per_id` (see below)
+and issues an Alma BIB API GET request per mms_id. If successful,
+job_status in `job_status_per_id` will be set to "done", otherwise
+"error".
+
+### Usage Example Python Console
+
+```python
+import alma_rest
+alma_rest.get_records_via_api_for_csv_list('./input/test.tsv')
+```
+
+## Add CSV Lines to `source_csv` and `job_status_per_id`
+
+A convenience function makes it possible to read a whole CSV-file into
+both relevant database tables. It takes two parameters:
+* Path to the CSV- or TSV-file
+* Intended action for the records listed ('POST', 'GET', 'PUT' or 'DELETE'). **Note:** If none is provided
+this will default to 'GET'.
+
+### Usage Example Python Console
+
+The following example prepares a simple 'GET' action for one record with additional
+information provided in the CSV-file.
+
+```python
+import alma_rest
+alma_rest.import_csv_to_db_tables('./input/test.csv', 'GET')
+```
 
 # `input_read.py`
 
@@ -85,15 +121,8 @@ on how the according regular expression came into existence have a look at SvG's
 
 ### Usage Example Bash
 
-```
-(venv)$ python3 input_read.py ../input/testsample.csv
-Use as commandline-tool only to test a given list of IDs.
----
-2020-02-25 15:38:59,136 - __main__ - INFO - Reading file ../input/testsample.csv into generator.
-2020-02-25 15:38:59,136 - __main__ - WARNING - Identifier is not a valid Alma ID: 'value1'
-2020-02-25 15:38:59,136 - __main__ - WARNING - The following row was discarded: OrderedDict([('header1', 'value1'), ('header2', 'value2')])
----
-First valid row of csv-file: OrderedDict([('header1', '990024144550201234'), ('header2', 'foobar')])
+```bash
+python3 input_read.py ../input/testsample.csv
 ```
 
 # `read_write_db.py`
@@ -108,35 +137,6 @@ with the database, including all SQL-statements**. This might lead to huge
 log files, but it also makes the actual interactions with the database
 more transparent.
 
-## Read CSV File Into Tables `source_csv` and `job_status_per_id`
-
-A convenience function makes it possible to read a whole CSV-file into
-both relevant database tables. It takes two parameters:
-* Path to the CSV- or TSV-file
-* Intended action for the records listed ('POST', 'GET', 'PUT' or 'DELETE'). **Note:** If none is provided
-this will default to 'GET'.
-
-### Usage Example Python Console
-
-The following example prepares a simple 'GET' action for one record with additional
-information provided in the CSV-file.
-
-```
->>> import db_read_write
->>> db_read_write.import_csv_to_db_tables('./input/test.csv', 'GET')
-2020-05-07 08:47:18,380 INFO sqlalchemy.engine.base.Engine SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-2020-05-07 08:47:18,380 INFO sqlalchemy.engine.base.Engine ()
-2020-05-07 08:47:18,380 INFO sqlalchemy.engine.base.Engine SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-2020-05-07 08:47:18,381 INFO sqlalchemy.engine.base.Engine ()
-2020-05-07 08:47:18,381 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
-2020-05-07 08:47:18,382 INFO sqlalchemy.engine.base.Engine INSERT INTO source_csv (job_timestamp, csv_line) VALUES (?, ?)
-2020-05-07 08:47:18,382 INFO sqlalchemy.engine.base.Engine ('2020-05-07 08:46:41.724602', '{"Item Id": "221234567890123", "Inventory Number": "I-1234", "Inventory Date": "2020-05-07", "Stat
-istics Note 1": "My test"}')
-2020-05-07 08:47:18,390 INFO sqlalchemy.engine.base.Engine INSERT INTO job_status_per_id (job_timestamp, alma_id, job_status, job_action) VALUES (?, ?, ?, ?)
-2020-05-07 08:47:18,390 INFO sqlalchemy.engine.base.Engine ('2020-05-07 08:46:41.724602', '221234567890123', 'new', 'GET')
-2020-05-07 08:47:18,391 INFO sqlalchemy.engine.base.Engine COMMIT
-```
-
 ## Check DB Connectivity From Commandline
 
 When used from commandline without any arguments this script will simply make a check
@@ -145,12 +145,8 @@ not give any custom feedback. Also it will be included in the logfile.
 
 ### Usage Example Bash
 
-```
-(venv)$ python3 db_read_write.py
-2020-05-07 08:19:23,628 INFO sqlalchemy.engine.base.Engine SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-2020-05-07 08:19:23,628 INFO sqlalchemy.engine.base.Engine ()
-2020-05-07 08:19:23,631 INFO sqlalchemy.engine.base.Engine SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-2020-05-07 08:19:23,632 INFO sqlalchemy.engine.base.Engine ()
+```bash
+python3 db_read_write.py
 ```
 
 ## Author
