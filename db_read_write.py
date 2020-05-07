@@ -37,7 +37,7 @@ def main():
     db_engine.connect()
 
 
-def import_csv_to_db_tables(file_path: str, action: str = '', validation: bool = True):
+def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: bool = True):
     """
     Imports a whole csv or tsv file to the table source_csv.
     Imports valid Alma-IDs to table job_status_per_id.

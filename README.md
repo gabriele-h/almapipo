@@ -86,7 +86,7 @@ A convenience function makes it possible to read a whole CSV-file into
 both relevant database tables. It takes two parameters:
 * Path to the CSV- or TSV-file
 * Intended action for the records listed ('POST', 'GET', 'PUT' or 'DELETE'). **Note:** If none is provided
-this will default to an empty string.
+this will default to 'GET'.
 
 ### Usage Example Python Console
 
