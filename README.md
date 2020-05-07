@@ -55,7 +55,7 @@ on how the according regular expression came into existence have a look at SvG's
 
 [1]: https://knowledge.exlibrisgroup.com/Alma/Community_Knowledge/How_to_-_A_cheat_sheet_for_Alma_record_numbers
 
-### Usage example
+### Usage Example
 
 ```
 $ python3 input_read.py ../input/testsample.csv
@@ -74,6 +74,27 @@ Will do the following:
 
 * Insert lines from input CSV file into the table `source_csv`
 * Insert valid Alma IDs into table `job_status_per_id` and set status to "new"
+
+Please note that this script uses SQLAlchemy which will log every interaction
+with the database, including all SQL-statements. This might lead to huge
+log files, but it also makes the actual interactions with the database
+more transparent.
+
+## Check DB Connectivity From Commandline
+
+When used from commandline without any arguments this script will simply make a check
+whether the database is reachable and writeable. This is done via SQLAlchemy and will
+not give any custom feedback. Also it will be included in the logfile.
+
+### Usage Example
+
+```
+$ python3 db_read_write.py
+2020-05-07 08:19:23,628 INFO sqlalchemy.engine.base.Engine SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+2020-05-07 08:19:23,628 INFO sqlalchemy.engine.base.Engine ()
+2020-05-07 08:19:23,631 INFO sqlalchemy.engine.base.Engine SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+2020-05-07 08:19:23,632 INFO sqlalchemy.engine.base.Engine ()
+```
 
 ## Author
 
