@@ -20,8 +20,8 @@ api_key = environ['ALMA_REST_API_KEY']
 api_base_url = environ['ALMA_REST_API_BASE_URL']
 
 
-def make_api_call(url_parameters: str):
-    """Generic function for API calls.
+def get_record(url_parameters: str):
+    """Generic function for GET calls to the Alma API.
 
     Will return the record if HTTP status code is 200 plus a second
     return value for table job_status_per_id. If the operation is successful,
@@ -43,9 +43,9 @@ def make_api_call(url_parameters: str):
             )
             return alma_record
         else:
-            logger.error(
-                f'Record could not be retrieved. Reason: {alma_response.status_code} - {alma_response.content}'
-            )
+            error_string = f"""Record for parameters "{url_parameters}" could not be retrieved.
+Reason: {alma_response.status_code} - {alma_response.content}"""
+            logger.error(error_string)
 
 
 def create_alma_api_session():

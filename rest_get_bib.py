@@ -3,7 +3,7 @@
 
 from logging import getLogger
 
-import rest_create_session
+import rest_call_api
 # noinspection PyUnresolvedReferences
 import logfile_setup
 
@@ -18,5 +18,5 @@ def get_bib_by_mms_id(mms_id: str):
     :return: Record data in JSON format.
     """
     logger.info(f'Trying to fetch BIB with mms_id {mms_id}.')
-    alma_record = rest_create_session.make_api_call(f'/bibs/{mms_id}')
+    alma_record = rest_call_api.get_record(f'/bibs/{mms_id}')
     return alma_record
