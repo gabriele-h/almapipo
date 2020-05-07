@@ -32,16 +32,6 @@ def main():
     db_engine.connect()
 
 
-def get_list_of_ids_for_job_with_status_error(session: Session, job_timestamp):
-    list_of_ids = get_list_of_ids_for_job_with_status('error', session, job_timestamp)
-    return list_of_ids
-
-
-def get_list_of_ids_for_job_with_status_new(session: Session, job_timestamp):
-    list_of_ids = get_list_of_ids_for_job_with_status('new', session, job_timestamp)
-    return list_of_ids
-
-
 def get_list_of_ids_for_job_with_status(status: str, session: Session, job_timestamp: datetime):
     """
     From table job_status_per_id get all Alma IDs that match the status
