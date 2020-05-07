@@ -14,6 +14,7 @@ import db_read_write
 import input_read
 # noinspection PyUnresolvedReferences
 import logfile_setup
+import rest_bib
 
 # Timestamp for the Script-Run as inserted in the database
 job_timestamp = datetime.now()
