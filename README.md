@@ -31,6 +31,17 @@ goes wrong, the status will be set to "error".
 
 # Initial Setup
 
+## Set up `venv`
+
+Please make use of a virtual environment.
+See https://docs.python.org/3/library/venv.html for further info.
+
+## Install All From `requirements.txt`
+
+```
+(venv)$ pip install -r requirements.txt
+```
+
 ## env Variables
 
 The following env variables need to be set:
@@ -75,7 +86,7 @@ on how the according regular expression came into existence have a look at SvG's
 ### Usage Example Bash
 
 ```
-$ python3 input_read.py ../input/testsample.csv
+(venv)$ python3 input_read.py ../input/testsample.csv
 Use as commandline-tool only to test a given list of IDs.
 ---
 2020-02-25 15:38:59,136 - __main__ - INFO - Reading file ../input/testsample.csv into generator.
@@ -135,7 +146,7 @@ not give any custom feedback. Also it will be included in the logfile.
 ### Usage Example Bash
 
 ```
-$ python3 db_read_write.py
+(venv)$ python3 db_read_write.py
 2020-05-07 08:19:23,628 INFO sqlalchemy.engine.base.Engine SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
 2020-05-07 08:19:23,628 INFO sqlalchemy.engine.base.Engine ()
 2020-05-07 08:19:23,631 INFO sqlalchemy.engine.base.Engine SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
