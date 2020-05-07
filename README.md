@@ -24,11 +24,14 @@ record will be changed from "new" to "done" in the database. If anything
 goes wrong, the status will be set to "error".
 
 # Requirements
+
 * Python 3.7 or higher, see requirements.txt for Python packages
 * A PostgreSQL, MySQL or SQLite database with read and write access
 * An Alma API-key with the necessary permissions for your operations
 
-# env Variables
+# Initial Setup
+
+## env Variables
 
 The following env variables need to be set:
 
@@ -42,6 +45,12 @@ export ALMA_REST_DB_DIALECT=              # supported values 'postgresql', 'mysq
 export ALMA_REST_API_KEY=                 # API key as per developmers.exlibrisgroup.com
 export ALMA_REST_API_BASE_URL=            # Base URL for your Alma API calls, ending with 'v1/'
 ```
+
+## db_create_tables.py
+
+This script needs to be **run only once** when starting to
+use the package, as it creates all necessary tables in the
+database.
 
 # `input_read.py`
 
