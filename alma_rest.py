@@ -43,7 +43,7 @@ def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: boo
     Imports valid Alma-IDs to table job_status_per_id.
     Checks for file existence first.
     NOTE: If no action (GET, PUT, POST or DELETE) is provided,
-    it will default to an empty string.
+    it will default to "GET".
     :param file_path: Path to the CSV file to be imported.
     :param action: REST action - GET, PUT, POST or DELETE, defaults to empty string.
     :param validation: If set to "False", the first column will not be checked for validity. Defaults to True.
