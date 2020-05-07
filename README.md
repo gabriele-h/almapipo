@@ -112,7 +112,7 @@ istics Note 1": "My test"}')
 ## Check DB Connectivity From Commandline
 
 When used from commandline without any arguments this script will simply make a check
-whether the database is reachable and writeable. This is done via SQLAlchemy and will
+whether the database is reachable. This is done via SQLAlchemy and will
 not give any custom feedback. Also it will be included in the logfile.
 
 ### Usage Example Bash
