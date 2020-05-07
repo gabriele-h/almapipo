@@ -6,6 +6,7 @@ The DB is intended to do the following:
 * Store which start time of the job triggered the DB-entry
 """
 
+from datetime import datetime
 from logging import getLogger
 from typing import OrderedDict
 
@@ -29,6 +30,25 @@ def main():
 
     db_engine = create_db_engine()
     db_engine.connect()
+
+
+def add_fetched_record_to_session(alma_id: str, record_data, job_timestamp: datetime, session: Session):
+    """
+    Create an entry in the database that identifies the job
+    responsible for the entry (job_timestamp).
+    Adds one line per Alma record with the data retrieved via Alma API.
+    :param alma_id: Alma ID for one specific record.
+    :param record_data: Record as retrieved via Alma API.
+    :param job_timestamp: Identifier of the job causing the DB-entry.
+    :param session: DB session to add the lines to.
+    :return: None
+    """
+    line_for_table_fetched_records = db_setup.FetchedRecords(
+        alma_id=alma_id,
+        alma_record=record_data,
+        job_timestamp=job_timestamp,
+    )
+    session.add(line_for_table_fetched_records)
 
 
 def add_csv_line_to_session(csv_line: OrderedDict, job_timestamp, session: Session, action: str = ''):
