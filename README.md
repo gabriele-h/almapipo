@@ -40,7 +40,7 @@ export ALMA_REST_DB_USER=                 # name of your user, not needed for sq
 export ALMA_REST_DB_PW=                   # password of your user, not needed for sqlite
 export ALMA_REST_DB_DIALECT=              # supported values 'postgresql', 'mysql' or 'sqlite'
 export ALMA_REST_API_KEY=                 # API key as per developmers.exlibrisgroup.com
-export ALMA_REST_API_BASE_URL=            # Base URL for your Alma instance
+export ALMA_REST_API_BASE_URL=            # Base URL for your Alma API calls, ending with 'v1/'
 ```
 
 # `input_read.py`
