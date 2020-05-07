@@ -7,7 +7,6 @@ Basic definitions for requests sent to the Alma API, including:
 """
 
 from requests import Session
-from urllib import parse
 from os import environ
 
 api_key = environ['ALMA_REST_API_KEY']
@@ -18,7 +17,7 @@ def create_alma_api_session():
     session = Session()
     session.headers.update({
         "accept": "application/json",
-        "authorization": api_key,
-        "User-Agent": "alma_rest"
+        "authorization": f"apikey {api_key}",
+        "User-Agent": "alma_rest/0.0.1"
     })
     return session

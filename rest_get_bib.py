@@ -11,5 +11,8 @@ def get_bib_by_mms_id(mms_id: str):
     :return: Record data in JSON format.
     """
     with rest_create_session.create_alma_api_session() as session:
-        alma_record = session.get(rest_create_session.api_base_url+f'/bibs/{mms_id}')
+        alma_url = rest_create_session.api_base_url+f'/bibs/{mms_id}'
+        alma_response = session.get(alma_url)
+        if alma_response.status_code == "200":
+            alma_record = alma_response.content
     return alma_record
