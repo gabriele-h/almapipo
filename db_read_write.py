@@ -32,6 +32,35 @@ def main():
     db_engine.connect()
 
 
+def get_list_of_ids_for_job_with_status_error(session: Session, job_timestamp):
+    list_of_ids = get_list_of_ids_for_job_with_status('error', session, job_timestamp)
+    return list_of_ids
+
+
+def get_list_of_ids_for_job_with_status_new(session: Session, job_timestamp):
+    list_of_ids = get_list_of_ids_for_job_with_status('new', session, job_timestamp)
+    return list_of_ids
+
+
+def get_list_of_ids_for_job_with_status(status: str, session: Session, job_timestamp: datetime):
+    """
+    From table job_status_per_id get all Alma IDs that match the status
+    given as the parameter.
+    :param status: As in job_status_per_id, possible values are "new", "done" and "error".
+    :param session: DB session to connect to.
+    :param job_timestamp: Timestamp to identify the job responsible for the ID.
+    :return: List of IDs.
+    """
+    list_of_ids = session.query(
+        db_setup.JobStatusPerId.alma_id
+    ).filter_by(
+        job_timestamp=job_timestamp
+    ).filter_by(
+        job_status=status
+    )
+    return list_of_ids
+
+
 def add_fetched_record_to_session(alma_id: str, record_data, job_timestamp: datetime, session: Session):
     """
     Create an entry in the database that identifies the job
