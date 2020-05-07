@@ -37,7 +37,7 @@ def get_records_via_api_for_csv_list(csv_path: str):
     """
     session = db_read_write.create_db_session()
     import_csv_to_db_tables(csv_path, 'GET')
-    list_of_ids = db_read_write.get_list_of_ids_for_job_with_status("new", job_timestamp, session)
+    list_of_ids = db_read_write.get_list_of_ids_for_job_with_status('new', job_timestamp, session)
     for alma_id, in list_of_ids:
         record_data = rest_bib.get_bib_by_mms_id(alma_id)
         db_read_write.add_fetched_record_to_session(alma_id, record_data, job_timestamp, session)
