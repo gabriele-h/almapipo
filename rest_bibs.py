@@ -2,6 +2,7 @@
 """
 
 from logging import getLogger
+from urllib import parse
 
 import rest_call_api
 # noinspection PyUnresolvedReferences
@@ -56,4 +57,27 @@ def get_bib_by_mms_id(mms_id: str):
     """
     logger.info(f'Trying to fetch BIB with mms_id {mms_id}.')
     bib_record = rest_call_api.get_record(f'/bibs/{mms_id}')
+    return bib_record
+
+
+def get_single_record_by_query(id_type: str, other_id: str):
+    """
+    Get single record by ID via Alma API. Possible IDs:
+    * mms_id
+    * ie_id
+    * holdings_id
+    * representation_id
+    * nz_mms_id
+    * cz_mms_id
+    * other_system_id
+    :param id_type: Query key. One of the possible IDs listed above.
+    :param other_id: Query value. ID of the record to be fetched.
+    :return: List of records in JSON format.
+    """
+    logger.info(f'Trying to fetch record by query with other_id {other_id}.')
+    api_url_path = '/bibs?'
+    api_url_query = {id_type: other_id}
+    api_url_query_encoded = parse.urlencode(api_url_query)
+    api_url = api_url_path + api_url_query_encoded
+    bib_record = rest_call_api.get_record(api_url)
     return bib_record
