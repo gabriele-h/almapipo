@@ -14,7 +14,7 @@ import db_read_write
 import input_read
 # noinspection PyUnresolvedReferences
 import logfile_setup
-import rest_bib
+import rest_bibs
 
 # Timestamp for the Script-Run as inserted in the database
 job_timestamp = datetime.now()
@@ -39,7 +39,7 @@ def get_records_via_api_for_csv_list(csv_path: str):
     import_csv_to_db_tables(csv_path, 'GET')
     list_of_ids = db_read_write.get_list_of_ids_for_job_with_status('new', job_timestamp, session)
     for alma_id, in list_of_ids:
-        record_data = rest_bib.get_bib_by_mms_id(alma_id)
+        record_data = rest_bibs.get_bib_by_mms_id(alma_id)
         db_read_write.add_fetched_record_to_session(alma_id, record_data, job_timestamp, session)
         if record_data is None:
             db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, session)
