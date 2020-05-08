@@ -62,7 +62,7 @@ def get_bib_by_mms_id(mms_id: str):
 
 def get_single_record_by_query(id_type: str, other_id: str):
     """
-    Get single record by ID via Alma API. Possible IDs:
+    Get single record by ID via Alma API. Possible ID types:
     * mms_id
     * ie_id
     * holdings_id
@@ -70,7 +70,7 @@ def get_single_record_by_query(id_type: str, other_id: str):
     * nz_mms_id
     * cz_mms_id
     * other_system_id
-    :param id_type: Query key. One of the possible IDs listed above.
+    :param id_type: Query key. One of the ID types listed above.
     :param other_id: Query value. ID of the record to be fetched.
     :return: List of records in JSON format.
     """
