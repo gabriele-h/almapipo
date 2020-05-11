@@ -33,8 +33,8 @@ def get_item(mms_id: str, hol_id: str, itm_id: str):
     :return: Record data in JSON format.
     """
     logger.info(f'Trying to fetch ITM with mms_id {mms_id} and hol_id {hol_id} and itm_id {itm_id}.')
-    hol_record = rest_call_api.get_record(f'/bibs/{mms_id}/holdings/{hol_id}/items/{itm_id}')
-    return hol_record
+    itm_record = rest_call_api.get_record(f'/bibs/{mms_id}/holdings/{hol_id}/items/{itm_id}')
+    return itm_record
 
 
 def get_hol(mms_id: str, hol_id: str):
