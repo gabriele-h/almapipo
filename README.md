@@ -7,8 +7,25 @@ A set of Alma-records needs to be manipulated (created, deleted, updated).
 
 The Alma-IDs of the records are known and saved in a **semicolon or tab
 delimited file**. The first column of that file needs to be the Alma-ID.
-All other columns may (as of now) contain whatever content the person
-doing the manipulation deems necessary.
+
+**Some operations require more than one ID** to work, e. g. if you want to
+operate on holdings, you will also need the MMS-ID. In such cases the
+**first column is still just one string**, with all necessary IDs **separated
+by a comma** without any blanks. The IDs should be listed from least specific
+(e. g. MMS-ID) to most specific (e. g. item-ID).
+
+### Example Data
+The example below shows the IDs necessary for querying a holding record in
+the first column. All other columns as of now are not relevant and may
+contain any data that is necessary for understanding when analyzed intellectually.
+
+In case of a holding record the first column should include one string with both
+the MMS-ID and the holding-ID, where the MMS-ID is listed before the holding-ID.
+Note how there are no blanks before and after the comma in the first column.
+```text
+alma-ids;title;author
+991234567890123,221234567890123;How to make things up;Yours Truly
+```
 
 ## What Does This Package Do?
 
