@@ -6,26 +6,8 @@ A set of Alma-records needs to be manipulated (created, deleted, updated).
 ## Preparation
 
 The Alma-IDs of the records are known and saved in a **semicolon or tab
-delimited file**. The first column of that file needs to be the Alma-ID.
-
-**Some operations require more than one ID** to work, e. g. if you want to
-operate on holdings, you will also need the MMS-ID. In such cases the
-**first column is still just one string**, with all necessary IDs **separated
-by a comma** without any blanks. The IDs should be listed from least specific
-(e. g. MMS-ID) to most specific (e. g. item-ID).
-
-### Example Data
-The example below shows the IDs necessary for querying a holding record in
-the first column. All other columns as of now are not relevant and may
-contain any data that is necessary for understanding when analyzed intellectually.
-
-In case of a holding record the first column should include one string with both
-the MMS-ID and the holding-ID, where the MMS-ID is listed before the holding-ID.
-Note how there are no blanks before and after the comma in the first column.
-```text
-alma-ids;title;author
-991234567890123,221234567890123;How to make things up;Yours Truly
-```
+delimited file**. The first column of that file needs to be the Alma-ID
+or a list of Alma-IDs (see below "Input data").
 
 ## What Does This Package Do?
 
@@ -72,6 +54,31 @@ export ALMA_REST_DB_PW=                   # password of your user, not needed fo
 export ALMA_REST_DB_DIALECT=              # supported values 'postgresql', 'mysql' or 'sqlite'
 export ALMA_REST_API_KEY=                 # API key as per developmers.exlibrisgroup.com
 export ALMA_REST_API_BASE_URL=            # Base URL for your Alma API calls, usually ending with 'v1'
+```
+
+## Input Data
+
+As of now only the first column of the CSV- or TSV-file are relevant for
+this package. The first column should include one or more Alma-IDs of the
+record you want to manipulate.
+
+**Some operations require more than one ID** to work, e. g. if you want to
+operate on holdings, you will also need the MMS-ID. In such cases the
+**first column is still just one string**, with all necessary IDs **separated
+by a comma** without any blanks. The IDs should be listed from least specific
+(e. g. MMS-ID) to most specific (e. g. item-ID).
+
+### Example Data
+The example below shows the IDs necessary for querying a holding record in
+the first column. All other columns as of now are not relevant and may
+contain any data that is necessary for understanding when analyzed intellectually.
+
+In case of a holding record the first column should include one string with both
+the MMS-ID and the holding-ID, where the MMS-ID is listed before the holding-ID.
+Note how there are no blanks before and after the comma in the first column.
+```text
+alma-ids;title;author
+991234567890123,221234567890123;How to make things up;Yours Truly
 ```
 
 ## `db_create_tables.py`
