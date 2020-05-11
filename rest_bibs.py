@@ -77,7 +77,7 @@ def get_single_bib_by_query(id_type: str, other_id: str):
     * other_system_id
     :param id_type: Query key. One of the ID types listed above.
     :param other_id: Query value. ID of the record to be fetched.
-    :return: List of records in JSON format.
+    :return: Record in JSON format.
     """
     logger.info(f'Trying to fetch record by query with other_id {other_id}.')
     api_url_path = '/bibs?'
@@ -86,6 +86,18 @@ def get_single_bib_by_query(id_type: str, other_id: str):
     api_url = api_url_path + api_url_query_encoded
     bib_record = rest_call_api.get_record(api_url)
     return bib_record
+
+
+def get_e_collection(mms_id: str, collection_id: str):
+    """
+    Get e-collection record for collection-ID.
+    :param mms_id: Unique ID of the BIB record the HOL is connected to.
+    :param collection_id: ID of the e-collection.
+    :return: Record in JSON format.
+    """
+    logger.info(f'Trying to fetch e-Collection record with mms_id {mms_id} and collection_id {collection_id}.')
+    collection_record = rest_call_api.get_record(f'/bibs/{mms_id}/e-collections/{collection_id}')
+    return collection_record
 
 
 #
