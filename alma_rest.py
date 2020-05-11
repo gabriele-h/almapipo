@@ -41,28 +41,28 @@ def get_records_via_api_for_csv_list(csv_path: str):
     :param csv_path: Path of the CSV file containing the Alma IDs.
     :return: None
     """
-    session = db_read_write.create_db_session()
-    import_csv_to_db_tables(csv_path, 'GET')
-    list_of_ids = db_read_write.get_list_of_ids_for_job_with_status('new', job_timestamp, session)
-    for alma_id, in list_of_ids:
-        id_prefix = alma_id[0:2]
-        if id_prefix == "99":
-            record_data = rest_bibs.get_bib(alma_id)
-        elif id_prefix == "22":
-            record_data = rest_bibs.get_hol(alma_id)
-        elif id_prefix == "23":
-            record_data = rest_bibs.get_item(alma_id)
-        elif id_prefix == "53":
-            record_data = rest_bibs.get_portfolio(alma_id)
-        else:
-            logger.error("Alma-Id does not have one of the expected prefixes (99, 22, 23 or 53).")
-            record_data = None
-        db_read_write.add_fetched_record_to_session(alma_id, record_data, job_timestamp, session)
-        if record_data is None:
-            db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, session)
-        else:
-            db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, session)
-    session.commit()
+    with db_read_write.create_db_session() as session:
+        import_csv_to_db_tables(csv_path, 'GET')
+        list_of_ids = db_read_write.get_list_of_ids_for_job_with_status('new', job_timestamp, session)
+        for alma_id, in list_of_ids:
+            id_prefix = alma_id[0:2]
+            if id_prefix == "99":
+                record_data = rest_bibs.get_bib(alma_id)
+            elif id_prefix == "22":
+                record_data = rest_bibs.get_hol(alma_id)
+            elif id_prefix == "23":
+                record_data = rest_bibs.get_item(alma_id)
+            elif id_prefix == "53":
+                record_data = rest_bibs.get_portfolio(alma_id)
+            else:
+                logger.error("Alma-Id does not have one of the expected prefixes (99, 22, 23 or 53).")
+                record_data = None
+            db_read_write.add_fetched_record_to_session(alma_id, record_data, job_timestamp, session)
+            if record_data is None:
+                db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, session)
+            else:
+                db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, session)
+        session.commit()
 
 
 def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: bool = True):
