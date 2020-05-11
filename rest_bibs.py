@@ -86,3 +86,38 @@ def get_single_bib_by_query(id_type: str, other_id: str):
     api_url = api_url_path + api_url_query_encoded
     bib_record = rest_call_api.get_record(api_url)
     return bib_record
+
+
+#
+# POST
+#
+
+
+# post_bib
+# post_bib_from_nz
+# post_bib_from_cz
+# post_hol
+# post_item
+# post_portfolio
+
+
+#
+# PUT
+#
+
+
+# put_bib
+# put_hol
+# put_item
+# put_portfolio
+
+
+#
+# DELETE
+#
+
+
+# delete_bib
+# delete_hol
+# delete_item
+# delete_portfolio
