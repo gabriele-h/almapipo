@@ -87,5 +87,5 @@ class FetchedRecords(Base):
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime)
-    alma_id = Column(Integer)
+    alma_id = Column(String)
     alma_record = Column(Text)
