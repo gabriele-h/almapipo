@@ -1,9 +1,14 @@
-"""Create consistent sessions
+"""Making consistent API calls
 
 Basic definitions for requests sent to the Alma API, including:
 * Base URL
 * API Key
 * Headers
+
+There is one function to define what every session for Alma should look like.
+
+Then for each REST operation (POST, GET, PUT, DELETE) there is one base
+function that the more specific modules (like rest_bibs) can make use of.
 """
 
 from logging import getLogger
