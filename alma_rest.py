@@ -24,6 +24,58 @@ logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
 
 
+def delete_records_via_api_for_csv_list(csv_path:str):
+    """
+    For a list of Alma-IDs given in a CSV file, this function does the following:
+    * Save the data from the CSV-file to tables job_status_per_id and source_csv
+    * Call DELETE on the Alma API for each Alma-ID
+    * Save the response from the API in table fetched_records
+    Note that this will only work for Alma-IDs and not alternatives like "Other system number".
+
+    List of possible Alma-IDs:
+    * MMS-ID
+    * Holding-ID
+    * Item-ID
+    * Portfolio-ID
+
+    :param csv_path: Path of the CSV file containing the Alma IDs.
+    :return: None
+    """
+    db_session = db_read_write.create_db_session()
+    import_csv_to_db_tables(csv_path, 'DELETE')
+    list_of_ids = db_read_write.get_list_of_ids_for_job_with_status('new', job_timestamp, db_session)
+    for alma_id, in list_of_ids:
+        split_alma_id = str.split(alma_id, ',')
+        id_prefix = split_alma_id[-1][0:2]
+        if id_prefix == "99":
+            record_data = rest_bibs.delete_bib(alma_id)
+        elif id_prefix == "22":
+            mms_id = split_alma_id[0]
+            hol_id = split_alma_id[1]
+            record_data = rest_bibs.delete_hol(mms_id, hol_id)
+        elif id_prefix == "23":
+            mms_id = split_alma_id[0]
+            hol_id = split_alma_id[1]
+            itm_id = split_alma_id[2]
+            record_data = rest_bibs.delete_item(mms_id, hol_id, itm_id)
+        elif id_prefix == "53":
+            mms_id = split_alma_id[0]
+            portfolio_id = split_alma_id[1]
+            record_data = rest_bibs.delete_portfolio(mms_id, portfolio_id)
+        elif id_prefix == "61":
+            mms_id = split_alma_id[0]
+            collection_id = split_alma_id[1]
+            record_data = rest_bibs.delete_e_collection(mms_id, collection_id)
+        else:
+            logger.error("Alma-Id does not have one of the expected prefixes (99, 22, 23 or 53).")
+            record_data = None
+        if record_data is None:
+            db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session)
+        else:
+            db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session)
+    db_session.commit()
+
+
 def get_records_via_api_for_csv_list(csv_path: str):
     """
     For a list of Alma-IDs given in a CSV file, this function does the following:

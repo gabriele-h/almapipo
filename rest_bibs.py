@@ -129,7 +129,29 @@ def get_e_collection(mms_id: str, collection_id: str):
 #
 
 
-# delete_bib
-# delete_hol
-# delete_item
-# delete_portfolio
+def delete_bib():
+    pass
+
+
+def delete_hol(mms_id: str, hol_id: str):
+    """
+    Get HOL record via Alma API with MMS-ID and HOL-id.
+    :param mms_id: Unique ID of the BIB record the HOL is connected to.
+    :param hol_id: ID of the HOL record.
+    :return: Record data in JSON format.
+    """
+    logger.info(f'Trying to DELETE HOL with mms_id {mms_id} and hol_id {hol_id}.')
+    delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}/holdings/{hol_id}')
+    return delete_response
+
+
+def delete_item():
+    pass
+
+
+def delete_portfolio():
+    pass
+
+
+def delete_e_collection():
+    pass
