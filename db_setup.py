@@ -35,6 +35,7 @@ elif db_dialect == "sqlite":
     from sqlalchemy.dialects.sqlite import JSON
 else:
     logger.error("No valid db_dialect given.")
+    exit(1)
 
 # Basic shortenings for SQLAlchemy
 metadata = MetaData()
@@ -46,17 +47,16 @@ def prepare_connection_params_from_env():
     Set up the engine for connections to the PostgreSQL database.
     :return: SQL Engine with connection params as provided via env vars.
     """
+    database = environ["ALMA_REST_DB"]
     if db_dialect in ('postgresql', 'mysql'):
         db_user = environ["ALMA_REST_DB_USER"]
         db_pw = environ["ALMA_REST_DB_PW"]
         db_url = environ["ALMA_REST_DB_URL"]
-    database = environ["ALMA_REST_DB"]
-    if db_dialect == "postgresql":
-        connection_params = f'postgresql://{db_user}:{db_pw}@{db_url}/{database}'
-    elif db_dialect == "mysql":
-        connection_params = f'mysql://{db_user}:{db_pw}@{db_url}/{database}'
+        connection_params = f'{db_dialect}://{db_user}:{db_pw}@{db_url}/{database}'
     elif db_dialect == "sqlite":
         connection_params = f'sqlite:///{database}'
+    else:
+        logger.error('Connection parameters for the database could not be set. Check env vars.')
     return connection_params
 
 
