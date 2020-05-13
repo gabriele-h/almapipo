@@ -11,6 +11,8 @@ Then for each REST operation (POST, GET, PUT, DELETE) there is one base
 function that the more specific modules (like rest_bibs) can make use of.
 """
 
+# TODO check for errors in http status code 2** responses
+
 from logging import getLogger
 from os import environ
 from requests import Session
