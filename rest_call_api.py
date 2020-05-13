@@ -11,8 +11,7 @@ Then for each REST operation (POST, GET, PUT, DELETE) there is one base
 function that the more specific modules (like rest_bibs) can make use of.
 """
 
-# TODO check for errors in http status code 2** responses
-
+from json import JSONDecoder, JSONDecodeError
 from logging import getLogger
 from os import environ
 from requests import Session
@@ -44,11 +43,19 @@ def delete_record(url_parameters: str):
         alma_url = api_base_url+url_parameters
         alma_response = session.delete(alma_url)
         if alma_response.status_code == 204:
-            api_response_content = alma_response.content
+            alma_response_content = alma_response.content
+            decoder = JSONDecoder()
+            try:
+                alma_record_json = decoder.decode(alma_response_content)
+            except JSONDecodeError:
+                logger.error('Alma response with status code 204 did not contain valid JSON.')
+            else:
+                if alma_record_json.errorExists:
+                    logger.error('Response with HTTP status code 204 returned an error.')
             logger.info(
                 f'Record for parameters "{url_parameters}" successfully DELETED.'
             )
-            return api_response_content
+            return alma_response_content
         else:
             error_string = f"""Record for parameters "{url_parameters}" could not be deleted.
 Reason: {alma_response.status_code} - {alma_response.content}"""
@@ -72,11 +79,19 @@ def get_record(url_parameters: str):
         alma_url = api_base_url+url_parameters
         alma_response = session.get(alma_url)
         if alma_response.status_code == 200:
-            alma_record = alma_response.content
+            alma_response_content = alma_response.content
+            decoder = JSONDecoder()
+            try:
+                alma_record_json = decoder.decode(alma_response_content)
+            except JSONDecodeError:
+                logger.error('Alma response with status code 200 did not contain valid JSON.')
+            else:
+                if alma_record_json.errorExists:
+                    logger.error('Response with HTTP status code 200 returned an error.')
             logger.info(
                 f'Record for parameters "{url_parameters}" successfully retrieved.'
             )
-            return alma_record
+            return alma_response_content
         else:
             error_string = f"""Record for parameters "{url_parameters}" could not be retrieved.
 Reason: {alma_response.status_code} - {alma_response.content}"""
