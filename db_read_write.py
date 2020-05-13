@@ -28,7 +28,7 @@ def main():
     """
     logfile_setup.log_to_stdout(logger)
 
-    db_engine = create_db_engine()
+    db_engine = create_db_engine(True)
     db_engine.connect()
 
 
@@ -148,13 +148,13 @@ def create_db_session():
     return session
 
 
-def create_db_engine():
+def create_db_engine(echo: bool = False):
     """
     Create the DB engine according to the information provided in env vars.
     :return: DB engine.
     """
     connection_params = db_setup.prepare_connection_params_from_env()
-    db_engine = create_engine(connection_params, echo=True)
+    db_engine = create_engine(connection_params, echo=echo)
     return db_engine
 
 
