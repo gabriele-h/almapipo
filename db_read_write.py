@@ -32,13 +32,18 @@ def main():
     db_engine.connect()
 
 
-def update_job_status_for_alma_id(status: str, alma_id: str, job_timestamp: datetime, session: Session):
+def update_job_status_for_alma_id(status: str,
+                                  alma_id: str,
+                                  job_timestamp: datetime,
+                                  session: Session,
+                                  action: str = 'GET'):
     """
     For a given alma_id and job_timestamp update the job_status in table job_status_per_id.
     :param status: New status to be set.
     :param alma_id: Alma ID to set the status for.
     :param job_timestamp: Job for which the status should be changed.
     :param session: Session to be used for the manipulation.
+    :param action: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
     :return: None
     """
     list_of_matched_rows = session.query(
@@ -47,6 +52,8 @@ def update_job_status_for_alma_id(status: str, alma_id: str, job_timestamp: date
         job_timestamp=job_timestamp
     ).filter_by(
         alma_id=alma_id
+    ).filter_by(
+        action=action
     )
     list_of_matched_rows[0].job_status = status
 
@@ -92,7 +99,7 @@ def add_fetched_record_to_session(alma_id: str, record_data, job_timestamp: date
     session.add(line_for_table_fetched_records)
 
 
-def add_csv_line_to_session(csv_line: OrderedDict, job_timestamp, session: Session, action: str = ''):
+def add_csv_line_to_session(csv_line: OrderedDict, job_timestamp, session: Session, action: str = 'GET'):
     """
     For an ordered Dictionary of values retrieved from a csv/tsv file
     create an entry in the database that identifies the job
@@ -101,20 +108,32 @@ def add_csv_line_to_session(csv_line: OrderedDict, job_timestamp, session: Sessi
     :param csv_line: Ordered dictionary of values from a line of the input file.
     :param job_timestamp: Timestamp to identify the job which created the line.
     :param session: DB session to add the data to.
-    :param action: REST action - GET, PUT, POST or DELETE
+    :param action: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
     :return: None
     """
     line_for_table_source_csv = db_setup.SourceCsv(
         job_timestamp=job_timestamp,
         csv_line=csv_line
     )
+    session.add(line_for_table_source_csv)
+    add_alma_ids_to_job_status_per_id(list(csv_line.values())[0], job_timestamp, session, action)
+
+
+def add_alma_ids_to_job_status_per_id(alma_id: str, job_timestamp, session: Session, action: str = 'GET'):
+    """
+    For a string of Alma IDs create an entry in job_status_per_id.
+    :param alma_id: IDs of the record to be manipulated.
+    :param job_timestamp: Timestamp to identify the job which created the line.
+    :param session: DB session to add the data to.
+    :param action: REST action - GET, PUT, POST or DELETE
+    :return:
+    """
     line_for_table_job_status_per_id = db_setup.JobStatusPerId(
         job_timestamp=job_timestamp,
-        alma_id=list(csv_line.values())[0],
+        alma_id=alma_id,
         job_status='new',
         job_action=action
     )
-    session.add(line_for_table_source_csv)
     session.add(line_for_table_job_status_per_id)
 
 
