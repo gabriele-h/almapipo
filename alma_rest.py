@@ -41,11 +41,12 @@ def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: st
     get_records_via_api_for_csv_list(csv_path, api, record_type)
     list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('done', 'GET', job_timestamp, db_session)
     for alma_id, in list_of_ids:
+        db_read_write.add_alma_ids_to_job_status_per_id(alma_id, job_timestamp, db_session, 'DELETE')
         alma_response = delete_record_for_alma_ids(alma_id, api, record_type)
         if alma_response is None:
-            db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session)
+            db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session, 'DELETE')
         else:
-            db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session)
+            db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session, 'DELETE')
     db_session.commit()
 
 
