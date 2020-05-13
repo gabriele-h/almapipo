@@ -53,7 +53,7 @@ def update_job_status_for_alma_id(status: str,
     ).filter_by(
         alma_id=alma_id
     ).filter_by(
-        action=action
+        job_action=action
     )
     list_of_matched_rows[0].job_status = status
 
