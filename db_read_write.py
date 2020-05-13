@@ -51,11 +51,12 @@ def update_job_status_for_alma_id(status: str, alma_id: str, job_timestamp: date
     list_of_matched_rows[0].job_status = status
 
 
-def get_list_of_ids_for_job_with_status(status: str, job_timestamp: datetime, session: Session):
+def get_list_of_ids_by_status_and_action(status: str, action: str, job_timestamp: datetime, session: Session):
     """
     From table job_status_per_id get all Alma IDs that match the status
     given as the parameter.
     :param status: As in job_status_per_id, possible values are "new", "done" and "error".
+    :param action: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
     :param session: DB session to connect to.
     :param job_timestamp: Timestamp to identify the job responsible for the ID.
     :return: List of IDs.
@@ -66,6 +67,8 @@ def get_list_of_ids_for_job_with_status(status: str, job_timestamp: datetime, se
         job_timestamp=job_timestamp
     ).filter_by(
         job_status=status
+    ).filter_by(
+        job_action=action
     )
     return list_of_ids
 
