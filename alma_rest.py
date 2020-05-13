@@ -48,6 +48,10 @@ def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: st
         else:
             db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session, 'DELETE')
     db_session.commit()
+    ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'DELETE', job_timestamp, db_session)
+    ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'DELETE', job_timestamp, db_session)
+    logger.info(f"Completed DELETE successfully for {ids_done.length()} records.")
+    logger.info(f"Errors were encountered for DELETE of {ids_error.length()} records.")
 
 
 def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str):
@@ -74,6 +78,10 @@ def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str):
             db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session)
             db_read_write.add_fetched_record_to_session(alma_id, record_data, job_timestamp, db_session)
     db_session.commit()
+    ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'GET', job_timestamp, db_session)
+    ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'GET', job_timestamp, db_session)
+    logger.info(f"Completed GET successfully for {ids_done.length()} records.")
+    logger.info(f"Errors were encountered for GET of {ids_error.length()} records.")
 
 
 def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: bool = True):
