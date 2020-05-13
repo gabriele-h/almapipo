@@ -133,9 +133,9 @@ def get_record_for_alma_ids(alma_ids: str, api: str, record_type: str):
     elif api == 'bibs' and record_type == 'items':
         return rest_bibs.get_item(split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
     elif api == 'bibs' and record_type == 'portfolios':
-        return rest_bibs.get_portfolio_by_bib(split_alma_ids[0], split_alma_ids[1])
+        return rest_bibs.get_portfolio(split_alma_ids[0], split_alma_ids[1])
     elif api == 'bibs' and record_type == 'e-collections':
-        return rest_bibs.get_e_collection_by_bib(split_alma_ids[0], split_alma_ids[1])
+        return rest_bibs.get_e_collection(split_alma_ids[0], split_alma_ids[1])
     else:
         logger.error('No valid combination of API and record type provided.')
         raise ValueError
