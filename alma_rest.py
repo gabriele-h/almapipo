@@ -109,7 +109,7 @@ def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: boo
 
 def delete_record_for_alma_ids(alma_ids: str, api: str, record_type: str):
     """
-    For a specific API and record type make the GET call to that API
+    For a specific API and record type make the DELETE call to that API
     and return the resulting response.
     :param alma_ids: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
