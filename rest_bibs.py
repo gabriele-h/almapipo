@@ -65,6 +65,18 @@ def get_portfolio(mms_id: str, portfolio_id: str):
     return portfolio_record
 
 
+def get_e_collection(mms_id: str, collection_id: str):
+    """
+    Get e-collection record for collection-ID.
+    :param mms_id: Unique ID of the BIB record the HOL is connected to.
+    :param collection_id: ID of the e-collection.
+    :return: Record in JSON format.
+    """
+    logger.info(f'Trying to fetch e-Collection record with mms_id {mms_id} and collection_id {collection_id}.')
+    collection_record = rest_call_api.get_record(f'/bibs/{mms_id}/e-collections/{collection_id}')
+    return collection_record
+
+
 def get_single_bib_by_query(id_type: str, other_id: str):
     """
     Get single record by ID via Alma API. Possible ID types:
@@ -86,18 +98,6 @@ def get_single_bib_by_query(id_type: str, other_id: str):
     api_url = api_url_path + api_url_query_encoded
     bib_record = rest_call_api.get_record(api_url)
     return bib_record
-
-
-def get_e_collection(mms_id: str, collection_id: str):
-    """
-    Get e-collection record for collection-ID.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
-    :param collection_id: ID of the e-collection.
-    :return: Record in JSON format.
-    """
-    logger.info(f'Trying to fetch e-Collection record with mms_id {mms_id} and collection_id {collection_id}.')
-    collection_record = rest_call_api.get_record(f'/bibs/{mms_id}/e-collections/{collection_id}')
-    return collection_record
 
 
 #
