@@ -30,7 +30,7 @@ def get_bib(mms_id: str):
 
 def get_hol(mms_id: str, hol_id: str):
     """
-    Get HOL record via Alma API with MMS-ID and HOL-id.
+    Get HOL record via Alma API by MMS-ID and HOL-id.
     :param mms_id: Unique ID of the BIB record the HOL is connected to.
     :param hol_id: ID of the HOL record.
     :return: Record data in JSON format.
@@ -42,7 +42,7 @@ def get_hol(mms_id: str, hol_id: str):
 
 def get_item(mms_id: str, hol_id: str, itm_id: str):
     """
-    Get Item record via Alma API with MMS-ID, HOL-id and ITM-ID.
+    Get Item record via Alma API by MMS-ID, HOL-id and ITM-ID.
     :param mms_id: Unique ID of the BIB record the HOL is connected to.
     :param hol_id: ID of the HOL record the ITM is connected to.
     :param itm_id: ID of the ITM record.
@@ -55,7 +55,7 @@ def get_item(mms_id: str, hol_id: str, itm_id: str):
 
 def get_portfolio(mms_id: str, portfolio_id: str):
     """
-    Get Portfolio record via Alma API with MMS-ID and portfolio-ID.
+    Get Portfolio record via Alma API by MMS-ID and portfolio-ID.
     :param mms_id: Unique ID of the BIB record the HOL is connected to.
     :param portfolio_id: ID of the portfolio record.
     :return: Record data in JSON format.
@@ -135,7 +135,7 @@ def delete_bib():
 
 def delete_hol(mms_id: str, hol_id: str):
     """
-    Get HOL record via Alma API with MMS-ID and HOL-id.
+    Delete HOL record via Alma API by MMS-ID and HOL-id.
     :param mms_id: Unique ID of the BIB record the HOL is connected to.
     :param hol_id: ID of the HOL record.
     :return: Record data in JSON format.
