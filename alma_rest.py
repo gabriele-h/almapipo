@@ -16,7 +16,7 @@ import input_read
 import logfile_setup
 import rest_bibs
 
-# Timestamp for the Script-Run as inserted in the database
+# Timestamp for as inserted in the database
 job_timestamp = datetime.now()
 
 # Logfile
