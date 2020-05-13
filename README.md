@@ -100,9 +100,13 @@ job_status in `job_status_per_id` will be set to "done", otherwise
 
 ### Usage Example Python Console
 
+First parameter of the function is the path to the csv-file. Then
+follow the API that needs to be called and what kind of record it
+should be called for.
+
 ```python
 import alma_rest
-alma_rest.get_records_via_api_for_csv_list('./input/test.tsv')
+alma_rest.get_records_via_api_for_csv_list('./input/test.tsv', 'bibs', 'hols')
 ```
 
 ## Add CSV Lines to `source_csv` and `job_status_per_id`
