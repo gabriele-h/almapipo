@@ -22,7 +22,7 @@ def extract_xml_from_fetched_records(alma_ids: str):
     :param alma_ids: Comma separated string of Alma IDs to identify the record.
     :return: Element of the record's XML.
     """
-    logger.info(f'Extracting record with alma_ids {alma_ids} from table fetched_records.')
+    logger.info(f'Extracting most recent record with alma_ids {alma_ids} from table fetched_records.')
     record_query = db_read_write.get_record_from_fetched_records(alma_ids)
     record_as_bytes = record_query.alma_record
     record_as_string = str(record_as_bytes, 'utf-8')
