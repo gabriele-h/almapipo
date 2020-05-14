@@ -32,6 +32,24 @@ def main():
     db_engine.connect()
 
 
+def get_record_from_fetched_records(alma_ids: str):
+    """
+    For a comma separated string of Alma IDs query for the record's most
+    most recently saved XML in the table fetched_records.
+    :param alma_ids: Comma separated string of Alma IDs to identify the record.
+    :return: SQLAlchemy query object of the record.
+    """
+    db_session = create_db_session()
+    record_query = db_session.query(
+        db_setup.FetchedRecords
+    ).filter_by(
+        alma_id = alma_ids
+    ).order_by(
+        'job_timestamp'
+    ).limit(1)
+    return record_query.first()
+
+
 def update_job_status_for_alma_id(status: str,
                                   alma_id: str,
                                   job_timestamp: datetime,
