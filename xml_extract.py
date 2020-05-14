@@ -5,7 +5,7 @@ handling of the record.
 
 import json
 from logging import getLogger
-from xml.etree.ElementTree import fromstring
+from xml.etree.ElementTree import fromstring, Element
 
 import db_read_write
 # noinspection PyUnresolvedReferences
@@ -15,13 +15,18 @@ import logfile_setup
 logger = getLogger(__name__)
 
 
-def extract_xml_from_fetched_records(alma_ids: str):
+def extract_xml_record_element_from_fetched_records(alma_ids: str) -> Element:
     """
-    From the table fetched_records extract the XML of the record and
-    return it as an Element Tree.
+    From table fetched_records extract the XML of the record and
+    return it as an xml.etree Element.
     :param alma_ids: Comma separated string of Alma IDs to identify the record.
     :return: Element of the record's XML.
     """
+    xml_as_string = extract_xml_from_fetched_records(alma_ids)
+    xml_as_element = fromstring(xml_as_string)
+    return xml_as_element
+
+
 def extract_xml_from_fetched_records(alma_ids: str) -> str:
     """
     From the table fetched_records extract the XML of the record and
