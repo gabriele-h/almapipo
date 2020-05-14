@@ -102,7 +102,7 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterator[str]:
         csv_reader = DictReader(csv_file, delimiter=delimit)
         for row in csv_reader:
             first_column_value = list(row.values())[0]
-            if all(is_this_an_alma_id(string) for string in str.split(first_column_value,',')) \
+            if all(is_this_an_alma_id(string) for string in str.split(first_column_value, ',')) \
                     or not validation:
                 yield row
             else:
