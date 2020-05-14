@@ -166,7 +166,7 @@ def create_db_session():
     return session
 
 
-def create_db_engine(echo: bool = False):
+def create_db_engine(echo: bool = db_setup.does_sqlalchemy_log):
     """
     Create the DB engine according to the information provided in env vars.
     :return: DB engine.

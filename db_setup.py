@@ -24,8 +24,9 @@ import logfile_setup
 # Logfile
 logger = logging.getLogger(__name__)
 
-# Dialect
+# DB Setup
 db_dialect = environ["ALMA_REST_DB_DIALECT"]
+does_sqlalchemy_log = bool(int(environ["ALMA_REST_DB_VERBOSE"]))
 
 if db_dialect == "postgresql":
     from sqlalchemy.dialects.postgresql import JSON
