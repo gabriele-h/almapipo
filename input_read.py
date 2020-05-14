@@ -10,17 +10,17 @@ The output contains a list of both IDs and required
 manipulations.
 """
 
-import logging
 import re
 import sys
-from os import access, environ, path, R_OK
 from csv import DictReader
+from logging import getLogger
+from os import access, environ, path, R_OK
 from typing import Iterator
 
 import logfile_setup
 
 # Logfile
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 # Pattern for Alma ID check
 alma_id_suffix = environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX']
