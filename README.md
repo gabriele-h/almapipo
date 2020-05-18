@@ -107,7 +107,7 @@ should be called for.
 
 ```python
 import alma_rest
-alma_rest.get_records_via_api_for_csv_list('./input/test.tsv', 'bibs', 'hols')
+alma_rest.get_records_via_api_for_csv_list('./input/test.tsv', 'bibs', 'holdings')
 ```
 
 ## Delete Records After Saving Them in `fetched_records`
@@ -125,7 +125,7 @@ should be called for.
 
 ```python
 import alma_rest
-alma_rest.delete_records_via_api_for_csv_list('./input/test.tsv', 'bibs', 'hols')
+alma_rest.delete_records_via_api_for_csv_list('./input/test.tsv', 'bibs', 'holdings')
 ```
 
 ## Add CSV Lines to `source_csv` and `job_status_per_id`
