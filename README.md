@@ -161,6 +161,26 @@ import alma_rest
 alma_rest.import_csv_to_db_tables('./input/test.csv', 'GET')
 ```
 
+# `xml_extract.py`
+
+For records retrieved via GET, extract the record's API response or XML
+record from the table `fetched_records`.
+
+Options for export currently include:
+* Whole response as a string
+* XML as a string
+* XML as an xml.etree Element
+
+### Usage Example Python Console
+
+The following extracts the XML of one holding record and returns it
+as an xml.etree Element:
+
+```python
+import xml_extract
+xml_extract.extract_xml_record_element_from_fetched_records('991234567890123,221234567890123')
+```
+
 # `input_read.py`
 
 Read a CSV- or TSV-file and return information for further handling by other modules.
