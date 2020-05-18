@@ -77,7 +77,7 @@ def get_e_collection(mms_id: str, collection_id: str):
     return collection_record
 
 
-def get_single_bib_by_query(id_type: str, other_id: str):
+def get_bib_by_query(id_type: str, other_id: str):
     """
     Get single record by ID via Alma API. Possible ID types:
     * mms_id
