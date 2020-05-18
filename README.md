@@ -92,7 +92,7 @@ database.
 
 Main part making use of most of the other modules.
 
-## Get BIB Records and Save in `fetched_records`
+## Get Records and Save in `fetched_records`
 
 Adds CSV Lines to `source_csv` and `job_status_per_id` (see below)
 and issues an Alma BIB API GET request per mms_id. If successful,
@@ -108,6 +108,24 @@ should be called for.
 ```python
 import alma_rest
 alma_rest.get_records_via_api_for_csv_list('./input/test.tsv', 'bibs', 'hols')
+```
+
+## Delete Records After Saving Them in `fetched_records`
+Calls `get_records_via_api_for_csv_list` first to create a backup
+of each record to be deleted. For each successful GET call, make
+the according DELETE call to the API. If DELETE action is successful,
+job_status in `job_status_per_id` will be set to "done", otherwise
+"error".
+
+### Usage Example Python Console
+
+First parameter of the function is the path to the csv-file. Then
+follow the API that needs to be called and what kind of record it
+should be called for.
+
+```python
+import alma_rest
+alma_rest.delete_records_via_api_for_csv_list('./input/test.tsv', 'bibs', 'hols')
 ```
 
 ## Add CSV Lines to `source_csv` and `job_status_per_id`
