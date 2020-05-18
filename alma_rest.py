@@ -30,7 +30,10 @@ def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: st
     * Save the data from the CSV-file to tables job_status_per_id and source_csv
     * Call GET on the Alma API for each Alma-ID
     * Save the response from the API in table fetched_records
-    Note that this will only work for Alma-IDs and not alternatives like "Other system number".
+    * For all successful GET calls, add DELETE lines to job_status_per_id
+    * Call DELETE on the Alma API for each Alma-ID that could be fetched via GET
+    Note that this will only work for Alma-IDs and not alternatives like "Other system number"
+    or other kinds of bibs queries.
 
     :param csv_path: Path of the CSV file containing the Alma IDs.
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
