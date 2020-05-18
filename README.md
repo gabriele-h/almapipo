@@ -1,7 +1,9 @@
 # About
 
 ## Scenario
-A set of Alma-records needs to be manipulated (created, deleted, updated).
+A set of
+[Alma](https://knowledge.exlibrisgroup.com/Alma/Product_Documentation/010Alma_Online_Help_(English)/010Getting_Started/010Alma_Introduction/010Alma_Overview)
+records needs to be manipulated (created, deleted, updated).
 
 ## Preparation
 
@@ -21,6 +23,12 @@ Another module of the package will handle the actual **manipulation of
 records in Alma via API**. If the manipulation is successful, the status for that
 record will be changed from "new" to "done" in the database. If anything
 goes wrong, the status will be set to "error".
+
+**Note:** Currently all API-calls will be made with a header value of
+```
+"accept": "application/json"
+```
+Be aware that there might be issues with JSON for the Alma APIs.
 
 # Requirements
 
