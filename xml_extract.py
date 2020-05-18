@@ -55,6 +55,5 @@ def extract_response_from_fetched_records(alma_ids: str) -> str:
     """
     logger.info(f'Extracting most recent response for alma_ids {alma_ids} from table fetched_records.')
     response_query = db_read_write.get_record_from_fetched_records(alma_ids)
-    response_as_bytes = response_query.alma_record
-    response_as_string = str(response_as_bytes, 'utf-8')
+    response_as_string = response_query.alma_record
     return response_as_string
