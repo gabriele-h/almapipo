@@ -120,8 +120,16 @@ def delete_record_for_alma_ids(alma_ids: str, api: str, record_type: str):
     :return: API response
     """
     split_alma_ids = str.split(alma_ids, ',')
-    if api == 'bibs' and record_type == 'holdings':
+    if api == 'bibs' and record_type == 'bibs':
+        return rest_bibs.delete_bib(split_alma_ids[0])
+    elif api == 'bibs' and record_type == 'holdings':
         return rest_bibs.delete_hol(split_alma_ids[0], split_alma_ids[1])
+    elif api == 'bibs' and record_type == 'items':
+        return rest_bibs.delete_item(split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
+    elif api == 'bibs' and record_type == 'portfolios':
+        return rest_bibs.delete_portfolio(split_alma_ids[0], split_alma_ids[1])
+    elif api == 'bibs' and record_type == 'e-collections':
+        return rest_bibs.delete_e_collection(split_alma_ids[0], split_alma_ids[1])
     else:
         logger.error('No valid combination of API and record type provided.')
         raise ValueError

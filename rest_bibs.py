@@ -12,9 +12,9 @@ import logfile_setup
 logger = getLogger(__name__)
 
 
-#
-# GET
-#
+#######
+# GET #
+#######
 
 
 def get_bib(mms_id: str):
@@ -55,12 +55,12 @@ def get_item(mms_id: str, hol_id: str, itm_id: str):
 
 def get_portfolio(mms_id: str, portfolio_id: str):
     """
-    Get Portfolio record via Alma API by MMS-ID and portfolio-ID.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
+    Get portfolio record via Alma API by MMS-ID and portfolio-ID.
+    :param mms_id: Unique ID of the BIB record the portfolio is connected to.
     :param portfolio_id: ID of the portfolio record.
     :return: Record data in JSON format.
     """
-    logger.info(f'Trying to fetch Portfolio record with mms_id {mms_id} and portfolio_id {portfolio_id}.')
+    logger.info(f'Trying to fetch portfolio record with mms_id {mms_id} and portfolio_id {portfolio_id}.')
     portfolio_record = rest_call_api.get_record(f'/bibs/{mms_id}/portfolios/{portfolio_id}')
     return portfolio_record
 
@@ -68,11 +68,11 @@ def get_portfolio(mms_id: str, portfolio_id: str):
 def get_e_collection(mms_id: str, collection_id: str):
     """
     Get e-collection record for collection-ID.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
+    :param mms_id: Unique ID of the BIB record the collection is connected to.
     :param collection_id: ID of the e-collection.
     :return: Record in JSON format.
     """
-    logger.info(f'Trying to fetch e-Collection record with mms_id {mms_id} and collection_id {collection_id}.')
+    logger.info(f'Trying to fetch e-collection record with mms_id {mms_id} and collection_id {collection_id}.')
     collection_record = rest_call_api.get_record(f'/bibs/{mms_id}/e-collections/{collection_id}')
     return collection_record
 
@@ -100,9 +100,9 @@ def get_single_bib_by_query(id_type: str, other_id: str):
     return bib_record
 
 
-#
-# POST
-#
+########
+# POST #
+########
 
 
 # post_bib
@@ -113,9 +113,9 @@ def get_single_bib_by_query(id_type: str, other_id: str):
 # post_portfolio
 
 
-#
-# PUT
-#
+#######
+# PUT #
+#######
 
 
 # put_bib
@@ -124,13 +124,20 @@ def get_single_bib_by_query(id_type: str, other_id: str):
 # put_portfolio
 
 
-#
-# DELETE
-#
+##########
+# DELETE #
+##########
 
 
-def delete_bib():
-    pass
+def delete_bib(mms_id: str):
+    """
+    Delete BIB record by MMS-ID via Alma API.
+    :param mms_id: Unique ID of Alma BIB records.
+    :return: API response
+    """
+    logger.info(f'Trying to DELETE BIB with mms_id {mms_id}.')
+    delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}')
+    return delete_response
 
 
 def delete_hol(mms_id: str, hol_id: str):
@@ -138,20 +145,45 @@ def delete_hol(mms_id: str, hol_id: str):
     Delete HOL record via Alma API by MMS-ID and HOL-id.
     :param mms_id: Unique ID of the BIB record the HOL is connected to.
     :param hol_id: ID of the HOL record.
-    :return: Record data in JSON format.
+    :return: API response
     """
     logger.info(f'Trying to DELETE HOL with mms_id {mms_id} and hol_id {hol_id}.')
     delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}/holdings/{hol_id}')
     return delete_response
 
 
-def delete_item():
-    pass
+def delete_item(mms_id: str, hol_id: str, itm_id: str):
+    """
+    Delete Item record via Alma API by MMS-ID, HOL-id and ITM-ID.
+    :param mms_id: Unique ID of the BIB record the HOL is connected to.
+    :param hol_id: ID of the HOL record the ITM is connected to.
+    :param itm_id: ID of the ITM record.
+    :return: API response
+    """
+    logger.info(f'Trying to DELETE ITM with mms_id {mms_id} and hol_id {hol_id} and itm_id {itm_id}.')
+    delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}/holdings/{hol_id}/items/{itm_id}')
+    return delete_response
 
 
-def delete_portfolio():
-    pass
+def delete_portfolio(mms_id: str, portfolio_id: str):
+    """
+    Delete portfolio record via Alma API by MMS-ID and portfolio-ID.
+    :param mms_id: Unique ID of the BIB record the portfolio is connected to.
+    :param portfolio_id: ID of the portfolio record.
+    :return: API response
+    """
+    logger.info(f'Trying to DELETE portfolio record with mms_id {mms_id} and portfolio_id {portfolio_id}.')
+    delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}/portfolios/{portfolio_id}')
+    return delete_response
 
 
-def delete_e_collection():
-    pass
+def delete_e_collection(mms_id: str, collection_id: str):
+    """
+    Delete e-collection record via Alma API by MMS-ID and collection-ID.
+    :param mms_id: Unique ID of the BIB record the collection is connected to.
+    :param collection_id: ID of the e-collection.
+    :return: Record in JSON format.
+    """
+    logger.info(f'Trying to DELETE e-collection record with mms_id {mms_id} and collection_id {collection_id}.')
+    delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}/e-collections/{collection_id}')
+    return delete_response
