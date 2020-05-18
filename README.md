@@ -107,6 +107,13 @@ and issues an Alma BIB API GET request per mms_id. If successful,
 job_status in `job_status_per_id` will be set to "done", otherwise
 "error".
 
+The successfully retrieved records will be saved to the table
+`fetched_records`, where the whole API response content is saved
+in the column `alma_record`.
+
+**Note:** If you query for a record multiple times there will be a
+separate row for each call in the table `fetched_records`.
+
 ### Usage Example Python Console
 
 First parameter of the function is the path to the csv-file. Then
