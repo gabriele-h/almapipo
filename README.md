@@ -32,7 +32,7 @@ Be aware that there might be issues with JSON for the Alma APIs.
 
 # Requirements
 
-* Python 3.7 or higher, see requirements.txt for Python packages
+* Python 3.6.9 or higher, see requirements.txt for Python packages
 * A PostgreSQL, MySQL or SQLite database with read and write access
 * An Alma API-key with the necessary permissions for your operations
 

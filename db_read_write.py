@@ -8,7 +8,12 @@ The DB is intended to do the following:
 
 from datetime import datetime
 from logging import getLogger
-from typing import OrderedDict
+
+try:
+    from typing import OrderedDict
+except ImportError:
+    from typing import MutableMapping
+    OrderedDict = MutableMapping
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
