@@ -37,7 +37,7 @@ def extract_xml_from_fetched_records(alma_ids: str) -> str:
     :return: String of the record's XML.
     """
     logger.info(f'Extracting XML from response for {alma_ids} as string.')
-    # SQLite will return str, Postres dict
+    # SQLite will return str, Postgres dict
     response = extract_response_from_fetched_records(alma_ids)
     if db_setup.db_dialect == "sqlite":
         try:
