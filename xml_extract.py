@@ -8,6 +8,7 @@ from logging import getLogger
 from xml.etree.ElementTree import fromstring, Element
 
 import db_read_write
+import db_setup
 # noinspection PyUnresolvedReferences
 import logfile_setup
 
@@ -36,14 +37,18 @@ def extract_xml_from_fetched_records(alma_ids: str) -> str:
     :return: String of the record's XML.
     """
     logger.info(f'Extracting XML from response for {alma_ids} as string.')
-    response_as_string = extract_response_from_fetched_records(alma_ids)
-    try:
-        response_as_json = json.loads(response_as_string)
-    except TypeError:
-        logger.error('Data type not valid to load as JSON object.')
+    # SQLite will return str, Postres dict
+    response = extract_response_from_fetched_records(alma_ids)
+    if db_setup.db_dialect == "sqlite":
+        try:
+            response_as_json = json.loads(response_as_string)
+        except TypeError:
+            logger.error('Data type not valid to load as JSON object.')
+        else:
+            xml_string = response_as_json['anies'][0]
     else:
-        xml_string = response_as_json['anies'][0]
-        return xml_string
+        xml_string = response['anies'][0]
+    return xml_string
 
 
 def extract_response_from_fetched_records(alma_ids: str) -> str:
@@ -55,5 +60,5 @@ def extract_response_from_fetched_records(alma_ids: str) -> str:
     """
     logger.info(f'Extracting most recent response for alma_ids {alma_ids} from table fetched_records.')
     response_query = db_read_write.get_record_from_fetched_records(alma_ids)
-    response_as_string = response_query.alma_record
-    return response_as_string
+    response = response_query.alma_record
+    return response
