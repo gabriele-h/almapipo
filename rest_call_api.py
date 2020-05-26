@@ -27,17 +27,41 @@ api_key = environ['ALMA_REST_API_KEY']
 api_base_url = environ['ALMA_REST_API_BASE_URL']
 
 
+def create_record(record_data: str, url_parameters: str):
+    """Generic function for POST calls to the Alma API.
+
+    Will return the response if HTTP status code is 200.
+    Otherwise the error returned by the API will be added to the
+    logfile as an ERROR.
+    :param record_data: XML of the record to be created.
+    :param url_parameters: Necessary path and arguments for API call.
+    :return: Contents of the response.
+    """
+
+    with create_alma_api_session() as session:
+        alma_url = api_base_url+url_parameters
+        alma_response = session.post(alma_url, data=record_data)
+        if alma_response.status_code == 200:
+            alma_response_content = alma_response.content
+            logger.info(
+                    f'Record for parameters "{url_parameters}" successfully POSTED.'
+                    )
+            return alma_response_content
+        else:
+            error_string = f"""Record for parameters "{url_parameters}" could not be created.
+Reason: {alma_response.status_code} - {alma_response.content}"""
+            logger.error(error_string)
+
+
 def delete_record(url_parameters: str):
     """Generic function for DELETE calls to the Alma API.
 
-    Will return the response if HTTP status code is 204 plus a second
-    return value for table job_status_per_id. If the operation is successful,
-    job_status_per_id will be set to "done" for the record. If the HTTP status
-    is anything other than 204, job_status_per_id will be set to "error" and
-    the status-code and content of the response will be added to the logfile.
+    Will return the response if HTTP status code is 204.
+    Otherwise the error returned by the API will be added to the
+    logfile as an ERROR.
 
     :param url_parameters: Necessary path and arguments for API call.
-    :return: Contents of the Response and status-string for table job_status_per_id.
+    :return: Contents of the response.
     """
 
     with create_alma_api_session() as session:
@@ -58,11 +82,9 @@ Reason: {alma_response.status_code} - {alma_response.content}"""
 def get_record(url_parameters: str):
     """Generic function for GET calls to the Alma API.
 
-    Will return the record if HTTP status code is 200 plus a second
-    return value for table job_status_per_id. If the operation is successful,
-    job_status_per_id will be set to "done" for the record. If the HTTP status
-    is anything other than 200, job_status_per_id will be set to "error" and
-    the status-code and content of the response will be added to the logfile.
+    Will return the record if HTTP status code is 200.
+    Otherwise the error returned by the API will be added to the
+    logfile as an ERROR.
 
     :param url_parameters: Necessary path and arguments for API call.
     :return: Contents of the Response and status-string for table job_status_per_id.

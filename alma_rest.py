@@ -25,6 +25,35 @@ logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
 
 
+def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record_type: str):
+    """
+    For a list of Alma-IDs given in a CSV file, this function does the following:
+    * Query for the latest version of the fetched record's xml in the local database
+    * Call POST with the XML on the API defined in the parameters
+    * Save the response from the API in table fetched_records
+    * Set status of API call in job_status_per_id
+    :param csv_path: Path of the CSV file containing the Alma IDs.
+    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
+    :param record_type: Type of the record to call the API for (e. g. "holdings")
+    :return: None
+    """
+    db_session = db_read_write.create_db_session()
+    import_csv_to_db_tables(csv_path, 'POST')
+    list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', 'POST', job_timestamp, db_session)
+    for alma_id, in list_of_ids:
+        alma_response = post_record_for_alma_ids(alma_id, api, record_type)
+        if alma_response is None:
+            db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session, 'POST')
+        else:
+            db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session, 'POST')
+    db_session.commit()
+    ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'POST', job_timestamp, db_session)
+    ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'POST', job_timestamp, db_session)
+    logger.info(f"Completed POST successfully for {ids_done.count()} record(s).")
+    logger.info(f"Errors were encountered for POST of {ids_error.count()} record(s).")
+
+
+
 def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str):
     """
     For a list of Alma-IDs given in a CSV file, this function does the following:
@@ -39,7 +68,7 @@ def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: st
     :param csv_path: Path of the CSV file containing the Alma IDs.
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of the record to call the API for (e. g. "holdings")
-    :return:
+    :return: None
     """
     db_session = db_read_write.create_db_session()
     get_records_via_api_for_csv_list(csv_path, api, record_type)
@@ -111,6 +140,31 @@ def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: boo
     else:
         logger.error('No valid file path provided.')
 
+
+def create_record_for_alma_ids(alma_ids: str, api: str, record_type: str, record_data: str):
+    """
+    For a specific API and record type make the POST call to that API
+    and return the resulting response.
+    :param alma_ids: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
+    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
+    :param record_type: Type of the record to call the API for (e. g. "holdings")
+    :param record_data: Data of the record to be created (usually XML)
+    :return: API response
+    """
+    split_alma_ids = str.split(alma_ids, ',')
+    if api == 'bibs' and record_type == 'bibs':
+        return rest_bibs.create_bib(record_data, split_alma_ids[0])
+    elif api == 'bibs' and record_type == 'holdings':
+        return rest_bibs.create_hol(record_data, split_alma_ids[0], split_alma_ids[1])
+    elif api == 'bibs' and record_type == 'items':
+        return rest_bibs.create_item(record_data, split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
+    elif api == 'bibs' and record_type == 'portfolios':
+        return rest_bibs.create_portfolio(record_data, split_alma_ids[0], split_alma_ids[1])
+    elif api == 'bibs' and record_type == 'e-collections':
+        return rest_bibs.create_e_collection(record_data, split_alma_ids[0], split_alma_ids[1])
+    else:
+        logger.error('No valid combination of API and record type provided.')
+        raise ValueError
 
 def delete_record_for_alma_ids(alma_ids: str, api: str, record_type: str):
     """

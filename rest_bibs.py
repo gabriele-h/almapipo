@@ -105,12 +105,69 @@ def get_bib_by_query(id_type: str, other_id: str):
 ########
 
 
-# post_bib
-# post_bib_from_nz
-# post_bib_from_cz
-# post_hol
-# post_item
-# post_portfolio
+def create_bib(record_data: str, mms_id: str):
+    """
+    Create BIB record by MMS-ID via Alma API.
+    :param record_data: XML of the record to be created.
+    :param mms_id: Unique ID of Alma BIB records.
+    :return: Response data in JSON format.
+    """
+    logger.info(f'Trying to create BIB with mms_id {mms_id}.')
+    bib_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}')
+    return bib_record
+
+
+def create_hol(record_data: str, mms_id: str, hol_id: str):
+    """
+    Create HOL record via Alma API by MMS-ID and HOL-id.
+    :param record_data: XML of the record to be created.
+    :param mms_id: Unique ID of the BIB record the HOL is connected to.
+    :param hol_id: ID of the HOL record.
+    :return: Response data in JSON format.
+    """
+    logger.info(f'Trying to create HOL with mms_id {mms_id} and hol_id {hol_id}.')
+    hol_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}')
+    return hol_record
+
+
+def create_item(record_data: str, mms_id: str, hol_id: str, itm_id: str):
+    """
+    Create Item record via Alma API by MMS-ID, HOL-id and ITM-ID.
+    :param record_data: XML of the record to be created.
+    :param mms_id: Unique ID of the BIB record the HOL is connected to.
+    :param hol_id: ID of the HOL record the ITM is connected to.
+    :param itm_id: ID of the ITM record.
+    :return: Response data in JSON format.
+    """
+    logger.info(f'Trying to create ITM with mms_id {mms_id} and hol_id {hol_id} and itm_id {itm_id}.')
+    itm_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}/items/{itm_id}')
+    return itm_record
+
+
+def create_portfolio(record_data: str, mms_id: str, portfolio_id: str):
+    """
+    Create portfolio record via Alma API by MMS-ID and portfolio-ID.
+    :param record_data: XML of the record to be created.
+    :param mms_id: Unique ID of the BIB record the portfolio is connected to.
+    :param portfolio_id: ID of the portfolio record.
+    :return: Response data in JSON format.
+    """
+    logger.info(f'Trying to create portfolio record with mms_id {mms_id} and portfolio_id {portfolio_id}.')
+    portfolio_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/portfolios/{portfolio_id}')
+    return portfolio_record
+
+
+def create_e_collection(record_data: str, mms_id: str, collection_id: str):
+    """
+    Create e-collection record for collection-ID.
+    :param record_data: XML of the record to be created.
+    :param mms_id: Unique ID of the BIB record the collection is connected to.
+    :param collection_id: ID of the e-collection.
+    :return: Record in JSON format.
+    """
+    logger.info(f'Trying to create e-collection record with mms_id {mms_id} and collection_id {collection_id}.')
+    collection_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/e-collections/{collection_id}')
+    return collection_record
 
 
 #######
