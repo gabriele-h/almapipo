@@ -29,6 +29,19 @@ def extract_record_from_fetched_records(alma_ids: str) -> ElementTree.Element:
     return record_as_etree
 
 
+def extract_response_as_bytes_from_fetched_records(alma_ids: str) -> bytes:
+    """
+    From the table fetched_records extract the whole response for the record
+    and convert the ElementTree to bytes.
+    :param alma_ids: Comma separated string of Alma IDs to identify the record.
+    :return: bytes of the record's GET response content
+    """
+    logger.info(f'Converting XML response for {alma_ids} to bytes.')
+    response_xml = extract_response_from_fetched_records(alma_ids)
+    record_as_bytes = ElementTree.tostring(response_xml)
+    return record_as_bytes
+
+
 def extract_response_from_fetched_records(alma_ids: str) -> ElementTree:
     """
     From the table fetched_records extract the whole response for the record
