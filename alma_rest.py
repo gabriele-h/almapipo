@@ -16,6 +16,7 @@ import input_read
 # noinspection PyUnresolvedReferences
 import logfile_setup
 import rest_bibs
+import xml_extract
 
 # Timestamp for as inserted in the database
 job_timestamp = datetime.now()
@@ -41,7 +42,8 @@ def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record
     import_csv_to_db_tables(csv_path, 'POST')
     list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', 'POST', job_timestamp, db_session)
     for alma_id, in list_of_ids:
-        alma_response = post_record_for_alma_ids(alma_id, api, record_type)
+        record_data = xml_extract.extract_xml_from_fetched_records(alma_id)
+        alma_response = create_record_for_alma_ids(alma_id, api, record_type, record_data)
         if alma_response is None:
             db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session, 'POST')
         else:
