@@ -4,19 +4,18 @@ Does the following two:
 * Prepare setup for the DB connection
 * Prepare setup of table definitions
 
-DB needs to support native JSON data type, so possible dialects are restricted to the following:
-* PostgreSQL
-* MySQL >= 5.7
-* sqlite >= 3.9
-(see https://docs.sqlalchemy.org/en/13/core/type_basics.html#sqlalchemy.types.JSON)
+DB needs to support native XML data type, so only PostgreSQL is supported.
 """
 
 import logging
+import xml.etree.ElementTree as etree
 from os import environ
 
 # more sqlalchemy setup below with conditions
 from sqlalchemy import Column, DateTime, Integer, MetaData, String, Text
+from sqlalchemy.types import UserDefinedType
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.postgresql import JSON
 
 # noinspection PyUnresolvedReferences
 import logfile_setup
@@ -25,21 +24,36 @@ import logfile_setup
 logger = logging.getLogger(__name__)
 
 # DB Setup
-db_dialect = environ["ALMA_REST_DB_DIALECT"]
 does_sqlalchemy_log = bool(int(environ["ALMA_REST_DB_VERBOSE"]))
-
-if db_dialect == "postgresql":
-    from sqlalchemy.dialects.postgresql import JSON
-elif db_dialect == "mysql":
-    from sqlalchemy.dialects.mysql import JSON
-elif db_dialect == "sqlite":
-    from sqlalchemy.dialects.sqlite import JSON
-else:
-    logger.error("No valid db_dialect given.")
-    exit(1)
 
 # Basic shortenings for SQLAlchemy
 metadata = MetaData()
+Base = declarative_base()
+
+
+# Define Custom Type XML
+# https://stackoverflow.com/questions/16153512/using-postgresql-xml-data-type-with-sqlalchemy
+class XMLType(UserDefinedType):
+    def get_col_spec(self):
+        return 'XML'
+
+    def bind_processor(self, dialect):
+        def process(value):
+            if value is not None:
+                if isinstance(value, str):
+                    return value
+                else:
+                    return etree.tostring(value, encoding="unicode")
+            else:
+                return None
+        return process
+
+    def result_processor(self, dialect, coltype):
+        def process(value):
+            if value is not None:
+                value = etree.fromstring(value)
+            return value
+        return process
 
 
 # Connection setup
@@ -49,20 +63,11 @@ def prepare_connection_params_from_env():
     :return: SQL Engine with connection params as provided via env vars.
     """
     database = environ["ALMA_REST_DB"]
-    if db_dialect in ('postgresql', 'mysql'):
-        db_user = environ["ALMA_REST_DB_USER"]
-        db_pw = environ["ALMA_REST_DB_PW"]
-        db_url = environ["ALMA_REST_DB_URL"]
-        connection_params = f'{db_dialect}://{db_user}:{db_pw}@{db_url}/{database}'
-    elif db_dialect == "sqlite":
-        connection_params = f'sqlite:///{database}'
-    else:
-        logger.error('Connection parameters for the database could not be set. Check env vars.')
+    db_user = environ["ALMA_REST_DB_USER"]
+    db_pw = environ["ALMA_REST_DB_PW"]
+    db_url = environ["ALMA_REST_DB_URL"]
+    connection_params = f'postgresql://{db_user}:{db_pw}@{db_url}/{database}'
     return connection_params
-
-
-# Table setup
-Base = declarative_base()
 
 
 class JobStatusPerId(Base):
@@ -89,4 +94,4 @@ class FetchedRecords(Base):
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime)
     alma_id = Column(String)
-    alma_record = Column(JSON)
+    alma_record = Column(XMLType)

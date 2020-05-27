@@ -7,7 +7,6 @@ This will import the other modules and do the following:
 * If API calls are not successful, mark the IDs with "error" in job_status_per_id
 """
 
-from json import loads
 from logging import getLogger
 from datetime import datetime
 
@@ -106,13 +105,12 @@ def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str):
     import_csv_to_db_tables(csv_path, 'GET')
     list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', 'GET', job_timestamp, db_session)
     for alma_id, in list_of_ids:
-        record_data = get_record_for_alma_ids(alma_id, api, record_type)
+        record_data = get_record_for_alma_ids(alma_id, api, record_type).decode("utf-8")
         if record_data is None:
             db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session)
         else:
             db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session)
-            alma_record_json = loads(str(record_data, 'utf-8'))
-            db_read_write.add_fetched_record_to_session(alma_id, alma_record_json, job_timestamp, db_session)
+            db_read_write.add_fetched_record_to_session(alma_id, record_data, job_timestamp, db_session)
     db_session.commit()
     ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'GET', job_timestamp, db_session)
     ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'GET', job_timestamp, db_session)

@@ -64,7 +64,7 @@ def delete_record(url_parameters: str):
     :return: Contents of the response.
     """
 
-    with create_alma_api_session('json') as session:
+    with create_alma_api_session('xml') as session:
         alma_url = api_base_url+url_parameters
         alma_response = session.delete(alma_url)
         if alma_response.status_code == 204:
@@ -90,7 +90,7 @@ def get_record(url_parameters: str):
     :return: Contents of the Response and status-string for table job_status_per_id.
     """
 
-    with create_alma_api_session('json') as session:
+    with create_alma_api_session('xml') as session:
         alma_url = api_base_url+url_parameters
         alma_response = session.get(alma_url)
         if alma_response.status_code == 200:

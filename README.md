@@ -26,14 +26,13 @@ goes wrong, the status will be set to "error".
 
 **Note:** Currently all API-calls will be made with a header value of
 ```
-"accept": "application/json"
+"accept": "application/xml"
 ```
-Be aware that there might be issues with JSON for the Alma APIs.
 
 # Requirements
 
 * Python 3.6.9 or higher, see requirements.txt for Python packages
-* A PostgreSQL, MySQL or SQLite database with read and write access
+* A PostgreSQL database with read and write access
 * An Alma API-key with the necessary permissions for your operations
 
 # Initial Setup
@@ -59,7 +58,6 @@ export ALMA_REST_ID_INSTITUTIONAL_SUFFIX= # the last four digits of your Alma ID
 export ALMA_REST_DB=                      # name of your database
 export ALMA_REST_DB_USER=                 # name of your user, not needed for sqlite
 export ALMA_REST_DB_PW=                   # password of your user, not needed for sqlite
-export ALMA_REST_DB_DIALECT=              # supported values 'postgresql', 'mysql' or 'sqlite'
 export ALMA_REST_DB_VERBOSE=              # enable (1) or suppress (0) logging of SQLAlchemy
 export ALMA_REST_API_KEY=                 # API key as per developers.exlibrisgroup.com
 export ALMA_REST_API_BASE_URL=            # base URL for your Alma API calls, usually ending with 'v1'
