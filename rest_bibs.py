@@ -113,7 +113,7 @@ def create_bib(record_data: str, mms_id: str):
     :return: Response data in XML format.
     """
     logger.info(f'Trying to create BIB with mms_id {mms_id}.')
-    bib_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}')
+    bib_record = rest_call_api.create_record(record_data, f'/bibs/')
     return bib_record
 
 
@@ -126,7 +126,7 @@ def create_hol(record_data: str, mms_id: str, hol_id: str):
     :return: Response data in XML format.
     """
     logger.info(f'Trying to create HOL with mms_id {mms_id} and hol_id {hol_id}.')
-    hol_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}')
+    hol_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/holdings/')
     return hol_record
 
 
@@ -140,7 +140,7 @@ def create_item(record_data: str, mms_id: str, hol_id: str, itm_id: str):
     :return: Response data in XML format.
     """
     logger.info(f'Trying to create ITM with mms_id {mms_id} and hol_id {hol_id} and itm_id {itm_id}.')
-    itm_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}/items/{itm_id}')
+    itm_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}/items/')
     return itm_record
 
 
@@ -153,7 +153,7 @@ def create_portfolio(record_data: str, mms_id: str, portfolio_id: str):
     :return: Response data in XML format.
     """
     logger.info(f'Trying to create portfolio record with mms_id {mms_id} and portfolio_id {portfolio_id}.')
-    portfolio_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/portfolios/{portfolio_id}')
+    portfolio_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/portfolios/')
     return portfolio_record
 
 
@@ -166,7 +166,7 @@ def create_e_collection(record_data: str, mms_id: str, collection_id: str):
     :return: Record in XML format.
     """
     logger.info(f'Trying to create e-collection record with mms_id {mms_id} and collection_id {collection_id}.')
-    collection_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/e-collections/{collection_id}')
+    collection_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/e-collections/')
     return collection_record
 
 
