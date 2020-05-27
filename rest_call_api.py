@@ -38,7 +38,7 @@ def create_record(record_data: str, url_parameters: str):
     :return: Contents of the response.
     """
 
-    with create_alma_api_session() as session:
+    with create_alma_api_session('xml') as session:
         alma_url = api_base_url+url_parameters
         alma_response = session.post(alma_url, data=record_data)
         if alma_response.status_code == 200:
@@ -64,7 +64,7 @@ def delete_record(url_parameters: str):
     :return: Contents of the response.
     """
 
-    with create_alma_api_session() as session:
+    with create_alma_api_session('json') as session:
         alma_url = api_base_url+url_parameters
         alma_response = session.delete(alma_url)
         if alma_response.status_code == 204:
@@ -90,7 +90,7 @@ def get_record(url_parameters: str):
     :return: Contents of the Response and status-string for table job_status_per_id.
     """
 
-    with create_alma_api_session() as session:
+    with create_alma_api_session('json') as session:
         alma_url = api_base_url+url_parameters
         alma_response = session.get(alma_url)
         if alma_response.status_code == 200:
@@ -105,13 +105,15 @@ Reason: {alma_response.status_code} - {alma_response.content}"""
             logger.error(error_string)
 
 
-def create_alma_api_session():
+def create_alma_api_session(session_format):
     """Create a Session with parameters from env vars
+    :param session_format: Format in which records are sent and retrieved.
     :return: Session object for connections to Alma
     """
     session = Session()
     session.headers.update({
-        "accept": "application/json",
+        "accept": "application/" + session_format,
+        "content_type": "application/" + session_format,
         "authorization": f"apikey {api_key}",
         "User-Agent": "alma_rest/0.0.1"
     })
