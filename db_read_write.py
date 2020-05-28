@@ -48,7 +48,7 @@ def get_record_from_fetched_records(alma_ids: str):
     record_query = db_session.query(
         db_setup.FetchedRecords
     ).filter_by(
-        alma_id = alma_ids
+        alma_id=alma_ids
     ).order_by(
         'job_timestamp'
     ).limit(1)

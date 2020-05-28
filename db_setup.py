@@ -12,7 +12,7 @@ import xml.etree.ElementTree as etree
 from os import environ
 
 # more sqlalchemy setup below with conditions
-from sqlalchemy import Column, DateTime, Integer, MetaData, String, Text
+from sqlalchemy import Column, DateTime, Integer, MetaData, String
 from sqlalchemy.types import UserDefinedType
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import JSON
@@ -33,11 +33,14 @@ Base = declarative_base()
 
 # Define Custom Type XML
 # https://stackoverflow.com/questions/16153512/using-postgresql-xml-data-type-with-sqlalchemy
+# noinspection PyUnusedLocal
 class XMLType(UserDefinedType):
-    def get_col_spec(self):
+    @staticmethod
+    def get_col_spec():
         return 'XML'
 
-    def bind_processor(self, dialect):
+    @staticmethod
+    def bind_processor(dialect):
         def process(value):
             if value is not None:
                 if isinstance(value, str):
@@ -48,7 +51,8 @@ class XMLType(UserDefinedType):
                 return None
         return process
 
-    def result_processor(self, dialect, coltype):
+    @staticmethod
+    def result_processor(dialect, coltype):
         def process(value):
             if value is not None:
                 value = etree.fromstring(value)

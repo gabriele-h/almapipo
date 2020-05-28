@@ -3,12 +3,10 @@ Extracts XML from the database and offers helper functions for further
 handling of the record.
 """
 
-import json
 from logging import getLogger
 from xml.etree import ElementTree
 
 import db_read_write
-import db_setup
 # noinspection PyUnresolvedReferences
 import logfile_setup
 

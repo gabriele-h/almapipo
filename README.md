@@ -176,7 +176,7 @@ as an xml.etree Element:
 
 ```python
 import xml_extract
-xml_extract.extract_xml_record_element_from_fetched_records('991234567890123,221234567890123')
+xml_extract.extract_record_from_fetched_records('991234567890123,221234567890123')
 ```
 
 # `input_read.py`
