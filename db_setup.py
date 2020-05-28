@@ -79,9 +79,9 @@ class JobStatusPerId(Base):
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime)
-    alma_id = Column(String)
-    job_status = Column(String)
-    job_action = Column(String)
+    alma_id = Column(String(100))
+    job_status = Column(String(5))
+    job_action = Column(String(6))
 
 
 class SourceCsv(Base):
@@ -97,5 +97,5 @@ class FetchedRecords(Base):
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime)
-    alma_id = Column(String)
+    alma_id = Column(String(100))
     alma_record = Column(XMLType)
