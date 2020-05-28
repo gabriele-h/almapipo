@@ -151,22 +151,11 @@ def create_record_for_alma_ids(alma_ids: str, api: str, record_type: str, record
     :param record_data: Data of the record to be created (usually XML)
     :return: API response
     """
-    split_alma_ids = str.split(alma_ids, ',')
-    if api == 'bibs' and record_type == 'bibs':
-        return rest_bibs.create_bib(record_data, split_alma_ids[0])
-    elif api == 'bibs' and record_type == 'holdings':
-        return rest_bibs.create_hol(record_data, split_alma_ids[0], split_alma_ids[1])
-    elif api == 'bibs' and record_type == 'items':
-        return rest_bibs.create_item(record_data, split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
-    elif api == 'bibs' and record_type == 'portfolios':
-        return rest_bibs.create_portfolio(record_data, split_alma_ids[0], split_alma_ids[1])
-    elif api == 'bibs' and record_type == 'e-collections':
-        return rest_bibs.create_e_collection(record_data, split_alma_ids[0], split_alma_ids[1])
-    else:
-        logger.error('No valid combination of API and record type provided.')
-        raise ValueError
+    response = call_api_for_record('POST', alma_ids, api, record_type, record_data)
+    return response
 
-def delete_record_for_alma_ids(alma_ids: str, api: str, record_type: str):
+
+def delete_record_for_alma_ids(alma_ids: str, api: str, record_type: str) -> str:
     """
     For a specific API and record type make the DELETE call to that API
     and return the resulting response.
@@ -175,23 +164,11 @@ def delete_record_for_alma_ids(alma_ids: str, api: str, record_type: str):
     :param record_type: Type of the record to call the API for (e. g. "holdings")
     :return: API response
     """
-    split_alma_ids = str.split(alma_ids, ',')
-    if api == 'bibs' and record_type == 'bibs':
-        return rest_bibs.delete_bib(split_alma_ids[0])
-    elif api == 'bibs' and record_type == 'holdings':
-        return rest_bibs.delete_hol(split_alma_ids[0], split_alma_ids[1])
-    elif api == 'bibs' and record_type == 'items':
-        return rest_bibs.delete_item(split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
-    elif api == 'bibs' and record_type == 'portfolios':
-        return rest_bibs.delete_portfolio(split_alma_ids[0], split_alma_ids[1])
-    elif api == 'bibs' and record_type == 'e-collections':
-        return rest_bibs.delete_e_collection(split_alma_ids[0], split_alma_ids[1])
-    else:
-        logger.error('No valid combination of API and record type provided.')
-        raise ValueError
+    response = call_api_for_record('DELETE', alma_ids, api, record_type)
+    return response
 
 
-def get_record_for_alma_ids(alma_ids: str, api: str, record_type: str):
+def get_record_for_alma_ids(alma_ids: str, api: str, record_type: str) -> str:
     """
     For a specific API and record type make the GET call to that API
     and return the resulting response.
@@ -200,17 +177,75 @@ def get_record_for_alma_ids(alma_ids: str, api: str, record_type: str):
     :param record_type: Type of the record to call the API for (e. g. "holdings")
     :return: API response
     """
+    response = call_api_for_record('GET', alma_ids, api, record_type)
+    return response
+
+
+def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, record_data: bytes = None) -> str:
+    """
+    Meta-function for all api_calls.
+    :param action: DELETE, GET, POST or PUT.
+    :param alma_ids: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
+    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
+    :param record_type: Type of the record to call the API for (e. g. "holdings")
+    :param record_data: Only necessary for POST and PUT actions.
+    :return: API response as a string.
+    """
     split_alma_ids = str.split(alma_ids, ',')
-    if api == 'bibs' and record_type == 'bibs':
-        return rest_bibs.get_bib(split_alma_ids[0])
-    elif api == 'bibs' and record_type == 'holdings':
-        return rest_bibs.get_hol(split_alma_ids[0], split_alma_ids[1])
-    elif api == 'bibs' and record_type == 'items':
-        return rest_bibs.get_item(split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
-    elif api == 'bibs' and record_type == 'portfolios':
-        return rest_bibs.get_portfolio(split_alma_ids[0], split_alma_ids[1])
-    elif api == 'bibs' and record_type == 'e-collections':
-        return rest_bibs.get_e_collection(split_alma_ids[0], split_alma_ids[1])
+    if api == 'bibs':
+        if record_type == 'bibs':
+            if action == 'DELETE':
+                return rest_bibs.delete_bib(split_alma_ids[0])
+            elif action == 'GET':
+                return rest_bibs.get_bib(split_alma_ids[0])
+            elif action == 'POST':
+                return rest_bibs.create_bib(record_data, split_alma_ids[0])
+            else:
+                logger.error('No valid combination of API, record type and action provided.')
+                raise ValueError
+        elif record_type == 'holdings':
+            if action == 'DELETE':
+                return rest_bibs.delete_hol(split_alma_ids[0], split_alma_ids[1])
+            elif action == 'GET':
+                return rest_bibs.get_hol(split_alma_ids[0], split_alma_ids[1])
+            elif action == 'POST':
+                return rest_bibs.create_hol(record_data, split_alma_ids[0], split_alma_ids[1])
+            else:
+                logger.error('No valid combination of API, record type and action provided.')
+                raise ValueError
+        elif record_type == 'items':
+            if action == 'DELETE':
+                return rest_bibs.delete_item(split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
+            elif action == 'GET':
+                return rest_bibs.get_item(split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
+            elif action == 'POST':
+                return rest_bibs.create_item(record_data, split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
+            else:
+                logger.error('No valid combination of API, record type and action provided.')
+                raise ValueError
+        elif record_type == 'portfolios':
+            if action == 'DELETE':
+                return rest_bibs.delete_portfolio(split_alma_ids[0], split_alma_ids[1])
+            elif action == 'GET':
+                return rest_bibs.get_portfolio(split_alma_ids[0], split_alma_ids[1])
+            elif action == 'POST':
+                return rest_bibs.create_portfolio(record_data, split_alma_ids[0], split_alma_ids[1])
+            else:
+                logger.error('No valid combination of API, record type and action provided.')
+                raise ValueError
+        elif record_type == 'e-collections':
+            if action == 'DELETE':
+                return rest_bibs.delete_e_collection(split_alma_ids[0], split_alma_ids[1])
+            elif action == 'GET':
+                return rest_bibs.get_e_collection(split_alma_ids[0], split_alma_ids[1])
+            elif action == 'POST':
+                return rest_bibs.create_e_collection(record_data, split_alma_ids[0], split_alma_ids[1])
+            else:
+                logger.error('No valid combination of API, record type and action provided.')
+                raise ValueError
+        else:
+            logger.error('No valid combination of API and record type provided.')
+            raise ValueError
     else:
         logger.error('No valid combination of API and record type provided.')
         raise ValueError
