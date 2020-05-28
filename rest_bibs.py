@@ -17,7 +17,7 @@ logger = getLogger(__name__)
 #######
 
 
-def get_bib(mms_id: str):
+def get_bib(mms_id: str) -> str:
     """
     Get BIB record by MMS-ID via Alma API.
     :param mms_id: Unique ID of Alma BIB records.
@@ -28,7 +28,7 @@ def get_bib(mms_id: str):
     return bib_record
 
 
-def get_hol(mms_id: str, hol_id: str):
+def get_hol(mms_id: str, hol_id: str) -> str:
     """
     Get HOL record via Alma API by MMS-ID and HOL-id.
     :param mms_id: Unique ID of the BIB record the HOL is connected to.
@@ -40,7 +40,7 @@ def get_hol(mms_id: str, hol_id: str):
     return hol_record
 
 
-def get_item(mms_id: str, hol_id: str, itm_id: str):
+def get_item(mms_id: str, hol_id: str, itm_id: str) -> str:
     """
     Get Item record via Alma API by MMS-ID, HOL-id and ITM-ID.
     :param mms_id: Unique ID of the BIB record the HOL is connected to.
@@ -53,7 +53,7 @@ def get_item(mms_id: str, hol_id: str, itm_id: str):
     return itm_record
 
 
-def get_portfolio(mms_id: str, portfolio_id: str):
+def get_portfolio(mms_id: str, portfolio_id: str) -> str:
     """
     Get portfolio record via Alma API by MMS-ID and portfolio-ID.
     :param mms_id: Unique ID of the BIB record the portfolio is connected to.
@@ -65,7 +65,7 @@ def get_portfolio(mms_id: str, portfolio_id: str):
     return portfolio_record
 
 
-def get_e_collection(mms_id: str, collection_id: str):
+def get_e_collection(mms_id: str, collection_id: str) -> str:
     """
     Get e-collection record for collection-ID.
     :param mms_id: Unique ID of the BIB record the collection is connected to.
@@ -77,7 +77,7 @@ def get_e_collection(mms_id: str, collection_id: str):
     return collection_record
 
 
-def get_bibs_by_query(id_type: str, other_id: str):
+def get_bibs_by_query(id_type: str, other_id: str) -> str:
     """
     Get records by ID via Alma API. Possible ID types:
     * mms_id
@@ -105,7 +105,7 @@ def get_bibs_by_query(id_type: str, other_id: str):
 ########
 
 
-def create_bib(record_data: str, mms_id: str):
+def create_bib(record_data: bytes, mms_id: str) -> str:
     """
     Create BIB record by MMS-ID via Alma API.
     :param record_data: XML of the record to be created.
@@ -117,7 +117,7 @@ def create_bib(record_data: str, mms_id: str):
     return bib_record
 
 
-def create_hol(record_data: str, mms_id: str, hol_id: str):
+def create_hol(record_data: bytes, mms_id: str, hol_id: str) -> str:
     """
     Create HOL record via Alma API by MMS-ID and HOL-id.
     :param record_data: XML of the record to be created.
@@ -130,7 +130,7 @@ def create_hol(record_data: str, mms_id: str, hol_id: str):
     return hol_record
 
 
-def create_item(record_data: str, mms_id: str, hol_id: str, itm_id: str):
+def create_item(record_data: bytes, mms_id: str, hol_id: str, itm_id: str) -> str:
     """
     Create Item record via Alma API by MMS-ID, HOL-id and ITM-ID.
     :param record_data: XML of the record to be created.
@@ -144,7 +144,7 @@ def create_item(record_data: str, mms_id: str, hol_id: str, itm_id: str):
     return itm_record
 
 
-def create_portfolio(record_data: str, mms_id: str, portfolio_id: str):
+def create_portfolio(record_data: bytes, mms_id: str, portfolio_id: str) -> str:
     """
     Create portfolio record via Alma API by MMS-ID and portfolio-ID.
     :param record_data: XML of the record to be created.
@@ -157,7 +157,7 @@ def create_portfolio(record_data: str, mms_id: str, portfolio_id: str):
     return portfolio_record
 
 
-def create_e_collection(record_data: str, mms_id: str, collection_id: str):
+def create_e_collection(record_data: bytes, mms_id: str, collection_id: str) -> str:
     """
     Create e-collection record for collection-ID.
     :param record_data: XML of the record to be created.
@@ -186,7 +186,7 @@ def create_e_collection(record_data: str, mms_id: str, collection_id: str):
 ##########
 
 
-def delete_bib(mms_id: str):
+def delete_bib(mms_id: str) -> str:
     """
     Delete BIB record by MMS-ID via Alma API.
     :param mms_id: Unique ID of Alma BIB records.
@@ -197,7 +197,7 @@ def delete_bib(mms_id: str):
     return delete_response
 
 
-def delete_hol(mms_id: str, hol_id: str):
+def delete_hol(mms_id: str, hol_id: str) -> str:
     """
     Delete HOL record via Alma API by MMS-ID and HOL-id.
     :param mms_id: Unique ID of the BIB record the HOL is connected to.
@@ -209,7 +209,7 @@ def delete_hol(mms_id: str, hol_id: str):
     return delete_response
 
 
-def delete_item(mms_id: str, hol_id: str, itm_id: str):
+def delete_item(mms_id: str, hol_id: str, itm_id: str) -> str:
     """
     Delete Item record via Alma API by MMS-ID, HOL-id and ITM-ID.
     :param mms_id: Unique ID of the BIB record the HOL is connected to.
@@ -222,7 +222,7 @@ def delete_item(mms_id: str, hol_id: str, itm_id: str):
     return delete_response
 
 
-def delete_portfolio(mms_id: str, portfolio_id: str):
+def delete_portfolio(mms_id: str, portfolio_id: str) -> str:
     """
     Delete portfolio record via Alma API by MMS-ID and portfolio-ID.
     :param mms_id: Unique ID of the BIB record the portfolio is connected to.
@@ -234,7 +234,7 @@ def delete_portfolio(mms_id: str, portfolio_id: str):
     return delete_response
 
 
-def delete_e_collection(mms_id: str, collection_id: str):
+def delete_e_collection(mms_id: str, collection_id: str) -> str:
     """
     Delete e-collection record via Alma API by MMS-ID and collection-ID.
     :param mms_id: Unique ID of the BIB record the collection is connected to.
