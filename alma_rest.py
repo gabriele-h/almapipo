@@ -25,7 +25,7 @@ logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
 
 
-def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record_type: str):
+def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
     """
     For a list of Alma-IDs given in a CSV file, this function does the following:
     * Query for the latest version of the fetched record's xml in the local database
@@ -54,8 +54,7 @@ def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record
     logger.info(f"Errors were encountered for POST of {ids_error.count()} record(s).")
 
 
-
-def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str):
+def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
     """
     For a list of Alma-IDs given in a CSV file, this function does the following:
     * Save the data from the CSV-file to tables job_status_per_id and source_csv
@@ -88,7 +87,7 @@ def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: st
     logger.info(f"Errors were encountered for DELETE of {ids_error.count()} record(s).")
 
 
-def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str):
+def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
     """
     For a list of Alma-IDs given in a CSV file, this function does the following:
     * Save the data from the CSV-file to tables job_status_per_id and source_csv
@@ -105,7 +104,7 @@ def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str):
     import_csv_to_db_tables(csv_path, 'GET')
     list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', 'GET', job_timestamp, db_session)
     for alma_id, in list_of_ids:
-        record_data = get_record_for_alma_ids(alma_id, api, record_type).decode("utf-8")
+        record_data = get_record_for_alma_ids(alma_id, api, record_type)
         if record_data is None:
             db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session)
         else:
@@ -118,7 +117,7 @@ def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str):
     logger.info(f"Errors were encountered for GET of {ids_error.count()} record(s).")
 
 
-def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: bool = True):
+def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: bool = True) -> None:
     """
     Imports a whole csv or tsv file to the table source_csv.
     Imports valid Alma-IDs to table job_status_per_id.
@@ -141,7 +140,7 @@ def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: boo
         logger.error('No valid file path provided.')
 
 
-def create_record_for_alma_ids(alma_ids: str, api: str, record_type: str, record_data: str):
+def create_record_for_alma_ids(alma_ids: str, api: str, record_type: str, record_data: bytes) -> str:
     """
     For a specific API and record type make the POST call to that API
     and return the resulting response.
