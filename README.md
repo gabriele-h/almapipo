@@ -3,7 +3,7 @@
 ## Scenario
 A set of
 [Alma](https://knowledge.exlibrisgroup.com/Alma/Product_Documentation/010Alma_Online_Help_(English)/010Getting_Started/010Alma_Introduction/010Alma_Overview)
-records needs to be manipulated (created, deleted, updated).
+records needs to be manipulated (created, deleted, updated) or fetched for analysis.
 
 ## Preparation
 
@@ -16,17 +16,20 @@ or a list of Alma-IDs (see below "Input data").
 In a **database** both the **input** used as well as the
 **status of the manipulation** are saved on a per-line or per-record basis.
 All records will be fetched prior to the manipulation and a
-**copy of each record before and after the manipulation** will
-be kept as a backup.
+**copy of each record before the manipulation** (plus where applicable
+after the manipulation) will be kept as a backup.
 
 Another module of the package will handle the actual **manipulation of
 records in Alma via API**. If the manipulation is successful, the status for that
-record will be changed from "new" to "done" in the database. If anything
+record will be changed from "new" to "done" in the database table
+`job_status_per_id`. If anything
 goes wrong, the status will be set to "error".
 
-**Note:** Currently all API-calls will be made with a header value of
+**Note:** Currently all API-calls will be made with xml as the format. See 
+how the format is set in the headers within `rest_call_api.py`:
 ```
 "accept": "application/xml"
+"Content-Type": "application/xml"
 ```
 
 # Requirements
@@ -56,8 +59,8 @@ The following env variables need to be set:
 export ALMA_REST_LOGFILE_DIR=             # where you want your logs saved
 export ALMA_REST_ID_INSTITUTIONAL_SUFFIX= # the last four digits of your Alma IDs
 export ALMA_REST_DB=                      # name of your database
-export ALMA_REST_DB_USER=                 # name of your user, not needed for sqlite
-export ALMA_REST_DB_PW=                   # password of your user, not needed for sqlite
+export ALMA_REST_DB_USER=                 # name of your user
+export ALMA_REST_DB_PW=                   # password of your user
 export ALMA_REST_DB_VERBOSE=              # enable (1) or suppress (0) logging of SQLAlchemy
 export ALMA_REST_API_KEY=                 # API key as per developers.exlibrisgroup.com
 export ALMA_REST_API_BASE_URL=            # base URL for your Alma API calls, usually ending with 'v1'
@@ -143,11 +146,13 @@ alma_rest.delete_records_via_api_for_csv_list('./input/test.tsv', 'bibs', 'holdi
 
 ## Add CSV Lines to `source_csv` and `job_status_per_id`
 
-A convenience function makes it possible to read a whole CSV-file into
+This makes it possible to read a whole CSV-file into
 both relevant database tables. It takes two parameters:
 * Path to the CSV- or TSV-file
 * Intended action for the records listed ('POST', 'GET', 'PUT' or 'DELETE'). **Note:** If none is provided
 this will default to 'GET'.
+
+**Note:** This will not produce any API-calls.
 
 ### Usage Example Python Console
 
@@ -165,8 +170,8 @@ For records retrieved via GET, extract the record's API response or XML
 record from the table `fetched_records`.
 
 Options for export currently include:
-* Whole response as a string
-* XML as a string
+* Whole response as an xml.etree Element
+* Whole response as a bytes object (used in POST calls)
 * XML as an xml.etree Element
 
 ### Usage Example Python Console
@@ -212,7 +217,8 @@ Will do the following:
 * Insert lines from input CSV file into the table `source_csv`
 * Insert valid Alma IDs into table `job_status_per_id` and set status to "new"
 
-Please note that this script uses **SQLAlchemy** which will **log every interaction
+Please note that this script uses **SQLAlchemy**. If the env variable
+`ALMA_REST_DB_VERBOSE` is set to 1, this will **log every interaction
 with the database, including all SQL-statements**. This might lead to huge
 log files, but it also makes the actual interactions with the database
 more transparent.
