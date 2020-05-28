@@ -77,9 +77,9 @@ def get_e_collection(mms_id: str, collection_id: str):
     return collection_record
 
 
-def get_bib_by_query(id_type: str, other_id: str):
+def get_bibs_by_query(id_type: str, other_id: str):
     """
-    Get single record by ID via Alma API. Possible ID types:
+    Get records by ID via Alma API. Possible ID types:
     * mms_id
     * ie_id
     * holdings_id
@@ -91,13 +91,13 @@ def get_bib_by_query(id_type: str, other_id: str):
     :param other_id: Query value. ID of the record to be fetched.
     :return: Record in XML format.
     """
-    logger.info(f'Trying to fetch record by query with other_id {other_id}.')
+    logger.info(f'Trying to fetch record by query with id_type {id_type} and other_id {other_id}.')
     api_url_path = '/bibs?'
     api_url_query = {id_type: other_id}
     api_url_query_encoded = parse.urlencode(api_url_query)
     api_url = api_url_path + api_url_query_encoded
-    bib_record = rest_call_api.get_record(api_url)
-    return bib_record
+    bib_records_response = rest_call_api.get_record(api_url)
+    return bib_records_response
 
 
 ########
