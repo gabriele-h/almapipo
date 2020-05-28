@@ -27,30 +27,18 @@ api_key = environ['ALMA_REST_API_KEY']
 api_base_url = environ['ALMA_REST_API_BASE_URL']
 
 
-def create_record(record_data: str, url_parameters: str):
+def create_record(record_data: bytes, url_parameters: str):
     """Generic function for POST calls to the Alma API.
 
     Will return the response if HTTP status code is 200.
     Otherwise the error returned by the API will be added to the
     logfile as an ERROR.
-    :param record_data: XML of the record to be created.
+    :param record_data: XML of the record to be created in bytes format.
     :param url_parameters: Necessary path and arguments for API call.
     :return: Contents of the response.
     """
-
-    with create_alma_api_session('xml') as session:
-        alma_url = api_base_url+url_parameters
-        alma_response = session.post(alma_url, data=record_data)
-        if alma_response.status_code == 200:
-            alma_response_content = alma_response.content
-            logger.info(
-                    f'Record for parameters "{url_parameters}" successfully POSTED.'
-                    )
-            return alma_response_content
-        else:
-            error_string = f"""Record for parameters "{url_parameters}" could not be created.
-Reason: {alma_response.status_code} - {alma_response.content}"""
-            logger.error(error_string)
+    response = call_api(url_parameters, 'POST', 200, record_data)
+    return response
 
 
 def delete_record(url_parameters: str):
@@ -63,20 +51,8 @@ def delete_record(url_parameters: str):
     :param url_parameters: Necessary path and arguments for API call.
     :return: Contents of the response.
     """
-
-    with create_alma_api_session('xml') as session:
-        alma_url = api_base_url+url_parameters
-        alma_response = session.delete(alma_url)
-        if alma_response.status_code == 204:
-            alma_response_content = alma_response.content
-            logger.info(
-                f'Record for parameters "{url_parameters}" successfully DELETED.'
-            )
-            return alma_response_content
-        else:
-            error_string = f"""Record for parameters "{url_parameters}" could not be deleted.
-Reason: {alma_response.status_code} - {alma_response.content}"""
-            logger.error(error_string)
+    response = call_api(url_parameters, 'DELETE', 204)
+    return response
 
 
 def get_record(url_parameters: str):
@@ -87,21 +63,55 @@ def get_record(url_parameters: str):
     logfile as an ERROR.
 
     :param url_parameters: Necessary path and arguments for API call.
-    :return: Contents of the Response and status-string for table job_status_per_id.
     """
+    response = call_api(url_parameters, 'GET', 200)
+    return response
 
+
+def call_api(url_parameters: str, action: str, status_code: int, record_data: bytes = None) -> str:
+    """
+    Generic function for all API calls.
+
+    Will return the response if the HTTP status code is met.
+    Otherwise the error returned by the API will be added to the
+    logfile as an ERROR.
+
+    Additionally there is a check for responses that meet the
+    required HTTP status code, but still contain an error. In this
+    case the response will be saved to the database (if it exists),
+    and the error will be added to the logfile as an ERROR.
+
+    :param url_parameters: Necessary path and arguments for the API call.
+    :param action: DELETE, GET, POST or PUT
+    :param status_code: Status code of a successful action.
+    :param record_data: Necessary input for POST and PUT, defaults to None.
+    :return: The API's response in XML format as a string.
+    """
     with create_alma_api_session('xml') as session:
         alma_url = api_base_url+url_parameters
-        alma_response = session.get(alma_url)
-        if alma_response.status_code == 200:
-            alma_response_content = alma_response.content
+        if action == 'DELETE':
+            alma_response = session.delete(alma_url)
+        elif action == 'GET':
+            alma_response = session.get(alma_url)
+        elif action == 'POST':
+            alma_response = session.post(alma_url, data=record_data)
+        elif action == 'PUT':
+            alma_response = session.put(alma_url, data=record_data)
+        else:
+            logger.error('No valid REST action supplied.')
+            raise ValueError
+        if alma_response.status_code == status_code:
+            alma_response_content = alma_response.content.decode("utf-8")
             logger.info(
-                f'Record for parameters "{url_parameters}" successfully retrieved.'
+                f'{action} for record "{url_parameters}" completed successfully.'
             )
+            if '<errorList>' in alma_response_content:
+                logger.warning(f"""The response contained an error, even though it had status code {status_code}.
+Reason: {alma_response.status_code} - {alma_response.content}""")
             return alma_response_content
         else:
-            error_string = f"""Record for parameters "{url_parameters}" could not be retrieved.
-Reason: {alma_response.status_code} - {alma_response.content}"""
+            error_string = f"""{action} for record "{url_parameters}" failed.
+Reason: {alma_response.status_code} - {alma_response.content.decode("utf-8")}"""
             logger.error(error_string)
 
 
