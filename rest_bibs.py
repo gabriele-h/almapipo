@@ -1,4 +1,5 @@
-"""Query the Alma API for a single BIB record
+"""
+Query the Alma API for bibs records
 """
 
 from logging import getLogger
