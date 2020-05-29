@@ -20,7 +20,7 @@ logger = getLogger(__name__)
 
 def get_user(user_id: str) -> str:
     """
-    Get BIB record by MMS-ID via Alma API.
+    Get BIB record by user-ID via Alma API.
     :param user_id: Unique ID of Alma user record.
     :return: Record data in XML format.
     """
