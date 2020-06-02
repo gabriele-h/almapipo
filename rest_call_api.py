@@ -11,8 +11,6 @@ Then for each REST operation (POST, GET, PUT, DELETE) there is one base
 function that the more specific modules (like rest_bibs) can make use of.
 """
 
-# TODO if http status code 2XX, check for errors
-
 from logging import getLogger
 from os import environ
 from requests import Session
@@ -108,6 +106,8 @@ def call_api(url_parameters: str, action: str, status_code: int, record_data: by
             if '<errorList>' in alma_response_content:
                 logger.warning(f"""The response contained an error, even though it had status code {status_code}.
 Reason: {alma_response.status_code} - {alma_response.content}""")
+            elif not alma_response_content.startswith('<?xml'):
+                logger.error(f"""The response retrieved does not seem to be valid xml - startswith('<?xml')""")
             return alma_response_content
         else:
             error_string = f"""{action} for record "{url_parameters}" failed.
