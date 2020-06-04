@@ -66,9 +66,9 @@ def get_portfolio(mms_id: str, portfolio_id: str) -> str:
     return portfolio_record
 
 
-def get_e_collection(mms_id: str, collection_id: str) -> str:
+def get_e_collection_with_mms_id(mms_id: str, collection_id: str) -> str:
     """
-    Get e-collection record for collection-ID.
+    Get e-collection record for id combination mms-ID and collection-ID.
     :param mms_id: Unique ID of the BIB record the collection is connected to.
     :param collection_id: ID of the e-collection.
     :return: Record in XML format.
