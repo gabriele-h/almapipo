@@ -28,7 +28,8 @@ logger = getLogger(__name__)
 def main():
     """
     When used from commandline, the module will test the database
-    connection and give according information on stdout.
+    connection and give according information on stdout. Please set
+    env var ALMA_REST_DB_VERBOSE to 1 for the necessary feedback.
     :return: None
     """
     logfile_setup.log_to_stdout(logger)
