@@ -3,7 +3,6 @@ Query the Alma API for users
 """
 
 from logging import getLogger
-from urllib import parse
 
 import rest_call_api
 # noinspection PyUnresolvedReferences
