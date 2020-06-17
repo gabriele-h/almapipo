@@ -237,7 +237,7 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
             if action == 'DELETE':
                 return rest_bibs.delete_e_collection(split_alma_ids[0], split_alma_ids[1])
             elif action == 'GET':
-                return rest_bibs.get_e_collection(split_alma_ids[0], split_alma_ids[1])
+                return rest_bibs.get_e_collection_with_mms_id(split_alma_ids[0], split_alma_ids[1])
             elif action == 'POST':
                 return rest_bibs.create_e_collection(record_data, split_alma_ids[0], split_alma_ids[1])
             else:
