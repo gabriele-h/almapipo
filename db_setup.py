@@ -33,14 +33,12 @@ Base = declarative_base()
 
 # Define Custom Type XML
 # https://stackoverflow.com/questions/16153512/using-postgresql-xml-data-type-with-sqlalchemy
-# noinspection PyUnusedLocal
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class XMLType(UserDefinedType):
-    @staticmethod
-    def get_col_spec():
+    def get_col_spec(self):
         return 'XML'
 
-    @staticmethod
-    def bind_processor(dialect):
+    def bind_processor(self, dialect):
         def process(value):
             if value is not None:
                 if isinstance(value, str):
@@ -51,8 +49,7 @@ class XMLType(UserDefinedType):
                 return None
         return process
 
-    @staticmethod
-    def result_processor(dialect, coltype):
+    def result_processor(self, dialect, coltype):
         def process(value):
             if value is not None:
                 value = etree.fromstring(value)
