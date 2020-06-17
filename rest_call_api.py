@@ -107,7 +107,8 @@ def call_api(url_parameters: str, action: str, status_code: int, record_data: by
                 logger.warning(f"""The response contained an error, even though it had status code {status_code}.
 Reason: {alma_response.status_code} - {alma_response.content}""")
             elif not alma_response_content.startswith('<?xml'):
-                logger.error(f"""The response retrieved does not seem to be valid xml - startswith('<?xml')""")
+                logger.error(f"""The response retrieved does not seem to be valid xml - startswith('<?xml')
+{alma_response_content}""")
             return alma_response_content
         else:
             error_string = f"""{action} for record "{url_parameters}" failed.
