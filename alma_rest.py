@@ -15,6 +15,7 @@ import input_read
 # noinspection PyUnresolvedReferences
 import logfile_setup
 import rest_bibs
+import rest_users
 import xml_extract
 
 # Timestamp for as inserted in the database
@@ -239,6 +240,32 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 return rest_bibs.get_e_collection(split_alma_ids[0], split_alma_ids[1])
             elif action == 'POST':
                 return rest_bibs.create_e_collection(record_data, split_alma_ids[0], split_alma_ids[1])
+            else:
+                logger.error('No valid combination of API, record type and action provided.')
+                raise ValueError
+        elif record_type == 'all_items':
+            if action == 'GET':
+                return rest_bibs.get_all_items_for_bib(split_alma_ids[0])
+            else:
+                logger.error('No valid combination of API, record type and action provided.')
+                raise ValueError
+        else:
+            logger.error('No valid combination of API and record type provided.')
+            raise ValueError
+    elif api == 'items':
+        if record_type == 'items':
+            if action == 'GET':
+                return rest_bibs.get_item_by_barcode(split_alma_ids[0])
+            else:
+                logger.error('No valid combination of API, record type and action provided.')
+                raise ValueError
+        else:
+            logger.error('No valid combination of API and record type provided.')
+            raise ValueError
+    elif api == 'users':
+        if record_type == 'users':
+            if action == 'GET':
+                return rest_users.get_user(split_alma_ids[0])
             else:
                 logger.error('No valid combination of API, record type and action provided.')
                 raise ValueError
