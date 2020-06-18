@@ -22,12 +22,12 @@ def add_element_to_root(
     """
     For an xml given as an ElementTree, add the given Element.
     The Element will be added as a direct descendant of the root element.
-    The original xml fed to the function will be untouched by this operation.
-    :param xml: ElementTree of the xml to be manipulated.
-    :param element_tag: Type of tag of the element to be added.
-    :param element_attributes: Attributes of the element to be added.
-    :param element_text: Text of the elemet to be added.
-    :return: ElementTree of the manipulated xml.
+    The original xml fed to the function will be left untouched by this operation.
+    :param xml: ElementTree of the xml to be manipulated
+    :param element_tag: Type of tag of the element to be added
+    :param element_attributes: Attributes of the element to be added
+    :param element_text: Text of the elemet to be added
+    :return: ElementTree of the manipulated xml
     """
     manipulated_xml = deepcopy(xml)
     if element_attributes:
@@ -44,10 +44,10 @@ def remove_element_from_root_by_tag(xml: ElementTree, element_tag: str) -> Eleme
     """
     From an xml given as an ElementTree, remove all elements with the given tag.
     Works only if the element is a direct descendant of the root element.
-    The original xml fed to the function will be untouched by this operation.
-    :param xml: ElementTree of the xml to be manipulated.
-    :param element_tag: Type of tag to be removed from the XML.
-    :return: ElementTree of the manipulated xml.
+    The original xml fed to the function will be left untouched by this operation.
+    :param xml: ElementTree of the xml to be manipulated
+    :param element_tag: Type of tag to be removed from the XML
+    :return: ElementTree of the manipulated xml
     """
     manipulated_xml = deepcopy(xml)
     for element in manipulated_xml.findall(element_tag):
