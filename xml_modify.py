@@ -35,6 +35,30 @@ def add_element_to_root(
     return manipulated_xml
 
 
+def add_element_to_child(
+        xml: ElementTree,
+        child: str,
+        element_tag: str,
+        element_attributes: dict = None,
+        element_text: str = None) -> ElementTree:
+    """
+    For an xml given as an ElementTree, add the given Element to a specific child tag.
+    The Element will be added to all children matching the description given for child.
+    The original xml fed to the function will be left untouched by this operation.
+    :param xml: ElementTree of the xml to be manipulated
+    :param child: Path to the child as per Element.findall() - e. g. tag type
+    :param element_tag: Type of tag of the element to be added
+    :param element_attributes: Attributes of the element to be added
+    :param element_text: Text of the elemet to be added
+    :return: ElementTree of the manipulated xml
+    """
+    manipulated_xml = deepcopy(xml)
+    element = create_element(element_tag, element_attributes, element_text)
+    for child in manipulated_xml.findall(child):
+        child.append(element)
+    return manipulated_xml
+
+
 def remove_element_from_root_by_tag(xml: ElementTree, element_tag: str) -> ElementTree:
     """
     From an xml given as an ElementTree, remove all elements with the given tag.
