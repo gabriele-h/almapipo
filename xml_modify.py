@@ -14,7 +14,7 @@ import logfile_setup
 logger = getLogger(__name__)
 
 
-def add_element_to_xml(
+def add_element_to_root(
         xml: ElementTree,
         element_tag: str,
         element_attributes: dict = None,
@@ -40,7 +40,7 @@ def add_element_to_xml(
     return manipulated_xml
 
 
-def remove_element_from_xml_by_tag(xml: ElementTree, element_tag: str) -> ElementTree:
+def remove_element_from_root_by_tag(xml: ElementTree, element_tag: str) -> ElementTree:
     """
     From an xml given as an ElementTree, remove all elements with the given tag.
     Works only if the element is a direct descendant of the root element.
