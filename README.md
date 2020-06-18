@@ -184,6 +184,35 @@ import xml_extract
 xml_extract.extract_record_from_fetched_records('991234567890123,221234567890123')
 ```
 
+# `xml_modify.py`
+
+For a given ElementTree object a copy is created for the manipulations.
+This is to say that one should keep in mind that the returned ElementTree
+differs from the one given as input.
+
+Available operations include:
+* Add a newly created Element to the root of the xml document
+* Add a newly created Element to all children of root with a given path
+* Remove all direct children of the root that have a given path
+
+### Usage Example Python Console
+
+The following appends a new Element to all children that match a specific
+path:
+
+```python
+import xml_modify
+from xml.etree.ElementTree import fromstring, tostring
+my_xml_string = '<parent><child></child><child></child></parent>'
+my_xml = fromstring(my_xml_string)
+my_xml_modified = xml_modify.add_element_to_child(my_xml, "child", "grandchild", {"appended": "yes"}, "text")
+print(tostring(my_xml_modified))
+```
+Gives the Output:
+```python
+b'<parent><child><grandchild appended="yes">text</grandchild></child><child><grandchild appended="yes">text</grandchild></child></parent>'
+```
+
 # `input_read.py`
 
 Read a CSV- or TSV-file and return information for further handling by other modules.
