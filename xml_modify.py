@@ -59,10 +59,56 @@ def add_element_to_child(
     return manipulated_xml
 
 
-def remove_element_from_root_by_tag(xml: ElementTree, element_tag: str) -> ElementTree:
+def replace_element_(
+        xml: ElementTree,
+        element_tag: str,
+        old_element_attributes: dict = None,
+        new_element_attributes: dict = None,
+        old_element_text: str = None,
+        new_element_text: str = None) -> ElementTree:
     """
-    From an xml given as an ElementTree, remove all elements with the given tag.
-    Works only if the element is a direct descendant of the root element.
+    In an xml given as an ElementTree, replace one element by another.
+    Please note that you will have to provide all attributes of the element
+    to make them match. If the element has more attributes than you provide,
+    there will be no match and with that no manipulation.
+    The original xml fed to the function will be left untouched by this operation.
+    :param xml: ElementTree of the xml to be manipulated
+    :param element_tag: Type of tag of the element to be replaced
+    :param old_element_attributes: Attributes of the element to be replaced
+    :param new_element_attributes: Attributes of the new element
+    :param old_element_text: Text of the element to be replaced
+    :param new_element_text: Text of the new element
+    :return: ElementTree of the manipulated xml
+    """
+    manipulated_xml = deepcopy(xml)
+    manipulation = False
+    for element in manipulated_xml.findall(element_tag):
+        if old_element_attributes and element.attrib == old_element_attributes:
+            if old_element_text and element.text == old_element_text:
+                manipulation = True
+                element.attrib = new_element_attributes
+                element.text = new_element_text
+                log_string = f"""Element {element_tag} had attributes {old_element_attributes} """
+                log_string += f"""and text {old_element_text}. New attributes are {new_element_attributes} """
+                log_string += f"""and new text {new_element_text}."""
+                logger.info(log_string)
+            elif not old_element_text:
+                manipulation = True
+                element.attrib = new_element_attributes
+                log_string = f"""Element {element_tag} had attributes {old_element_attributes}. """
+                log_string += f"""New attributes are {new_element_attributes}."""
+                logger.info(log_string)
+    if manipulation:
+        return manipulated_xml
+    else:
+        logger.warning("Could not modify any element.")
+
+
+def remove_element_by_path(xml: ElementTree, element_tag: str) -> ElementTree:
+    """
+    From an xml given as an ElementTree, remove all elements with the given path.
+    This operation is based on Element.findall(), so besides providing a tag type
+    you can identify the element to remove by path.
     The original xml fed to the function will be left untouched by this operation.
     :param xml: ElementTree of the xml to be manipulated
     :param element_tag: Type of tag to be removed from the XML
