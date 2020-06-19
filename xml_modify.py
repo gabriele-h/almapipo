@@ -26,7 +26,7 @@ def add_element_to_root(
     :param xml: ElementTree of the xml to be manipulated
     :param element_tag: Type of tag of the element to be added
     :param element_attributes: Attributes of the element to be added
-    :param element_text: Text of the elemet to be added
+    :param element_text: Text of the element to be added
     :return: ElementTree of the manipulated xml
     """
     manipulated_xml = deepcopy(xml)
@@ -49,7 +49,7 @@ def add_element_to_child(
     :param child: Path to the child as per Element.findall() - e. g. tag type
     :param element_tag: Type of tag of the element to be added
     :param element_attributes: Attributes of the element to be added
-    :param element_text: Text of the elemet to be added
+    :param element_text: Text of the element to be added
     :return: ElementTree of the manipulated xml
     """
     manipulated_xml = deepcopy(xml)
@@ -82,7 +82,7 @@ def create_element(
     Simple helper function to create Elements from strings and a dict.
     :param element_tag: Type of tag of the element to be added
     :param element_attributes: Attributes of the element to be added
-    :param element_text: Text of the elemet to be added
+    :param element_text: Text of the element to be added
     """
     if element_attributes:
         element = Element(element_tag, element_attributes)
