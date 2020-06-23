@@ -71,6 +71,8 @@ def update_element(
     Please note that you will have to provide all attributes of the element
     to make them match. If the element has more attributes than you provide,
     there will be no match and with that no manipulation.
+    If you want to update attributes only without touching the element's text,
+    provide the text as None for both old_element_text and new_element_text.
     The original xml fed to the function will be left untouched by this operation.
     :param xml: ElementTree of the xml to be manipulated
     :param element_tag: Type of tag of the element to be replaced
