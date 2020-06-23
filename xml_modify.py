@@ -83,27 +83,21 @@ def update_element(
     :return: ElementTree of the manipulated xml
     """
     manipulated_xml = deepcopy(xml)
-    manipulation = False
-    for element in manipulated_xml.findall(element_tag):
-        if old_element_attributes and element.attrib == old_element_attributes:
-            if old_element_text and element.text == old_element_text:
-                manipulation = True
-                element.attrib = new_element_attributes
-                element.text = new_element_text
-                log_string = f"""Element {element_tag} had attributes {old_element_attributes} """
-                log_string += f"""and text {old_element_text}. New attributes are {new_element_attributes} """
-                log_string += f"""and new text {new_element_text}."""
-                logger.info(log_string)
-            elif not old_element_text:
-                manipulation = True
-                element.attrib = new_element_attributes
-                log_string = f"""Element {element_tag} had attributes {old_element_attributes}. """
-                log_string += f"""New attributes are {new_element_attributes}."""
-                logger.info(log_string)
-    if manipulation:
-        return manipulated_xml
-    else:
-        logger.warning("Could not modify any element.")
+    list_of_elements = check_element_existence(manipulated_xml, element_tag, old_element_text, old_element_attributes)
+    for element in list_of_elements:
+        if old_element_text and new_element_text:
+            element.text = new_element_text
+            log_string = f"""Element {element_tag} had text {old_element_text}. """
+            log_string += f"""New text is {new_element_text}."""
+            logger.info(log_string)
+        elif old_element_attributes and new_element_attributes:
+            element.attrib = new_element_attributes
+            log_string = f"""Element {element_tag} had attributes {old_element_attributes}. """
+            log_string += f"""New attributes are {new_element_attributes}."""
+            logger.info(log_string)
+        else:
+            logger.warning("Could not modify any element.")
+    return manipulated_xml
 
 
 def remove_element_by_path(xml: ElementTree, element_tag: str) -> ElementTree:
@@ -120,6 +114,43 @@ def remove_element_by_path(xml: ElementTree, element_tag: str) -> ElementTree:
     for element in manipulated_xml.findall(element_tag):
         manipulated_xml.remove(element)
     return manipulated_xml
+
+
+def check_element_existence(
+        xml: ElementTree,
+        element_tag: str,
+        element_text: str = None,
+        element_attributes: dict = None) -> list:
+    """
+    In an xml given as an ElementTree, check for existence of an element.
+    Works only if all attributes provided match. If you want to check for
+    attributes only and ignore the text, provide it as None.
+    :param xml: ElementTree of the xml to be checked
+    :param element_tag: Type of tag of the element to be searched for
+    :param element_text: Text of the element to be searched for
+    :param element_attributes: Attributes of the element to be searched for
+    :return: List of matching Elements
+    """
+    list_of_elements = []
+    for element in xml.findall(element_tag):
+        print(str(element_text) + ' is ' + str(element.text) + '?')
+        if element_text and element.text == element_text:
+            print('Yes.')
+            print(str(element_attributes) + ' is ' + str(element.attrib) + '?')
+            if element_attributes and element.attrib == element_attributes:
+                print('Yes.')
+                list_of_elements.append(element)
+            elif not element_attributes:
+                print('No attributes to check for.')
+                list_of_elements.append(element)
+        elif not element_text and element_attributes and element.attrib == element_attributes:
+            list_of_elements.append(element)
+        elif not element_attributes and not element_text:
+            print('No text and no attributes to check for.')
+            list_of_elements.append(element)
+        else:
+            logger.warning('No matching element found.')
+    return list_of_elements
 
 
 def create_element(
