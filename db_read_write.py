@@ -172,13 +172,13 @@ def create_db_session():
     return session
 
 
-def create_db_engine(echo: bool = db_setup.does_sqlalchemy_log):
+def create_db_engine(verbosity: bool = db_setup.does_sqlalchemy_log):
     """
     Create the DB engine according to the information provided in env vars.
     :return: DB engine.
     """
     connection_params = db_setup.prepare_connection_params_from_env()
-    db_engine = create_engine(connection_params, echo=echo)
+    db_engine = create_engine(connection_params, echo=verbosity)
     return db_engine
 
 
