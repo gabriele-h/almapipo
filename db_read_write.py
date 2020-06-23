@@ -140,16 +140,16 @@ def add_csv_line_to_session(csv_line: OrderedDict, job_timestamp, session: Sessi
         csv_line=csv_line
     )
     session.add(line_for_table_source_csv)
-    add_alma_ids_to_job_status_per_id(list(csv_line.values())[0], job_timestamp, session, action)
+    add_alma_ids_to_job_status_per_id(list(csv_line.values())[0], action, job_timestamp, session)
 
 
-def add_alma_ids_to_job_status_per_id(alma_id: str, job_timestamp, session: Session, action: str = 'GET'):
+def add_alma_ids_to_job_status_per_id(alma_id: str, action: str, job_timestamp, session: Session):
     """
     For a string of Alma IDs create an entry in job_status_per_id.
     :param alma_id: IDs of the record to be manipulated.
+    :param action: REST action - GET, PUT, POST or DELETE
     :param job_timestamp: Timestamp to identify the job which created the line.
     :param session: DB session to add the data to.
-    :param action: REST action - GET, PUT, POST or DELETE
     :return:
     """
     line_for_table_job_status_per_id = db_setup.JobStatusPerId(
