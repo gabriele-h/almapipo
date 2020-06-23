@@ -59,7 +59,7 @@ def add_element_to_child(
     return manipulated_xml
 
 
-def replace_element_(
+def update_element(
         xml: ElementTree,
         element_tag: str,
         old_element_text: str = None,
