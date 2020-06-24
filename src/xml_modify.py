@@ -133,20 +133,14 @@ def check_element_existence(
     """
     list_of_elements = []
     for element in xml.findall(element_tag):
-        print(str(element_text) + ' is ' + str(element.text) + '?')
         if element_text and element.text == element_text:
-            print('Yes.')
-            print(str(element_attributes) + ' is ' + str(element.attrib) + '?')
             if element_attributes and element.attrib == element_attributes:
-                print('Yes.')
                 list_of_elements.append(element)
             elif not element_attributes:
-                print('No attributes to check for.')
                 list_of_elements.append(element)
         elif not element_text and element_attributes and element.attrib == element_attributes:
             list_of_elements.append(element)
         elif not element_attributes and not element_text:
-            print('No text and no attributes to check for.')
             list_of_elements.append(element)
         else:
             logger.warning('No matching element found.')
