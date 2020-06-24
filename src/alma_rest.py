@@ -53,6 +53,7 @@ def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record
     ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'POST', job_timestamp, db_session)
     logger.info(f"Completed POST successfully for {ids_done.count()} record(s).")
     logger.info(f"Errors were encountered for POST of {ids_error.count()} record(s).")
+    db_session.close()
 
 
 def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
@@ -86,6 +87,7 @@ def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: st
     ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'DELETE', job_timestamp, db_session)
     logger.info(f"Completed DELETE successfully for {ids_done.count()} record(s).")
     logger.info(f"Errors were encountered for DELETE of {ids_error.count()} record(s).")
+    db_session.close()
 
 
 def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
@@ -116,6 +118,7 @@ def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str) 
     ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'GET', job_timestamp, db_session)
     logger.info(f"Completed GET successfully for {ids_done.count()} record(s).")
     logger.info(f"Errors were encountered for GET of {ids_error.count()} record(s).")
+    db_session.close()
 
 
 def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: bool = True) -> None:
