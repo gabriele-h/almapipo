@@ -40,7 +40,8 @@ def add_element_to_child(
         child: str,
         element_tag: str,
         element_text: str = None,
-        element_attributes: dict = None) -> ElementTree:
+        element_attributes: dict = None,
+        ns: dict = {}) -> ElementTree:
     """
     For an xml given as an ElementTree, add the given Element to a specific child tag.
     The Element will be added to all children matching the description given for child.
@@ -50,11 +51,12 @@ def add_element_to_child(
     :param element_tag: Type of tag of the element to be added
     :param element_text: Text of the element to be added
     :param element_attributes: Attributes of the element to be added
+    :param ns: Namespaces of the XML. Defaults to empty dict.
     :return: ElementTree of the manipulated xml
     """
     manipulated_xml = deepcopy(xml)
     element = create_element(element_tag, element_attributes, element_text)
-    for child in manipulated_xml.findall(child):
+    for child in manipulated_xml.findall(child, ns):
         child.append(element)
     return manipulated_xml
 
@@ -100,7 +102,7 @@ def update_element(
     return manipulated_xml
 
 
-def remove_element_by_path(xml: ElementTree, element_tag: str) -> ElementTree:
+def remove_element_by_path(xml: ElementTree, element_tag: str, ns: dict = {}) -> ElementTree:
     """
     From an xml given as an ElementTree, remove all elements with the given path.
     This operation is based on Element.findall(), so besides providing a tag type
@@ -108,10 +110,11 @@ def remove_element_by_path(xml: ElementTree, element_tag: str) -> ElementTree:
     The original xml fed to the function will be left untouched by this operation.
     :param xml: ElementTree of the xml to be manipulated
     :param element_tag: Type of tag to be removed from the XML
+    :param ns: Namespaces of the XML. Defaults to empty dict.
     :return: ElementTree of the manipulated xml
     """
     manipulated_xml = deepcopy(xml)
-    for element in manipulated_xml.findall(element_tag):
+    for element in manipulated_xml.findall(element_tag, ns):
         manipulated_xml.remove(element)
     return manipulated_xml
 
@@ -120,7 +123,8 @@ def check_element_existence(
         xml: ElementTree,
         element_tag: str,
         element_text: str = None,
-        element_attributes: dict = None) -> list:
+        element_attributes: dict = None,
+        ns: dict = {}) -> list:
     """
     In an xml given as an ElementTree, check for existence of an element.
     Works only if all attributes provided match. If you want to check for
@@ -129,10 +133,11 @@ def check_element_existence(
     :param element_tag: Type of tag of the element to be searched for
     :param element_text: Text of the element to be searched for
     :param element_attributes: Attributes of the element to be searched for
+    :param ns: Namespaces of the XML. Defaults to empty dict.
     :return: List of matching Elements
     """
     list_of_elements = []
-    for element in xml.findall(element_tag):
+    for element in xml.findall(element_tag, ns):
         print(str(element_text) + ' is ' + str(element.text) + '?')
         if element_text and element.text == element_text:
             print('Yes.')
