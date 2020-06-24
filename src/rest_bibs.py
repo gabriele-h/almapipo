@@ -200,6 +200,18 @@ def create_e_collection(record_data: bytes, mms_id: str, collection_id: str) -> 
 #######
 
 
+def update_hol(record_data: bytes, mms_id: str, hol_id: str) -> str:
+    """
+    Update HOL record via Alma API by MMS-ID and HOL-id.
+    :param record_data: XML of the record to be updated.
+    :param mms_id: Unique ID of the BIB record the HOL is connected to.
+    :param hol_id: ID of the HOL record.
+    :return: Response data in XML format.
+    """
+    logger.info(f'Trying to update HOL with mms_id {mms_id} and hol_id {hol_id}.')
+    hol_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}/holdings/')
+    return hol_record
+
 # put_bib
 # put_hol
 # put_item
