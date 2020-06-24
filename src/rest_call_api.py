@@ -26,7 +26,7 @@ api_base_url = environ['ALMA_REST_API_BASE_URL']
 
 
 def update_record(record_data: bytes, url_parameters: str):
-    """Generic function for POST calls to the Alma API.
+    """Generic function for PUT calls to the Alma API.
 
     Will return the response if HTTP status code is 200.
     Otherwise the error returned by the API will be added to the
