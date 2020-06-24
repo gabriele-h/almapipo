@@ -77,7 +77,7 @@ def get_record_from_fetched_records(alma_ids: str):
     ).filter_by(
         alma_id=alma_ids
     ).order_by(
-        'job_timestamp'
+        db_setup.FetchedRecords.job_timestamp.desc()
     ).limit(1)
     return record_query.first()
 
