@@ -104,6 +104,25 @@ def get_list_of_ids_by_status_and_action(status: str, action: str, job_timestamp
     return list_of_ids
 
 
+def add_sent_record_to_session(alma_id: str, record_data, job_timestamp: datetime, session: Session):
+    """
+    Create an entry in the database that identifies the job
+    responsible for the entry (job_timestamp).
+    Adds one line per Alma record with the data to be sent via Alma API.
+    :param alma_id: Alma ID for one specific record.
+    :param record_data: Record to be sent via Alma API.
+    :param job_timestamp: Identifier of the job causing the DB-entry.
+    :param session: DB session to add the lines to.
+    :return: None
+    """
+    line_for_table_sent_records = db_setup.SentRecords(
+        alma_id=alma_id,
+        alma_record=record_data,
+        job_timestamp=job_timestamp,
+    )
+    session.add(line_for_table_sent_records)
+
+
 def add_fetched_record_to_session(alma_id: str, record_data, job_timestamp: datetime, session: Session):
     """
     Create an entry in the database that identifies the job
