@@ -144,6 +144,20 @@ def import_csv_to_db_tables(file_path: str, action: str = 'GET', validation: boo
         logger.error('No valid file path provided.')
 
 
+def update_record_for_alma_ids(alma_ids: str, api: str, record_type: str, record_data: bytes) -> str:
+    """
+    For a specific API and record type make the PUT call to that API
+    and return the resulting response.
+    :param alma_ids: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
+    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
+    :param record_type: Type of the record to call the API for (e. g. "holdings")
+    :param record_data: Data of the record to be updated (usually XML)
+    :return: API response
+    """
+    response = call_api_for_record('PUT', alma_ids, api, record_type, record_data)
+    return response
+
+
 def create_record_for_alma_ids(alma_ids: str, api: str, record_type: str, record_data: bytes) -> str:
     """
     For a specific API and record type make the POST call to that API
@@ -213,6 +227,8 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 return rest_bibs.get_hol(split_alma_ids[0], split_alma_ids[1])
             elif action == 'POST':
                 return rest_bibs.create_hol(record_data, split_alma_ids[0], split_alma_ids[1])
+            elif action == 'PUT':
+                return rest_bibs.update_hol(record_data, split_alma_ids[0], split_alma_ids[1])
             else:
                 logger.error('No valid combination of API, record type and action provided.')
                 raise ValueError
