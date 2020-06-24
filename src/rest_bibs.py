@@ -209,7 +209,7 @@ def update_hol(record_data: bytes, mms_id: str, hol_id: str) -> str:
     :return: Response data in XML format.
     """
     logger.info(f'Trying to update HOL with mms_id {mms_id} and hol_id {hol_id}.')
-    hol_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}/holdings/')
+    hol_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}')
     return hol_record
 
 # put_bib
