@@ -96,3 +96,12 @@ class FetchedRecords(Base):
     job_timestamp = Column(DateTime)
     alma_id = Column(String(100))
     alma_record = Column(XMLType)
+
+
+class SentRecords(Base):
+    __tablename__ = 'sent_records'
+
+    primary_key = Column(Integer, primary_key=True)
+    job_timestamp = Column(DateTime)
+    alma_id = Column(String(100))
+    alma_record = Column(XMLType)
