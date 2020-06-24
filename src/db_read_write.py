@@ -38,6 +38,32 @@ def main():
     db_engine.connect()
 
 
+def get_value_from_csv_json(
+        alma_id_name: str,
+        alma_ids: str,
+        job_timestamp: datetime,
+        json_key: str) -> str:
+    """
+    For a given string of alma_ids and job_timestamp, retrieve a
+    specific value from the csv as it was saved in json-format in source_csv table.
+    :param alma_id_name: Key of the alma_id, heading of first column in csv
+    :param alma_ids: Comma separated string of Alma IDs to identify the record
+    :param job_timestamp: Job that created the entry in source_csv
+    :param json_key: Heading of the column that has the desired information
+    :return: Value from source_csv json for json_key
+    """
+    db_session = create_db_session()
+    value_query = db_session.query(
+        db_setup.SourceCsv
+    ).filter(
+        db_setup.SourceCsv.csv_line[alma_id_name].astext == alma_ids
+    ).filter_by(
+        job_timestamp=job_timestamp
+    )
+    json_value = value_query.first().csv_line[json_key]
+    return json_value
+
+
 def get_record_from_fetched_records(alma_ids: str):
     """
     For a comma separated string of Alma IDs query for the record's most
