@@ -10,13 +10,13 @@ This will import the other modules and do the following:
 from logging import getLogger
 from datetime import datetime
 
-from alma_rest import db_read_write
-from alma_rest import input_read
+from . import db_read_write
+from . import input_read
 # noinspection PyUnresolvedReferences
-from alma_rest import logfile_setup
-from alma_rest import rest_bibs
-from alma_rest import rest_users
-from alma_rest import xml_extract
+from . import logfile_setup
+from . import rest_bibs
+from . import rest_users
+from . import xml_extract
 
 # Timestamp for as inserted in the database
 job_timestamp = datetime.now()

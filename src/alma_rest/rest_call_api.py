@@ -16,7 +16,7 @@ from os import environ
 from requests import Session
 
 # noinspection PyUnresolvedReferences
-from alma_rest import logfile_setup
+from . import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)
