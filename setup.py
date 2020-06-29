@@ -16,7 +16,6 @@ setup(
     packages=find_packages(where="src"),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GPL",
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
