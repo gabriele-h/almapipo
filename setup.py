@@ -9,14 +9,14 @@ with open("README.md", "r") as fh:
 setup(
     name="alma_rest",
     version="0.0.1",
-    description="Make use of Alma's REST API. Read IDs from CSV or TSV files, save necessary changes and all fetched data to a database and finally create, read, update and delete records in/from Alma.",
+    description="Make use of Alma's REST APIs and store related data in a Postgres DB."
     long_description=long_description,
     long_description_content="text/markdown",
     url="https://github.com/gabriele-h/alma_rest",
     packages=find_packages(where="src"),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: GPL",
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
