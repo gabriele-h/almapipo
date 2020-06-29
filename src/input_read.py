@@ -22,10 +22,7 @@ import logfile_setup
 # Logfile
 logger = getLogger(__name__)
 
-# Pattern for Alma ID check
-alma_id_suffix = environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX']
-alma_id_pattern_str = r"^(22|23|53|61|62|81|99)\d{2,}" + alma_id_suffix + "$"
-pattern = re.compile(alma_id_pattern_str)
+ID_SUFFIX_PATTERN = r"^(22|23|53|61|62|81|99)\d{{2,}}{alma_id_suffix}$"
 
 
 def main():
@@ -117,20 +114,25 @@ def is_this_an_alma_id(identifier: str) -> bool:
     :return: Boolean indicating the status of the verification.
     """
     if type(identifier) != str:
-        is_alma_id = False
         logger.warning("Please provide ID as a string.")
-    elif not pattern.fullmatch(identifier):
-        is_alma_id = False
-        logger.warning(f"Identifier is not a valid Alma ID: '{identifier}'")
-    elif not identifier:
-        is_alma_id = False
+        return False
+
+    if not identifier:
         logger.error("No identifier given.")
-    elif pattern.fullmatch(identifier):
-        is_alma_id = True
-    else:
-        is_alma_id = False
-        logger.warning(f"Identifier not valid for unknown reasons: '{identifier}'")
-    return is_alma_id
+        return False
+
+    try:
+        alma_id_suffix = environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX']
+    except KeyError:
+        logger.error("Env var 'ALMA_REST_ID_INSTITUTIONAL_SUFFIX' not set.")
+        exit(1)
+
+    pattern = ID_SUFFIX_PATTERN.format(alma_id_suffix=alma_id_suffix)
+    if re.fullmatch(pattern, identifier):
+        return True
+
+    logger.warning(f"Identifier is not a valid Alma ID: '{identifier}'")
+    return False
 
 
 if __name__ == "__main__":
