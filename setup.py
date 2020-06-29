@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
 setup(
     name="alma_rest",
     version="0.0.1",
-    description="Make use of Alma's REST APIs and store related data in a Postgres DB."
+    description="Make use of Alma's REST APIs and store related data in a Postgres DB.",
     long_description=long_description,
     long_description_content="text/markdown",
     url="https://github.com/gabriele-h/alma_rest",
