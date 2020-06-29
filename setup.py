@@ -3,14 +3,28 @@ from os.path import splitext, basename
 
 from setuptools import setup, find_packages
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name="alma_rest",
     version="0.0.1",
+    description="Make use of Alma's REST API. Read IDs from CSV or TSV files, save necessary changes and all fetched data to a database and finally create, read, update and delete records in/from Alma.",
+    long_description=long_description,
+    long_description_content="text/markdown",
+    url="https://github.com/gabriele-h/alma_rest",
     packages=find_packages(where="src"),
-    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
-    package_dir={"": "src"},
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires='>=3.6',
     install_requires=[
-        'sqlalchemy~=1.3.0',
-        'requests~=2.24.0',
+        "psycopg2 ~= 2.8.0; sys_platform == 'linux'",
+        "psycopg2-binary ~= 2.8.0; sys_platform != 'linux'",
+        "pytest ~= 5.4.0",
+        "requests ~= 2.23.0",
+        "sqlalchemy ~= 1.3.0",
     ],
 )
