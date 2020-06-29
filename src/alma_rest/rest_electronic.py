@@ -4,9 +4,9 @@ Query the Alma API for electronic resources
 
 from logging import getLogger
 
-import rest_call_api
+from alma_rest import rest_call_api
 # noinspection PyUnresolvedReferences
-import logfile_setup
+from alma_rest import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)

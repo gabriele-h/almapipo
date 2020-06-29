@@ -6,9 +6,9 @@ handling of the record.
 from logging import getLogger
 from xml.etree import ElementTree
 
-import db_read_write
+from alma_rest import db_read_write
 # noinspection PyUnresolvedReferences
-import logfile_setup
+from alma_rest import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)

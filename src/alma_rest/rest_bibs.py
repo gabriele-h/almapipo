@@ -5,9 +5,9 @@ Query the Alma API for bibs records
 from logging import getLogger
 from urllib import parse
 
-import rest_call_api
+from alma_rest import rest_call_api
 # noinspection PyUnresolvedReferences
-import logfile_setup
+from alma_rest import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)

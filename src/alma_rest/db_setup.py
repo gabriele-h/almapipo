@@ -18,7 +18,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import JSON
 
 # noinspection PyUnresolvedReferences
-import logfile_setup
+from alma_rest import logfile_setup
 
 # Logfile
 logger = logging.getLogger(__name__)

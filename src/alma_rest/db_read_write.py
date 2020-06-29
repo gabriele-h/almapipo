@@ -18,8 +18,8 @@ except ImportError:
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-import db_setup
-import logfile_setup
+from alma_rest import db_setup
+from alma_rest import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)

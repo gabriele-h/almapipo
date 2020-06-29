@@ -17,7 +17,7 @@ from logging import getLogger
 from os import access, environ, path, R_OK
 from typing import Iterator
 
-import logfile_setup
+from alma_rest import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)
