@@ -14,6 +14,7 @@ setup(
     long_description_content="text/markdown",
     url="https://github.com/gabriele-h/alma_rest",
     packages=find_packages(where="src"),
+    package_dir={'': 'src'},
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
