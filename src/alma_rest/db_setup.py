@@ -105,3 +105,12 @@ class SentRecords(Base):
     job_timestamp = Column(DateTime)
     alma_id = Column(String(100))
     alma_record = Column(XMLType)
+
+
+class PutPostResponses(Base):
+    __tablename__ = 'put_post_responses'
+
+    primary_key = Column(Integer, primary_key=True)
+    job_timestamp = Column(DateTime)
+    alma_id = Column(String(100))
+    alma_record = Column(XMLType)
