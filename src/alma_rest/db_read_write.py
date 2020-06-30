@@ -61,6 +61,7 @@ def get_value_from_csv_json(
         job_timestamp=job_timestamp
     )
     json_value = value_query.first().csv_line[json_key]
+    db_session.close()
     return json_value
 
 
@@ -79,6 +80,7 @@ def get_record_from_fetched_records(alma_ids: str):
     ).order_by(
         db_setup.FetchedRecords.job_timestamp.desc()
     ).limit(1)
+    db_session.close()
     return record_query.first()
 
 
