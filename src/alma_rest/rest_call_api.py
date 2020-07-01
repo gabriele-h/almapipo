@@ -115,7 +115,7 @@ def call_api(url_parameters: str, action: str, status_code: int, record_data: by
         if alma_response.status_code == status_code:
             alma_response_content = alma_response.content.decode("utf-8")
             logger.info(
-                f'{action} for record "{url_parameters}" completed successfully.'
+                f'{action} for record "{url_parameters}" completed.'
             )
             if '<errorList>' in alma_response_content:
                 logger.warning(f"""The response contained an error, even though it had status code {status_code}.
