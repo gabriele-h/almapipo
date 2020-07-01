@@ -75,7 +75,7 @@ class JobStatusPerId(Base):
     __tablename__ = 'job_status_per_id'
 
     primary_key = Column(Integer, primary_key=True)
-    job_timestamp = Column(DateTime)
+    job_timestamp = Column(DateTime, timezone=True)
     alma_id = Column(String(100))
     job_status = Column(String(5))
     job_action = Column(String(6))
@@ -85,7 +85,7 @@ class SourceCsv(Base):
     __tablename__ = 'source_csv'
 
     primary_key = Column(Integer, primary_key=True)
-    job_timestamp = Column(DateTime)
+    job_timestamp = Column(DateTime, timezone=True)
     csv_line = Column(JSON)
 
 
@@ -93,7 +93,7 @@ class FetchedRecords(Base):
     __tablename__ = 'fetched_records'
 
     primary_key = Column(Integer, primary_key=True)
-    job_timestamp = Column(DateTime)
+    job_timestamp = Column(DateTime, timezone=True)
     alma_id = Column(String(100))
     alma_record = Column(XMLType)
 
@@ -102,7 +102,7 @@ class SentRecords(Base):
     __tablename__ = 'sent_records'
 
     primary_key = Column(Integer, primary_key=True)
-    job_timestamp = Column(DateTime)
+    job_timestamp = Column(DateTime, timezone=True)
     alma_id = Column(String(100))
     alma_record = Column(XMLType)
 
@@ -111,6 +111,6 @@ class PutPostResponses(Base):
     __tablename__ = 'put_post_responses'
 
     primary_key = Column(Integer, primary_key=True)
-    job_timestamp = Column(DateTime)
+    job_timestamp = Column(DateTime, timezone=True)
     alma_id = Column(String(100))
     alma_record = Column(XMLType)
