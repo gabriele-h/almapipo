@@ -8,7 +8,7 @@ This will import the other modules and do the following:
 """
 
 from logging import getLogger
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Callable
 
 from . import db_read_write
@@ -20,7 +20,7 @@ from . import rest_users
 from . import xml_extract
 
 # Timestamp for as inserted in the database
-job_timestamp = datetime.now()
+job_timestamp = datetime.now(timezone.utc)
 
 # Logfile
 logger = getLogger(__name__)
