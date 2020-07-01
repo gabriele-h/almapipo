@@ -27,7 +27,7 @@ logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
 
 
-def update_records_from_db_via_api_for_csv_list(
+def update_records_via_api_for_csv_list(
         csv_path: str,
         api: str,
         record_type: str,
