@@ -142,8 +142,8 @@ def check_element_existence(
             list_of_elements.append(element)
         elif not element_attributes and not element_text:
             list_of_elements.append(element)
-        else:
-            logger.info(f'No matching element found with {element_tag}, {element_text} and {element_attributes}.')
+    if not list_of_elements:
+        logger.info(f'No matching element found with {element_tag}, {element_text} and {element_attributes}.')
     return list_of_elements
 
 
