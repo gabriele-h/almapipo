@@ -73,9 +73,9 @@ def update_records_via_api_for_csv_list(
     ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'PUT', job_timestamp, db_session)
     ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'PUT', job_timestamp, db_session)
     ids_new = db_read_write.get_list_of_ids_by_status_and_action('new', 'PUT', job_timestamp, db_session)
-    logger.info(f"Completed POST successfully for {ids_done.count()} record(s).")
-    logger.info(f"Errors were encountered for POST of {ids_error.count()} record(s).")
-    logger.info(f"POST was not handled at all for {ids_new.count()} record(s).")
+    logger.info(f"Completed PUT successfully for {ids_done.count()} record(s).")
+    logger.info(f"Errors were encountered for PUT of {ids_error.count()} record(s).")
+    logger.info(f"PUT was not handled at all for {ids_new.count()} record(s).")
     db_session.close()
 
 
