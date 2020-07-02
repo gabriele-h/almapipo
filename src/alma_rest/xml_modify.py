@@ -85,12 +85,12 @@ def update_element(
     manipulated_xml = deepcopy(xml)
     list_of_elements = check_element_existence(manipulated_xml, element_tag, old_element_text, old_element_attributes)
     for element in list_of_elements:
-        if old_element_text and new_element_text:
+        if new_element_text:
             element.text = new_element_text
             log_string = f"""Element {element_tag} had text {old_element_text}. """
             log_string += f"""New text is {new_element_text}."""
             logger.info(log_string)
-        elif old_element_attributes and new_element_attributes:
+        elif new_element_attributes:
             element.attrib = new_element_attributes
             log_string = f"""Element {element_tag} had attributes {old_element_attributes}. """
             log_string += f"""New attributes are {new_element_attributes}."""
