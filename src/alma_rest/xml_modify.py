@@ -53,7 +53,7 @@ def add_element_to_child(
     :return: ElementTree of the manipulated xml
     """
     manipulated_xml = deepcopy(xml)
-    element = create_element(element_tag, element_attributes, element_text)
+    element = create_element(element_tag, element_text, element_attributes)
     for child in manipulated_xml.findall(child):
         child.append(element)
     return manipulated_xml
