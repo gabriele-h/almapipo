@@ -8,6 +8,7 @@ The DB is intended to do the following:
 
 from datetime import datetime
 from logging import getLogger
+from xml.etree.ElementTree import fromstring
 
 try:
     from typing import OrderedDict
@@ -132,26 +133,27 @@ def get_list_of_ids_by_status_and_action(status: str, action: str, job_timestamp
     return list_of_ids
 
 
-def add_put_post_response_to_session(alma_id: str, record_data, job_timestamp: datetime, session: Session):
+def add_put_post_response_to_session(alma_id: str, record_data: bytes, job_timestamp: datetime, session: Session):
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
-    Adds one line per Alma record with the data to be sent via Alma API.
+    Adds one line per Alma record with the data retrieved via Alma API.
     :param alma_id: Alma ID for one specific record.
-    :param record_data: Record to be sent via Alma API.
+    :param record_data: Response retrieved via Alma API.
     :param job_timestamp: Identifier of the job causing the DB-entry.
     :param session: DB session to add the lines to.
     :return: None
     """
+    record_data_xml = fromstring(record_data)
     line_for_table_put_post_responses = db_setup.PutPostResponses(
         alma_id=alma_id,
-        alma_record=record_data,
+        alma_record=record_data_xml,
         job_timestamp=job_timestamp,
     )
     session.add(line_for_table_put_post_responses)
 
 
-def add_sent_record_to_session(alma_id: str, record_data, job_timestamp: datetime, session: Session):
+def add_sent_record_to_session(alma_id: str, record_data: bytes, job_timestamp: datetime, session: Session):
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
@@ -162,9 +164,10 @@ def add_sent_record_to_session(alma_id: str, record_data, job_timestamp: datetim
     :param session: DB session to add the lines to.
     :return: None
     """
+    record_data_xml = fromstring(record_data)
     line_for_table_sent_records = db_setup.SentRecords(
         alma_id=alma_id,
-        alma_record=record_data,
+        alma_record=record_data_xml,
         job_timestamp=job_timestamp,
     )
     session.add(line_for_table_sent_records)
