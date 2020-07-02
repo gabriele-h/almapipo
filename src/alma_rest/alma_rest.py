@@ -16,6 +16,7 @@ from . import input_read
 # noinspection PyUnresolvedReferences
 from . import logfile_setup
 from . import rest_bibs
+from . import rest_electronic
 from . import rest_users
 from . import xml_extract
 
@@ -341,6 +342,15 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 raise ValueError
         else:
             logger.error('No valid combination of API and record type provided.')
+            raise ValueError
+    elif api == 'electronic':
+        if record_type == 'e-collections':
+            if action == 'GET':
+                return rest_electronic.get_e_collection(split_alma_ids[0])
+            elif action == 'PUT':
+                return rest_electronic.update_e_collection(record_data, split_alma_ids[0])
+        else:
+            logger.error('No valid combination of API, record type and action provided.')
             raise ValueError
     else:
         logger.error('No valid combination of API and record type provided.')
