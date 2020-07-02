@@ -30,7 +30,7 @@ def add_element_to_root(
     :return: ElementTree of the manipulated xml
     """
     manipulated_xml = deepcopy(xml)
-    element = create_element(element_tag, element_attributes, element_text)
+    element = create_element(element_tag, element_text, element_attributes)
     manipulated_xml.append(element)
     return manipulated_xml
 
