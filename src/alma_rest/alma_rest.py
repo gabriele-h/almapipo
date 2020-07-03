@@ -10,6 +10,7 @@ This will import the other modules and do the following:
 from logging import getLogger
 from datetime import datetime, timezone
 from typing import Callable
+from xml.etree.ElementTree import fromstring
 
 from . import db_read_write
 from . import input_read
@@ -57,10 +58,12 @@ def update_records_via_api_for_csv_list(
         else:
             db_read_write.add_fetched_record_to_session(alma_id, record_data, job_timestamp, db_session)
             new_record_data = manipulation(alma_id, record_data)
+            record_xml = fromstring(record_data)
+            new_record_xml = fromstring(new_record_data)
             if not new_record_data:
                 logger.error(f'Could not manipulate data of record {alma_id}.')
                 db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session, 'PUT')
-            elif record_data == new_record_data:
+            elif record_xml == new_record_xml:
                 logger.error(f"{manipulation.__name__} did not carry out a change of {alma_id}.")
                 db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session, 'PUT')
             else:
