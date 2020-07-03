@@ -64,7 +64,7 @@ def update_records_via_api_for_csv_list(
                 logger.error(f"{manipulation.__name__} did not carry out a change of {alma_id}.")
                 db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session, 'PUT')
             else:
-                logger.info(f'Record manipulation for {alma_id} successful. Adding to put_post_response.')
+                logger.info(f'Record manipulation for {alma_id} successful. Adding to put_post_responses.')
                 update_record_for_alma_ids(alma_id, api, record_type, new_record_data)
                 db_read_write.add_put_post_response_to_session(alma_id, new_record_data, job_timestamp, db_session)
                 db_read_write.add_sent_record_to_session(alma_id, new_record_data, job_timestamp, db_session)
