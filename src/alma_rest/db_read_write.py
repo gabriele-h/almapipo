@@ -72,7 +72,7 @@ def check_data_sent_equals_put_post_response(
         alma_id=alma_ids
     )
 
-    bool_query = session.query(
+    sent_received_matching = session.query(
         db_setup.PutPostResponses
     ).join(
         db_setup.SentRecords,
@@ -89,7 +89,7 @@ def check_data_sent_equals_put_post_response(
         logger.error(f'No data in either sent_records or put_post_responses for {alma_ids} and {job_timestamp}.')
         return False
 
-    if bool_query.count() > 0:
+    if sent_received_matching.count() > 0:
         return True
     else:
         logger.warning(f'Data in sent_records and put_post_responses for {alma_ids} and {job_timestamp} did not match.')
