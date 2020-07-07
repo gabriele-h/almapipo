@@ -204,7 +204,7 @@ Gives the Output:
 b'<parent><child><grandchild appended="yes">text</grandchild></child><child><grandchild appended="yes">text</grandchild></child></parent>'
 ```
 
-# `alma_read.input_read`
+# `alma_rest.input_read`
 
 Read a CSV- or TSV-file and return information for further handling by other modules.
 
