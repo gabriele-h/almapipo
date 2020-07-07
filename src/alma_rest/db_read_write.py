@@ -96,7 +96,7 @@ def check_data_sent_equals_put_post_response(
         return False
 
 
-def get_value_from_csv_json(
+def get_value_from_source_csv(
         alma_id_name: str,
         alma_ids: str,
         job_timestamp: datetime,
