@@ -278,7 +278,65 @@ not give any custom feedback. Also it will be included in the logfile.
 ### Usage Example Bash
 
 ```bash
-python3 db_read_write.py
+python3 -m alma_rest.db_read_write
+```
+
+# So you want to query the database
+
+There might be times when you need to have a look at the data that
+is stored in the database. Here are some examples that might prove
+useful.
+
+## PUT/POST data does not equal response
+
+The function `db_read_write.get_value_from_source_csv` will make
+use of a similar query with the difference of creating and ID
+consisting of a concatenation of `alma_id` and `job_timestamp`.
+
+```sql
+SELECT put_post_responses.alma_id
+  FROM sent_records
+  JOIN put_post_responses
+	ON sent_records.job_timestamp = put_post_responses.job_timestamp
+	AND sent_records.alma_id = put_post_responses.alma_id
+  WHERE CAST(sent_records.alma_record AS VARCHAR) != cast(put_post_responses.alma_record AS VARCHAR);
+```
+
+## Contents of MARC holding category subfield
+
+Similar queries can be built for tables `sent_records` and
+`put_post_responses`.
+
+```sql
+SELECT xpath('//holding/record/datafield[@tag=245]/subfield', alma_record)
+  FROM fetched_records
+  WHERE job_timestamp = '2020-02-02 20:02:02.202002+00:00';
+```
+
+## Count number of records for `job_timestamp` and `job_action`
+
+Good for comparing the number of lines in your CSV file to what
+was saved in the `job_status_per_id` table. If you want to check
+the status you might add another condition on `job_status`.
+
+```sql
+SELECT count(primary_key)
+  FROM job_status_per_id
+  WHERE job_timestamp = '2020-02-02 20:02:02.202002+00:00'
+  AND job_action = 'GET';
+```
+
+## Get content of CSV by column heading for one `alma_id`
+
+In this example you would have to replace 'MMS Id,HOL Id' by the
+column heading of your first column and 'HOL 245' by the column
+heading of the column you want to query.
+
+```sql
+SELECT csv_line -> 'MMS Id,HOL Id', csv_line -> 'HOL 245' as info
+  FROM source_csv
+  WHERE job_timestamp = '2020-02-02 20:02:02.202002+00:00'
+  AND csv_line ->> 'MMS Id,HOL Id' = '990068822450203332,22337530320003332';
 ```
 
 ## Author
