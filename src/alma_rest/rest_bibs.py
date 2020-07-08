@@ -112,6 +112,17 @@ def get_all_items_for_holding(mms_id: str, hol_id: str) -> str:
     return physical_inventory_record
 
 
+def get_all_portfolios_for_bib(mms_id: str) -> str:
+    """
+    For a given mms_id, get all portfolios.
+    param: mms_id: Unique ID of the BIB record the portfolios are connected to.
+    :return: Record in XML format.
+    """
+    logger.info(f'Trying to fetch all portfolios for bib record {mms_id}.')
+    e_inventory_record = rest_call_api.get_record(f'/bibs/{mms_id}/portfolios/')
+    return e_inventory_record
+
+
 def get_all_e_collections_for_bib(mms_id: str) -> str:
     """
     For a given mms_id, get all e-collection information.
