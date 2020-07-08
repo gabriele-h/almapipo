@@ -101,17 +101,8 @@ def call_api(url_parameters: str, action: str, status_code: int, record_data: by
     """
     with create_alma_api_session('xml') as session:
         alma_url = api_base_url+url_parameters
-        if action == 'DELETE':
-            alma_response = session.delete(alma_url)
-        elif action == 'GET':
-            alma_response = session.get(alma_url)
-        elif action == 'POST':
-            alma_response = session.post(alma_url, data=record_data)
-        elif action == 'PUT':
-            alma_response = session.put(alma_url, data=record_data)
-        else:
-            logger.error('No valid REST action supplied.')
-            raise ValueError
+        alma_response = fetch_api_response(alma_url, action, session, record_data)
+
         if alma_response.status_code == status_code:
             alma_response_content = alma_response.content.decode("utf-8")
             logger.info(
@@ -130,7 +121,28 @@ Reason: {alma_response.status_code} - {alma_response.content.decode("utf-8")}"""
             logger.error(error_string)
 
 
-def create_alma_api_session(session_format):
+def fetch_api_response(alma_url: str, action: str, session: Session, record_data: str = None) -> Response:
+    """
+    Make API calls according to the kind of action provided.
+    :param alma_url: Combination of base-url and parameters necessary (path, arguments).
+    :param action: DELETE, GET, POST or PUT
+    :param session: Alma API session.
+    :param record_data: Necessary input for POST and PUT, defaults to None.
+    :return:
+    """
+    if action == 'DELETE':
+        return session.delete(alma_url)
+    elif action == 'GET':
+        return session.get(alma_url)
+    elif action == 'POST':
+        return session.post(alma_url, data=record_data)
+    elif action == 'PUT':
+        return session.put(alma_url, data=record_data)
+    logger.error('No valid REST action supplied.')
+    raise ValueError
+
+
+def create_alma_api_session(session_format) -> Session:
     """Create a Session with parameters from env vars
     :param session_format: Format in which records are sent and retrieved.
     :return: Session object for connections to Alma
