@@ -100,6 +100,18 @@ def get_all_items_for_bib(mms_id: str) -> str:
     return physical_inventory_record
 
 
+def get_all_items_for_holding(mms_id: str, hol_id: str) -> str:
+    """
+    For a given mms_id, get all holding and item information.
+    :param mms_id: Unique ID of the BIB record the holdings and items are connected to.
+    :param hol_id: ID of the HOL record the ITMs are connected to.
+    :return: Record in XML format.
+    """
+    logger.info(f'Trying to fetch all items information for mms_id {mms_id} and hol_id {hol_id}.')
+    physical_inventory_record = rest_call_api.get_record(f'/bibs/{mms_id}/holdings/{hol_id}/items')
+    return physical_inventory_record
+
+
 def get_all_e_collections_for_bib(mms_id: str) -> str:
     """
     For a given mms_id, get all e-collection information.
