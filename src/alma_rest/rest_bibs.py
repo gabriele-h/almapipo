@@ -84,7 +84,7 @@ def get_all_items_for_bib(mms_id: str) -> str:
     :param mms_id: Unique ID of the BIB record the holdings and items are connected to.
     :return: Record in XML format.
     """
-    logger.info(f'Trying to fetch all holdings and items information for bib record {mms_id}')
+    logger.info(f'Trying to fetch all holdings and items information for bib record {mms_id}.')
     physical_inventory_record = rest_call_api.get_record(f'/bibs/{mms_id}/holdings/ALL/items')
     return physical_inventory_record
 
@@ -102,7 +102,7 @@ def get_all_e_collections_for_bib(mms_id: str) -> str:
 
 def get_item_by_barcode(item_barcode: str) -> str:
     """
-    Get item information by barcode.
+    Get item information by barcode. Please note that this equals a scan-in operation!
     :param item_barcode: Barcode of the item.
     :return: Record in XML format.
     """
