@@ -200,9 +200,21 @@ def create_e_collection(record_data: bytes, mms_id: str, collection_id: str) -> 
 #######
 
 
+def update_bib(record_data: bytes, mms_id: str) -> str:
+    """
+    Update BIB record via Alma API by MMS-ID.
+    :param record_data: XML of the record to be updated.
+    :param mms_id: Unique ID of the BIB record.
+    :return: Response data in XML format.
+    """
+    logger.info(f'Trying to update BIB with mms_id {mms_id}.')
+    bib_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}')
+    return bib_record
+
+
 def update_hol(record_data: bytes, mms_id: str, hol_id: str) -> str:
     """
-    Update HOL record via Alma API by MMS-ID and HOL-id.
+    Update HOL record via Alma API by MMS-ID and HOL-ID.
     :param record_data: XML of the record to be updated.
     :param mms_id: Unique ID of the BIB record the HOL is connected to.
     :param hol_id: ID of the HOL record.
@@ -212,10 +224,32 @@ def update_hol(record_data: bytes, mms_id: str, hol_id: str) -> str:
     hol_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}')
     return hol_record
 
-# put_bib
-# put_hol
-# put_item
-# put_portfolio
+
+def update_item(record_data: bytes, mms_id: str, hol_id: str, itm_id: str) -> str:
+    """
+    Update ITM record via Alma API by MMS-ID, HOL-ID and ITM-ID.
+    :param record_data: XML of the record to be updated.
+    :param mms_id: Unique ID of the BIB record the HOL is connected to.
+    :param hol_id: ID of the HOL record the ITM is connected to.
+    :param itm_id: ID of the ITM record.
+    :return: Response data in XML format.
+    """
+    logger.info(f'Trying to update ITM with mms_id {mms_id}, hol_id {hol_id}, and itm_id {itm_id}.')
+    itm_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}/items/{itm_id}')
+    return itm_record
+
+
+def update_portfolio(record_data: bytes, mms_id: str, portfolio_id: str) -> str:
+    """
+    Update portfolio record via Alma API by MMS-ID and portfolio-ID.
+    :param record_data: XML of the record to be updated.
+    :param mms_id: Unique ID of the BIB record the portfolio is connected to.
+    :param portfolio_id: ID of the portfolio.
+    :return: Response data in XML format.
+    """
+    logger.info(f'Trying to update portfolio with mms_id {mms_id} and portfolio-id {portfolio_id}.')
+    portfolio_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}/portfolios/{portfolio_id}.')
+    return portfolio_record
 
 
 ##########

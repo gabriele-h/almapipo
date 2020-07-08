@@ -273,6 +273,8 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 return rest_bibs.get_bib(split_alma_ids[0])
             elif action == 'POST':
                 return rest_bibs.create_bib(record_data, split_alma_ids[0])
+            elif action == 'PUT':
+                return rest_bibs.update_bib(record_data, split_alma_ids[0])
             else:
                 logger.error('No valid combination of API, record type and action provided.')
                 raise ValueError
@@ -295,6 +297,8 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 return rest_bibs.get_item(split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
             elif action == 'POST':
                 return rest_bibs.create_item(record_data, split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
+            elif action == 'PUT':
+                return rest_bibs.update_item(record_data, split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
             else:
                 logger.error('No valid combination of API, record type and action provided.')
                 raise ValueError
@@ -305,6 +309,8 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 return rest_bibs.get_portfolio(split_alma_ids[0], split_alma_ids[1])
             elif action == 'POST':
                 return rest_bibs.create_portfolio(record_data, split_alma_ids[0], split_alma_ids[1])
+            elif action == 'PUT':
+                return rest_bibs.update_portfolio(record_data, split_alma_ids[0], split_alma_ids[1])
             else:
                 logger.error('No valid combination of API, record type and action provided.')
                 raise ValueError
