@@ -109,16 +109,18 @@ def call_api(url_parameters: str, action: str, status_code: int, record_data: by
                 f'{action} for record "{url_parameters}" completed.'
             )
             if '<errorList>' in alma_response_content:
-                logger.warning(f"""The response contained an error, even though it had status code {status_code}.
-Reason: {alma_response.status_code} - {alma_response.content}""")
+                log_string = f"""The response contained an error, even though it had status code {status_code}. """
+                log_string += f"""Reason: {alma_response.status_code} - {alma_response.content}"""
+                logger.warning(log_string)
             elif not alma_response_content.startswith('<?xml') and status_code != 204:
-                logger.error(f"""The response retrieved does not seem to be valid xml - startswith('<?xml')
-{alma_response_content}""")
+                log_string = f"""The response retrieved does not seem to be valid xml - startswith('<?xml') -- """
+                log_string += {alma_response_content}
+                logger.error(log_string)
             return alma_response_content
-        else:
-            error_string = f"""{action} for record "{url_parameters}" failed.
-Reason: {alma_response.status_code} - {alma_response.content.decode("utf-8")}"""
-            logger.error(error_string)
+
+        error_string = f"""{action} for record "{url_parameters}" failed. """
+        error_string += f"""Reason: {alma_response.status_code} - {alma_response.content.decode("utf-8")}"""
+        logger.error(error_string)
 
 
 def fetch_api_response(alma_url: str, action: str, session: Session, record_data: str = None) -> Response:
