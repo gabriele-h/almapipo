@@ -13,7 +13,7 @@ function that the more specific modules (like rest_bibs) can make use of.
 
 from logging import getLogger
 from os import environ
-from requests import Session
+from requests import Session, Response
 
 # noinspection PyUnresolvedReferences
 from . import logfile_setup
@@ -25,7 +25,7 @@ api_key = environ['ALMA_REST_API_KEY']
 api_base_url = environ['ALMA_REST_API_BASE_URL']
 
 
-def update_record(record_data: bytes, url_parameters: str):
+def update_record(record_data: bytes, url_parameters: str) -> str:
     """Generic function for PUT calls to the Alma API.
 
     Will return the response if HTTP status code is 200.
@@ -39,7 +39,7 @@ def update_record(record_data: bytes, url_parameters: str):
     return response
 
 
-def create_record(record_data: bytes, url_parameters: str):
+def create_record(record_data: bytes, url_parameters: str) -> str:
     """Generic function for POST calls to the Alma API.
 
     Will return the response if HTTP status code is 200.
@@ -49,11 +49,11 @@ def create_record(record_data: bytes, url_parameters: str):
     :param url_parameters: Necessary path and arguments for API call.
     :return: Contents of the response.
     """
-    response = call_api(url_parameters, 'POST', 200, record_data)
-    return response
+    response_content = call_api(url_parameters, 'POST', 200, record_data)
+    return response_content
 
 
-def delete_record(url_parameters: str):
+def delete_record(url_parameters: str) -> str:
     """Generic function for DELETE calls to the Alma API.
 
     Will return the response if HTTP status code is 204.
@@ -63,11 +63,11 @@ def delete_record(url_parameters: str):
     :param url_parameters: Necessary path and arguments for API call.
     :return: Contents of the response.
     """
-    response = call_api(url_parameters, 'DELETE', 204)
-    return response
+    response_content = call_api(url_parameters, 'DELETE', 204)
+    return response_content
 
 
-def get_record(url_parameters: str):
+def get_record(url_parameters: str) -> str:
     """Generic function for GET calls to the Alma API.
 
     Will return the record if HTTP status code is 200.
@@ -76,8 +76,8 @@ def get_record(url_parameters: str):
 
     :param url_parameters: Necessary path and arguments for API call.
     """
-    response = call_api(url_parameters, 'GET', 200)
-    return response
+    response_content = call_api(url_parameters, 'GET', 200)
+    return response_content
 
 
 def call_api(url_parameters: str, action: str, status_code: int, record_data: bytes = None) -> str:
