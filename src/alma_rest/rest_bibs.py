@@ -89,6 +89,17 @@ def get_all_items_for_bib(mms_id: str) -> str:
     return physical_inventory_record
 
 
+def get_all_e_collections_for_bib(mms_id: str) -> str:
+    """
+    For a given mms_id, get all e-collection information.
+    :param mms_id: Unique ID of the BIB record the e-collections are connected to.
+    :return: Record in XML format.
+    """
+    logger.info(f'Trying to fetch all e-collections for bib record {mms_id}.')
+    e_inventory_record = rest_call_api.get_record(f'/bibs/{mms_id}/e-collections/')
+    return e_inventory_record
+
+
 def get_item_by_barcode(item_barcode: str) -> str:
     """
     Get item information by barcode.
@@ -180,19 +191,6 @@ def create_portfolio(record_data: bytes, mms_id: str, portfolio_id: str) -> str:
     logger.info(f'Trying to create portfolio record with mms_id {mms_id} and portfolio_id {portfolio_id}.')
     portfolio_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/portfolios/')
     return portfolio_record
-
-
-def create_e_collection(record_data: bytes, mms_id: str, collection_id: str) -> str:
-    """
-    Create e-collection record for collection-ID.
-    :param record_data: XML of the record to be created.
-    :param mms_id: Unique ID of the BIB record the collection is connected to.
-    :param collection_id: ID of the e-collection.
-    :return: Record in XML format.
-    """
-    logger.info(f'Trying to create e-collection record with mms_id {mms_id} and collection_id {collection_id}.')
-    collection_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/e-collections/')
-    return collection_record
 
 
 #######
@@ -302,16 +300,4 @@ def delete_portfolio(mms_id: str, portfolio_id: str) -> str:
     """
     logger.info(f'Trying to DELETE portfolio record with mms_id {mms_id} and portfolio_id {portfolio_id}.')
     delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}/portfolios/{portfolio_id}')
-    return delete_response
-
-
-def delete_e_collection(mms_id: str, collection_id: str) -> str:
-    """
-    Delete e-collection record via Alma API by MMS-ID and collection-ID.
-    :param mms_id: Unique ID of the BIB record the collection is connected to.
-    :param collection_id: ID of the e-collection.
-    :return: Record in XML format.
-    """
-    logger.info(f'Trying to DELETE e-collection record with mms_id {mms_id} and collection_id {collection_id}.')
-    delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}/e-collections/{collection_id}')
     return delete_response

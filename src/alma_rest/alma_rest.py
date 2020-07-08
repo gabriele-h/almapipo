@@ -315,18 +315,20 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 logger.error('No valid combination of API, record type and action provided.')
                 raise ValueError
         elif record_type == 'e-collections':
-            if action == 'DELETE':
-                return rest_bibs.delete_e_collection(split_alma_ids[0], split_alma_ids[1])
-            elif action == 'GET':
+            if action == 'GET':
                 return rest_bibs.get_e_collection_with_mms_id(split_alma_ids[0], split_alma_ids[1])
-            elif action == 'POST':
-                return rest_bibs.create_e_collection(record_data, split_alma_ids[0], split_alma_ids[1])
             else:
                 logger.error('No valid combination of API, record type and action provided.')
                 raise ValueError
         elif record_type == 'all_items':
             if action == 'GET':
                 return rest_bibs.get_all_items_for_bib(split_alma_ids[0])
+            else:
+                logger.error('No valid combination of API, record type and action provided.')
+                raise ValueError
+        elif record_type == 'all_e_collections':
+            if action == 'GET':
+                return rest_bibs.get_all_e_collections_for_bib(split_alma_ids[0])
             else:
                 logger.error('No valid combination of API, record type and action provided.')
                 raise ValueError
