@@ -78,6 +78,17 @@ def get_e_collection_with_mms_id(mms_id: str, collection_id: str) -> str:
     return collection_record
 
 
+def get_all_holdings_for_bib(mms_id: str) -> str:
+    """
+    For a given mms_id, get all holdings information.
+    :param mms_id: Unique ID of the BIB record the holdings are connected to.
+    :return: Record in XML format.
+    """
+    logger.info(f'Trying to fetch all holdings information for bib record {mms_id}.')
+    physical_inventory_record = rest_call_api.get_record(f'/bibs/{mms_id}/holdings')
+    return physical_inventory_record
+
+
 def get_all_items_for_bib(mms_id: str) -> str:
     """
     For a given mms_id, get all holding and item information.

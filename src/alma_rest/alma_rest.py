@@ -320,6 +320,12 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
             else:
                 logger.error('No valid combination of API, record type and action provided.')
                 raise ValueError
+        elif record_type == 'all_holdings':
+            if action == 'GET':
+                return rest_bibs.get_all_holdings_for_bib(split_alma_ids[0])
+            else:
+                logger.error('No valid combination of API, record type and action provided.')
+                raise ValueError
         elif record_type == 'all_items':
             if action == 'GET':
                 return rest_bibs.get_all_items_for_bib(split_alma_ids[0])
