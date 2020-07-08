@@ -275,9 +275,6 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 return rest_bibs.create_bib(record_data, split_alma_ids[0])
             elif action == 'PUT':
                 return rest_bibs.update_bib(record_data, split_alma_ids[0])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
         elif record_type == 'holdings':
             if action == 'DELETE':
                 return rest_bibs.delete_hol(split_alma_ids[0], split_alma_ids[1])
@@ -287,9 +284,6 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 return rest_bibs.create_hol(record_data, split_alma_ids[0], split_alma_ids[1])
             elif action == 'PUT':
                 return rest_bibs.update_hol(record_data, split_alma_ids[0], split_alma_ids[1])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
         elif record_type == 'items':
             if action == 'DELETE':
                 return rest_bibs.delete_item(split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
@@ -299,9 +293,6 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 return rest_bibs.create_item(record_data, split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
             elif action == 'PUT':
                 return rest_bibs.update_item(record_data, split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
         elif record_type == 'portfolios':
             if action == 'DELETE':
                 return rest_bibs.delete_portfolio(split_alma_ids[0], split_alma_ids[1])
@@ -311,74 +302,37 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
                 return rest_bibs.create_portfolio(record_data, split_alma_ids[0], split_alma_ids[1])
             elif action == 'PUT':
                 return rest_bibs.update_portfolio(record_data, split_alma_ids[0], split_alma_ids[1])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
         elif record_type == 'e-collections':
             if action == 'GET':
                 return rest_bibs.get_e_collection_with_mms_id(split_alma_ids[0], split_alma_ids[1])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
         elif record_type == 'all_holdings':
             if action == 'GET':
                 return rest_bibs.get_all_holdings_for_bib(split_alma_ids[0])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
         elif record_type == 'all_items_for_bib':
             if action == 'GET':
                 return rest_bibs.get_all_items_for_bib(split_alma_ids[0])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
         elif record_type == 'all_items_for_holding':
             if action == 'GET':
                 return rest_bibs.get_all_items_for_holding(split_alma_ids[0], split_alma_ids[1])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
         elif record_type == 'all_portfolios':
             if action == 'GET':
                 return rest_bibs.get_all_portfolios_for_bib(split_alma_ids[0])
         elif record_type == 'all_e_collections':
             if action == 'GET':
                 return rest_bibs.get_all_e_collections_for_bib(split_alma_ids[0])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
-        else:
-            logger.error('No valid combination of API and record type provided.')
-            raise ValueError
     elif api == 'items':
         if record_type == 'items':
             if action == 'GET':
                 return rest_bibs.get_item_by_barcode(split_alma_ids[0])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
-        else:
-            logger.error('No valid combination of API and record type provided.')
-            raise ValueError
     elif api == 'users':
         if record_type == 'users':
             if action == 'GET':
                 return rest_users.get_user(split_alma_ids[0])
-            else:
-                logger.error('No valid combination of API, record type and action provided.')
-                raise ValueError
-        else:
-            logger.error('No valid combination of API and record type provided.')
-            raise ValueError
     elif api == 'electronic':
         if record_type == 'e-collections':
             if action == 'GET':
                 return rest_electronic.get_e_collection(split_alma_ids[0])
             elif action == 'PUT':
                 return rest_electronic.update_e_collection(record_data, split_alma_ids[0])
-        else:
-            logger.error('No valid combination of API, record type and action provided.')
-            raise ValueError
-    else:
-        logger.error('No valid combination of API and record type provided.')
-        raise ValueError
+    logger.error('No valid combination of API and record type provided.')
+    raise ValueError
