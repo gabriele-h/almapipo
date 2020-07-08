@@ -1,6 +1,7 @@
 # About
 
 ## Scenario
+
 A set of
 [Alma](https://knowledge.exlibrisgroup.com/Alma/Product_Documentation/010Alma_Online_Help_(English)/010Getting_Started/010Alma_Introduction/010Alma_Overview)
 records needs to be created, deleted, updated, or fetched for analysis.
@@ -33,7 +34,16 @@ how the format is set in the headers within `rest_call_api.py`:
 This is necessary as not all APIs will support json and in general the
 Alma APIs seem to be implemented xml-first.
 
-## What is *not* covered in this README
+## What Does This Package *Not* Do?
+
+At the time I write this: A lot!
+
+Currently I am not implementing all the APIs with some kind of grand
+scheme, but as I need them. If you want and are able to contribute, I
+will be happy to receive your pull requests. If that is not an option:
+Get in touch!
+
+## What Is *Not* Covered in This README
 Modules that are not meant for day-to-day use will not be covered by
 this README. They should include doc-strings though, so if you are
 curious make use of python's `help`-function.
@@ -126,11 +136,14 @@ Main part making use of most of the other modules.
 
 ## Actions on whole CSV lists
 
-Adds CSV Lines to `source_csv` and `job_status_per_id` (see below)
-and issues an Alma BIB API GET request per alma-id. If successful,
+There are four functions for create, delete, get, and update to
+operate on whole CSV lists. These will
+add CSV Lines to `source_csv` and `job_status_per_id` (see below)
+and issue an Alma API request per alma-id. If successful,
 job_status in `job_status_per_id` will be set from "new" to "done",
 otherwise "error". For all calls other than GET a second request per
-alma-id is done for the action specified.
+alma-id is done for the action specified, so there will be two
+lines in `job_status_per_id` for those function calls per alma_id.
 
 The successfully retrieved records will be saved to the table
 `fetched_records`, where the whole API response content is saved
@@ -260,13 +273,16 @@ the CSV/TSV file, you can make use of the function `get_value_from_csv_json`.
 ### Usage Example Python
 
 In the following example we have a CSV/TSV file with a column that contains the
-alma-ids ('IDs') and one with the desired Input for a specific MARC category.
+alma-ids and one with the title for that record (see **Example Data** above).
 The strings provided in the function correspond with the headings of those
 columns.
 
 ```python
 from alma_rest import db_read_write
-db_read_write.get_value_from_source_csv('IDs', alma_id, job_timestamp, 'MARC 100')
+from datetime import datetime, timezone
+alma_id = "991234567890123,221234567890123"
+job_timestamp = datetime(2020, 2, 20, 20, 00, 20, timezone.utc)
+db_read_write.get_value_from_source_csv('alma-ids', alma_id, job_timestamp, 'title')
 ```
 
 ## Check DB Connectivity From Commandline
