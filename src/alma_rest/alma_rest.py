@@ -256,11 +256,13 @@ def get_record_for_alma_ids(alma_ids: str, api: str, record_type: str) -> str:
 
 def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, record_data: bytes = None) -> str:
     """
-    Meta-function for all api_calls.
+    Meta-function for all api_calls. Please note that for some API calls there is a fake
+    record_type available, such as 'all_items_for_bib'. These will not take additional
+    query-parameters, though, and are only meant as convenience functions.
     :param action: DELETE, GET, POST or PUT.
     :param alma_ids: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
-    :param record_type: Type of the record to call the API for (e. g. "holdings")
+    :param record_type: Type of the record, usually last path-argument with hardcoded string (e. g. "holdings")
     :param record_data: Only necessary for POST and PUT actions.
     :return: API response as a string.
     """
