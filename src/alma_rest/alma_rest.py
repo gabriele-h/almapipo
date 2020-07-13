@@ -175,27 +175,26 @@ def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str) 
     db_session.close()
 
 
-def import_csv_and_ids_to_db_tables(file_path: str, action: str = 'GET', validation: bool = True) -> None:
+def import_csv_and_ids_to_db_tables(file_path: str, action: str, validation: bool = True) -> None:
     """
     Imports a whole csv or tsv file to the table source_csv.
     Imports valid Alma-IDs to table job_status_per_id.
     Checks for file existence first.
-    NOTE: If no action (GET, PUT, POST or DELETE) is provided,
-    it will default to "GET".
-    :param file_path: Path to the CSV file to be imported.
-    :param action: REST action - GET, PUT, POST or DELETE, defaults to empty string.
+    :param file_path: Path to the CSV file to be imported
+    :param action: REST action - GET, PUT, POST or DELETE
     :param validation: If set to "False", the first column will not be checked for validity. Defaults to True.
     :return: None
     """
     if input_read.check_file_path(file_path):
-        session = db_read_write.create_db_session()
+        db_session = db_read_write.create_db_session()
         csv_generator = input_read.read_csv_contents(file_path, validation)
         for csv_line in csv_generator:
             # noinspection PyTypeChecker
-            db_read_write.add_csv_line_to_session(csv_line, job_timestamp, session, action)
-        session.commit()
-    else:
-        logger.error('No valid file path provided.')
+            db_read_write.add_csv_line_to_session(csv_line, job_timestamp, db_session, action)
+        db_session.commit()
+        db_session.close()
+    logger.error('No valid file path provided.')
+    raise ValueError
 
 
 def update_record_for_alma_ids(alma_ids: str, api: str, record_type: str, record_data: bytes) -> str:
