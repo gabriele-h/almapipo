@@ -97,7 +97,9 @@ def call_api_for_csv_list(
                     logger.error(f'Could not fetch record {alma_id}.')
                     db_read_write.update_job_status('error', alma_id, 'GET', job_timestamp, db_session)
                 else:
-                    db_read_write.add_response_content_to_fetched_records(alma_id, record_data, job_timestamp, db_session)
+                    db_read_write.add_response_content_to_fetched_records(
+                        alma_id, record_data, job_timestamp, db_session
+                    )
                     db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
                     if action == 'DELETE':
                         alma_response = delete_record_for_alma_ids(alma_id, api, record_type)
