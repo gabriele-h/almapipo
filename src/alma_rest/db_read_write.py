@@ -142,11 +142,11 @@ def get_record_from_fetched_records(alma_ids: str):
     return record_query.first()
 
 
-def update_job_status_for_alma_id(status: str,
-                                  alma_id: str,
-                                  action: str,
-                                  job_timestamp: datetime,
-                                  session: Session) -> None:
+def update_job_status(status: str,
+                      alma_id: str,
+                      action: str,
+                      job_timestamp: datetime,
+                      session: Session) -> None:
     """
     For a given alma_id and job_timestamp update the job_status in table job_status_per_id.
     :param status: New status to be set.
@@ -190,7 +190,7 @@ def get_list_of_ids_by_status_and_action(status: str, action: str, job_timestamp
     return list_of_ids
 
 
-def add_put_post_response_to_session(alma_id: str, record_data: bytes, job_timestamp: datetime, session: Session):
+def add_put_post_response(alma_id: str, record_data: bytes, job_timestamp: datetime, session: Session):
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
@@ -210,7 +210,7 @@ def add_put_post_response_to_session(alma_id: str, record_data: bytes, job_times
     session.add(line_for_table_put_post_responses)
 
 
-def add_sent_record_to_session(alma_id: str, record_data: bytes, job_timestamp: datetime, session: Session):
+def add_sent_record(alma_id: str, record_data: bytes, job_timestamp: datetime, session: Session):
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
