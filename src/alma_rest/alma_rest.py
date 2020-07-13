@@ -40,6 +40,7 @@ def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record
     :param record_type: Type of the record to call the API for (e. g. "holdings")
     :return: None
     """
+    logger.info(f"Trying to restore records listed in {csv_path} with latest version in the database.")
     db_session = db_read_write.create_db_session()
     import_csv_and_ids_to_db_tables(csv_path, 'POST')
     list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', 'POST', job_timestamp, db_session)
