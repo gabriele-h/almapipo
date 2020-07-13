@@ -86,7 +86,7 @@ def update_records_via_api_for_csv_list(
             logger.error(f'Could not fetch record {alma_id}.')
             db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session, 'GET')
         else:
-            db_read_write.add_fetched_record_to_session(alma_id, record_data, job_timestamp, db_session)
+            db_read_write.add_response_content_to_fetched_records(alma_id, record_data, job_timestamp, db_session)
             db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session, 'GET')
             new_record_data = manipulation(alma_id, record_data)
             if not new_record_data:
@@ -168,7 +168,7 @@ def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str) 
             db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session)
         else:
             db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session)
-            db_read_write.add_fetched_record_to_session(alma_id, record_data, job_timestamp, db_session)
+            db_read_write.add_response_content_to_fetched_records(alma_id, record_data, job_timestamp, db_session)
     db_session.commit()
     ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'GET', job_timestamp, db_session)
     ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'GET', job_timestamp, db_session)

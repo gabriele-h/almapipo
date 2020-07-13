@@ -230,7 +230,7 @@ def add_sent_record_to_session(alma_id: str, record_data: bytes, job_timestamp: 
     session.add(line_for_table_sent_records)
 
 
-def add_fetched_record_to_session(alma_id: str, record_data, job_timestamp: datetime, session: Session):
+def add_response_content_to_fetched_records(alma_id: str, record_data, job_timestamp: datetime, session: Session):
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
