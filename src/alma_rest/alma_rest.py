@@ -20,12 +20,42 @@ from . import rest_electronic
 from . import rest_users
 from . import xml_extract
 
-# Timestamp for as inserted in the database
+# Timestamp as inserted in the database
 job_timestamp = datetime.now(timezone.utc)
 
 # Logfile
 logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
+
+
+def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
+    """
+    For a list of Alma-IDs given in a CSV file, this function does the following:
+    * Query for the latest version of the fetched record's xml in the local database
+    * Call POST with the XML on the API defined in the parameters
+    * Save the response from the API in table fetched_records
+    * Set status of API call in job_status_per_id
+    :param csv_path: Path of the CSV file containing the Alma IDs.
+    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
+    :param record_type: Type of the record to call the API for (e. g. "holdings")
+    :return: None
+    """
+    db_session = db_read_write.create_db_session()
+    import_csv_to_db_tables(csv_path, 'POST')
+    list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', 'POST', job_timestamp, db_session)
+    for alma_id, in list_of_ids:
+        record_data = xml_extract.extract_response_from_fetched_records(alma_id)
+        alma_response = create_record_for_alma_ids(alma_id, api, record_type, record_data)
+        if alma_response is None:
+            db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session, 'POST')
+        else:
+            db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session, 'POST')
+    db_session.commit()
+    ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'POST', job_timestamp, db_session)
+    ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'POST', job_timestamp, db_session)
+    logger.info(f"Completed POST successfully for {ids_done.count()} record(s).")
+    logger.info(f"Errors were encountered for POST of {ids_error.count()} record(s).")
+    db_session.close()
 
 
 def update_records_via_api_for_csv_list(
@@ -34,7 +64,7 @@ def update_records_via_api_for_csv_list(
         record_type: str,
         manipulation: Callable[[str, str], bytes]) -> None:
     """
-    Fro a list of Alma-IDs given in a CSV file, this function does the following:
+    For a list of Alma-IDs given in a CSV file, this function does the following:
     * Call GET for the Alma-IDs and store it in fetched_records
     * Manipulate the retrieved record with the manipulation_function
     * Call PUT with the manipulated data if input for manipulation_function and its output differ
@@ -79,36 +109,6 @@ def update_records_via_api_for_csv_list(
     logger.info(f"Completed PUT successfully for {ids_done.count()} record(s).")
     logger.info(f"Errors were encountered for PUT of {ids_error.count()} record(s).")
     logger.info(f"PUT was not handled at all for {ids_new.count()} record(s).")
-    db_session.close()
-
-
-def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
-    """
-    For a list of Alma-IDs given in a CSV file, this function does the following:
-    * Query for the latest version of the fetched record's xml in the local database
-    * Call POST with the XML on the API defined in the parameters
-    * Save the response from the API in table fetched_records
-    * Set status of API call in job_status_per_id
-    :param csv_path: Path of the CSV file containing the Alma IDs.
-    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
-    :param record_type: Type of the record to call the API for (e. g. "holdings")
-    :return: None
-    """
-    db_session = db_read_write.create_db_session()
-    import_csv_to_db_tables(csv_path, 'POST')
-    list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', 'POST', job_timestamp, db_session)
-    for alma_id, in list_of_ids:
-        record_data = xml_extract.extract_response_from_fetched_records(alma_id)
-        alma_response = create_record_for_alma_ids(alma_id, api, record_type, record_data)
-        if alma_response is None:
-            db_read_write.update_job_status_for_alma_id('error', alma_id, job_timestamp, db_session, 'POST')
-        else:
-            db_read_write.update_job_status_for_alma_id('done', alma_id, job_timestamp, db_session, 'POST')
-    db_session.commit()
-    ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'POST', job_timestamp, db_session)
-    ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'POST', job_timestamp, db_session)
-    logger.info(f"Completed POST successfully for {ids_done.count()} record(s).")
-    logger.info(f"Errors were encountered for POST of {ids_error.count()} record(s).")
     db_session.close()
 
 
