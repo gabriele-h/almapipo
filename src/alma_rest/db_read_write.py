@@ -39,7 +39,7 @@ def main():
     db_engine.connect()
 
 
-def check_data_sent_equals_put_post_response(
+def check_data_sent_equals_response(
         alma_ids: str,
         job_timestamp: datetime,
         session: Session) -> bool:

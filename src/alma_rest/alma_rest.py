@@ -116,7 +116,7 @@ def call_api_for_csv_list(
                             db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
                             db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
                             db_read_write.update_job_status('done', alma_id, action, job_timestamp, db_session)
-                            db_read_write.check_data_sent_equals_put_post_response(alma_id, job_timestamp, db_session)
+                            db_read_write.check_data_sent_equals_response(alma_id, job_timestamp, db_session)
 
     db_session.commit()
     db_read_write.log_success_rate(action, job_timestamp, db_session)
