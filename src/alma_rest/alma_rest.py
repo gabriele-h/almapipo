@@ -111,12 +111,15 @@ def call_api_for_csv_list(
                             logger.error(f'Could not manipulate data of record {alma_id}.')
                             db_read_write.update_job_status('error', alma_id, action, job_timestamp, db_session)
                         else:
-                            logger.info(f'Record manipulation for {alma_id} successful. Adding to put_post_responses.')
                             response = update_record_for_alma_ids(alma_id, api, record_type, new_record_data)
-                            db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
-                            db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
-                            db_read_write.update_job_status('done', alma_id, action, job_timestamp, db_session)
-                            db_read_write.check_data_sent_equals_response(alma_id, job_timestamp, db_session)
+                            if response:
+                                logger.info(f'Manipulation for {alma_id} successful. Adding to put_post_responses.')
+                                db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
+                                db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
+                                db_read_write.update_job_status('done', alma_id, action, job_timestamp, db_session)
+                                db_read_write.check_data_sent_equals_response(alma_id, job_timestamp, db_session)
+                            logger.error(f'Did not receive a response for {alma_id}?')
+                            db_read_write.update_job_status('error', alma_id, action, job_timestamp, db_session)
 
     db_session.commit()
     db_read_write.log_success_rate(action, job_timestamp, db_session)
