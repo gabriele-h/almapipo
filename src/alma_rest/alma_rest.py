@@ -56,122 +56,70 @@ def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record
     db_session.close()
 
 
-def update_records_via_api_for_csv_list(
+def call_api_for_csv_list(
         csv_path: str,
         api: str,
         record_type: str,
-        manipulation: Callable[[str, str], bytes]) -> None:
+        action: str,
+        manipulate_record: Callable[[str, str], bytes] = None) -> None:
     """
     For a list of Alma-IDs given in a CSV file, this function does the following:
     * Call GET for the Alma-IDs and store it in fetched_records
-    * Manipulate the retrieved record with the manipulation_function
-    * Call PUT with the manipulated data if input for manipulation_function and its output differ
-    * Save the response to the PUT call in put_post_responses
+    * For action PUT: Manipulate the retrieved record with the manipulation_function
+    * For actions PUT or POST: Save the response to put_post_responses
     * Set status of all API calls in job_status_per_id
-    :param csv_path: Path of the CSV file containing the Alma IDs.
+    * NOTE: action 'POST' is not implemented yet!
+    :param csv_path: Path of the CSV file containing the Alma IDs
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of the record to call the API for (e. g. "holdings")
-    :param manipulation: Function with arguments alma_ids and data retrieved via GET. Returns manipulated data.
+    :param action: As in job_status_per_id, possible values are "DELETE", "GET", "PUT" - POST not implemented yet!
+    :param manipulate_record: Function with arguments alma_ids and data retrieved via GET that returns record_data
     :return: None
     """
+    if action not in ['DELETE', 'GET', 'PUT', 'POST']:
+        logger.error(f'Provided action {action} does not match any of the expected values.')
+        raise ValueError
+    if action == 'POST':
+        raise NotImplementedError
+
     db_session = db_read_write.create_db_session()
-    import_csv_and_ids_to_db_tables(csv_path, 'PUT')
-    list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', 'PUT', job_timestamp, db_session)
-    for alma_id, in list_of_ids:
-        db_read_write.add_alma_ids_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
-        record_data = get_record_for_alma_ids(alma_id, api, record_type)
-        if not record_data:
-            logger.error(f'Could not fetch record {alma_id}.')
-            db_read_write.update_job_status('error', alma_id, 'GET', job_timestamp, db_session)
-        else:
-            db_read_write.add_response_content_to_fetched_records(alma_id, record_data, job_timestamp, db_session)
-            db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
-            new_record_data = manipulation(alma_id, record_data)
-            if not new_record_data:
-                logger.error(f'Could not manipulate data of record {alma_id}.')
-                db_read_write.update_job_status('error', alma_id, 'PUT', job_timestamp, db_session)
-            elif record_data == new_record_data:
-                logger.error(f"{manipulation.__name__} did not effect a change of {alma_id}.")
-                db_read_write.update_job_status('error', alma_id, 'PUT', job_timestamp, db_session)
-            else:
-                logger.info(f'Record manipulation for {alma_id} successful. Adding to put_post_responses.')
-                response = update_record_for_alma_ids(alma_id, api, record_type, new_record_data)
-                db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
-                db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
-                db_read_write.update_job_status('done', alma_id, 'PUT', job_timestamp, db_session)
-                db_read_write.check_data_sent_equals_put_post_response(alma_id, job_timestamp, db_session)
+    import_csv_and_ids_to_db_tables(csv_path, action)
+
+    list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', action, job_timestamp, db_session)
+
+    if action in ['DELETE', 'GET', 'PUT']:
+        for alma_id, in list_of_ids:
+            if action != 'GET' and action != 'POST':
+                db_read_write.add_alma_ids_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
+            if action != 'POST':
+                record_data = get_record_for_alma_ids(alma_id, api, record_type)
+                if not record_data:
+                    logger.error(f'Could not fetch record {alma_id}.')
+                    db_read_write.update_job_status('error', alma_id, 'GET', job_timestamp, db_session)
+                else:
+                    db_read_write.add_response_content_to_fetched_records(alma_id, record_data, job_timestamp, db_session)
+                    db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
+                    if action == 'DELETE':
+                        alma_response = delete_record_for_alma_ids(alma_id, api, record_type)
+                        if alma_response is None:
+                            db_read_write.update_job_status('error', alma_id, action, job_timestamp, db_session)
+                        else:
+                            db_read_write.update_job_status('done', alma_id, action, job_timestamp, db_session)
+                    elif action == 'PUT':
+                        new_record_data = manipulate_record(alma_id, record_data)
+                        if not new_record_data:
+                            logger.error(f'Could not manipulate data of record {alma_id}.')
+                            db_read_write.update_job_status('error', alma_id, action, job_timestamp, db_session)
+                        else:
+                            logger.info(f'Record manipulation for {alma_id} successful. Adding to put_post_responses.')
+                            response = update_record_for_alma_ids(alma_id, api, record_type, new_record_data)
+                            db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
+                            db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
+                            db_read_write.update_job_status('done', alma_id, action, job_timestamp, db_session)
+                            db_read_write.check_data_sent_equals_put_post_response(alma_id, job_timestamp, db_session)
+
     db_session.commit()
-    ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'PUT', job_timestamp, db_session)
-    ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'PUT', job_timestamp, db_session)
-    ids_new = db_read_write.get_list_of_ids_by_status_and_action('new', 'PUT', job_timestamp, db_session)
-    logger.info(f"Completed PUT successfully for {ids_done.count()} record(s).")
-    logger.info(f"Errors were encountered for PUT of {ids_error.count()} record(s).")
-    logger.info(f"PUT was not handled at all for {ids_new.count()} record(s).")
-    db_session.close()
-
-
-def delete_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
-    """
-    For a list of Alma-IDs given in a CSV file, this function does the following:
-    * Save the data from the CSV-file to tables job_status_per_id and source_csv
-    * Call GET on the Alma API for each Alma-ID
-    * Save the response from the API in table fetched_records
-    * For all successful GET calls, add DELETE lines to job_status_per_id
-    * Call DELETE on the Alma API for each Alma-ID that could be fetched via GET
-    Note that this will only work for Alma-IDs and not alternatives like "Other system number"
-    or other kinds of bibs queries.
-
-    :param csv_path: Path of the CSV file containing the Alma IDs.
-    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
-    :param record_type: Type of the record to call the API for (e. g. "holdings")
-    :return: None
-    """
-    db_session = db_read_write.create_db_session()
-    get_records_via_api_for_csv_list(csv_path, api, record_type)
-    list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('done', 'GET', job_timestamp, db_session)
-    for alma_id, in list_of_ids:
-        db_read_write.add_alma_ids_to_job_status_per_id(alma_id, 'DELETE', job_timestamp, db_session)
-        alma_response = delete_record_for_alma_ids(alma_id, api, record_type)
-        if alma_response is None:
-            db_read_write.update_job_status('error', alma_id, 'DELETE', job_timestamp, db_session)
-        else:
-            db_read_write.update_job_status('done', alma_id, 'DELETE', job_timestamp, db_session)
-    db_session.commit()
-    ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'DELETE', job_timestamp, db_session)
-    ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'DELETE', job_timestamp, db_session)
-    logger.info(f"Completed DELETE successfully for {ids_done.count()} record(s).")
-    logger.info(f"Errors were encountered for DELETE of {ids_error.count()} record(s).")
-    db_session.close()
-
-
-def get_records_via_api_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
-    """
-    For a list of Alma-IDs given in a CSV file, this function does the following:
-    * Save the data from the CSV-file to tables job_status_per_id and source_csv
-    * Call GET on the Alma API for each Alma-ID
-    * Save the response from the API in table fetched_records
-    Note that this will only work for Alma-IDs and not alternatives like "Other system number".
-
-    :param csv_path: Path of the CSV file containing the Alma IDs.
-    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
-    :param record_type: Type of the record to call the API for (e. g. "holdings")
-    :return: None
-    """
-    db_session = db_read_write.create_db_session()
-    import_csv_and_ids_to_db_tables(csv_path, 'GET')
-    list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', 'GET', job_timestamp, db_session)
-    for alma_id, in list_of_ids:
-        record_data = get_record_for_alma_ids(alma_id, api, record_type)
-        if record_data is None:
-            db_read_write.update_job_status('error', 'GET', alma_id, job_timestamp, db_session)
-        else:
-            db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
-            db_read_write.add_response_content_to_fetched_records(alma_id, record_data, job_timestamp, db_session)
-    db_session.commit()
-    ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'GET', job_timestamp, db_session)
-    ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'GET', job_timestamp, db_session)
-    logger.info(f"Completed GET successfully for {ids_done.count()} record(s).")
-    logger.info(f"Errors were encountered for GET of {ids_error.count()} record(s).")
+    db_read_write.log_success_rate(action, job_timestamp, db_session)
     db_session.close()
 
 
