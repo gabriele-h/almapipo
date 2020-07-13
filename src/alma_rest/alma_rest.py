@@ -97,8 +97,8 @@ def update_records_via_api_for_csv_list(
                 db_read_write.update_job_status('error', alma_id, 'PUT', job_timestamp, db_session)
             else:
                 logger.info(f'Record manipulation for {alma_id} successful. Adding to put_post_responses.')
-                update_record_for_alma_ids(alma_id, api, record_type, new_record_data)
-                db_read_write.add_put_post_response(alma_id, new_record_data, job_timestamp, db_session)
+                response = update_record_for_alma_ids(alma_id, api, record_type, new_record_data)
+                db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
                 db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
                 db_read_write.update_job_status('done', alma_id, 'PUT', job_timestamp, db_session)
                 db_read_write.check_data_sent_equals_put_post_response(alma_id, job_timestamp, db_session)
