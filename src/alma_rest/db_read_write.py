@@ -144,16 +144,16 @@ def get_record_from_fetched_records(alma_ids: str):
 
 def update_job_status_for_alma_id(status: str,
                                   alma_id: str,
+                                  action: str,
                                   job_timestamp: datetime,
-                                  session: Session,
-                                  action: str = 'GET'):
+                                  session: Session) -> None:
     """
     For a given alma_id and job_timestamp update the job_status in table job_status_per_id.
     :param status: New status to be set.
     :param alma_id: Alma ID to set the status for.
+    :param action: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
     :param job_timestamp: Job for which the status should be changed.
     :param session: Session to be used for the manipulation.
-    :param action: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
     :return: None
     """
     list_of_matched_rows = session.query(
