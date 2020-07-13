@@ -9,18 +9,18 @@ from alma_rest import input_read
 
 class TestDoesStringEqualAlmaID:
     set_of_alma_ids = {
-        '9981093873903332', '22447985240003332', '23447985190003332',
-        '61363367390003332', '62363367380003332', '53375846240003332',
-        '81445078000003332'
+        '9981093873901234', '22447985240001234', '23447985190001234',
+        '61363367390001234', '62363367380001234', '53375846240001234',
+        '81445078000001234'
     }
-    not_an_alma_id = '813332'
+    not_an_alma_id = '811234'
     string_empty = ""
     not_a_string = 1234567
 
     @pytest.fixture
     def set_env_id_suffix(self):
         old_suffix = environ.get('ALMA_REST_ID_INSTITUTIONAL_SUFFIX', '')
-        environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX'] = '3332'
+        environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX'] = '1234'
         yield
         environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX'] = old_suffix
 
