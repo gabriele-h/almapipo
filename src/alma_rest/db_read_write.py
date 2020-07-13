@@ -269,7 +269,7 @@ def add_csv_line_to_session(csv_line: OrderedDict, job_timestamp, session: Sessi
     add_alma_ids_to_job_status_per_id(list(csv_line.values())[0], action, job_timestamp, session)
 
 
-def add_alma_ids_to_job_status_per_id(alma_id: str, action: str, job_timestamp, session: Session):
+def add_alma_ids_to_job_status_per_id(alma_id: str, action: str, job_timestamp: datetime, session: Session):
     """
     For a string of Alma IDs create an entry in job_status_per_id.
     :param alma_id: IDs of the record to be manipulated.
