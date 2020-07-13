@@ -52,10 +52,7 @@ def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record
         else:
             db_read_write.update_job_status('done', alma_id, 'POST', job_timestamp, db_session)
     db_session.commit()
-    ids_done = db_read_write.get_list_of_ids_by_status_and_action('done', 'POST', job_timestamp, db_session)
-    ids_error = db_read_write.get_list_of_ids_by_status_and_action('error', 'POST', job_timestamp, db_session)
-    logger.info(f"Completed POST successfully for {ids_done.count()} record(s).")
-    logger.info(f"Errors were encountered for POST of {ids_error.count()} record(s).")
+    db_read_write.log_success_rate('POST', job_timestamp, db_session)
     db_session.close()
 
 

@@ -287,6 +287,22 @@ def add_alma_ids_to_job_status_per_id(alma_id: str, action: str, job_timestamp, 
     session.add(line_for_table_job_status_per_id)
 
 
+def log_success_rate(action: str, job_timestamp: datetime, db_session: Session):
+    """
+    For the current job check how many records have a specific status in job_status_per_id.
+    :param action: REST action - GET, PUT, POST or DELETE
+    :param job_timestamp: Timestamp to identify the job which created the line.
+    :param db_session: DB session to make use of.
+    :return:
+    """
+    ids_done = get_list_of_ids_by_status_and_action('done', action, job_timestamp, db_session)
+    ids_error = get_list_of_ids_by_status_and_action('error', action, job_timestamp, db_session)
+    ids_new = get_list_of_ids_by_status_and_action('new', action, job_timestamp, db_session)
+    logger.info(f"Completed {action} successfully for {ids_done.count()} record(s).")
+    logger.info(f"Errors were encountered for {action} of {ids_error.count()} record(s).")
+    logger.info(f"{action} was not handled at all for {ids_new.count()} record(s).")
+
+
 def create_db_session():
     """
     Create a DB session to manipulate the contents of the DB.
