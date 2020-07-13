@@ -190,7 +190,7 @@ def get_list_of_ids_by_status_and_action(status: str, action: str, job_timestamp
     return list_of_ids
 
 
-def add_put_post_response(alma_id: str, record_data: bytes, job_timestamp: datetime, session: Session):
+def add_put_post_response(alma_id: str, record_data: str, job_timestamp: datetime, session: Session):
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
