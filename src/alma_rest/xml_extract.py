@@ -21,6 +21,6 @@ def extract_response_from_fetched_records(alma_ids: str) -> ElementTree:
     :return: ElementTree of the record.
     """
     logger.info(f'Extracting most recent response for alma_ids {alma_ids} from table fetched_records.')
-    response_query = db_read_write.get_record_from_fetched_records(alma_ids)
+    response_query = db_read_write.get_most_recent_version_from_fetched_records(alma_ids)
     response = response_query.alma_record
     return response

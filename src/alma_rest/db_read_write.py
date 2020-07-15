@@ -110,7 +110,7 @@ def get_value_from_source_csv(
     return json_value
 
 
-def get_record_from_fetched_records(alma_ids: str):
+def get_most_recent_version_from_fetched_records(alma_ids: str):
     """
     For a comma separated string of Alma IDs query for the record's
     most recently saved XML in the table fetched_records.
