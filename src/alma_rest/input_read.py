@@ -22,7 +22,7 @@ from . import logfile_setup
 # Logfile
 logger = getLogger(__name__)
 
-ID_SUFFIX_PATTERN = r"^(22|23|53|61|62|81|99)\d{{2,}}{alma_id_suffix}$"
+ALMA_ID_PATTERN = r"^(22|23|53|61|62|81|99)\d{{2,}}{alma_id_suffix}$"
 
 
 def main():
@@ -123,7 +123,7 @@ def is_this_an_alma_id(identifier: str) -> bool:
         logger.error("Env var 'ALMA_REST_ID_INSTITUTIONAL_SUFFIX' not set.")
         exit(1)
 
-    pattern = ID_SUFFIX_PATTERN.format(alma_id_suffix=alma_id_suffix)
+    pattern = ALMA_ID_PATTERN.format(alma_id_suffix=alma_id_suffix)
     if re.fullmatch(pattern, identifier):
         return True
 
