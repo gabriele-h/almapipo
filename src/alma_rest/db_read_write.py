@@ -17,6 +17,7 @@ except ImportError:
     OrderedDict = MutableMapping
 
 from sqlalchemy import create_engine, func, String
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from . import db_setup
@@ -125,7 +126,7 @@ def get_value_from_source_csv(
 
 def get_record_from_fetched_records(alma_ids: str):
     """
-    For a comma separated string of Alma IDs query for the record's most
+    For a comma separated string of Alma IDs query for the record's
     most recently saved XML in the table fetched_records.
     :param alma_ids: Comma separated string of Alma IDs to identify the record.
     :return: SQLAlchemy query object of the record.
@@ -168,7 +169,7 @@ def update_job_status(status: str,
     list_of_matched_rows[0].job_status = status
 
 
-def get_list_of_ids_by_status_and_action(status: str, action: str, job_timestamp: datetime, session: Session):
+def get_list_of_ids_by_status_and_action(status: str, action: str, job_timestamp: datetime, session: Session) -> list:
     """
     From table job_status_per_id get all Alma IDs that match the status
     given as the parameter.
@@ -190,7 +191,7 @@ def get_list_of_ids_by_status_and_action(status: str, action: str, job_timestamp
     return list_of_ids
 
 
-def add_put_post_response(alma_id: str, record_data: str, job_timestamp: datetime, session: Session):
+def add_put_post_response(alma_id: str, record_data: str, job_timestamp: datetime, session: Session) -> None:
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
@@ -210,7 +211,7 @@ def add_put_post_response(alma_id: str, record_data: str, job_timestamp: datetim
     session.add(line_for_table_put_post_responses)
 
 
-def add_sent_record(alma_id: str, record_data: bytes, job_timestamp: datetime, session: Session):
+def add_sent_record(alma_id: str, record_data: bytes, job_timestamp: datetime, session: Session) -> None:
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
@@ -230,7 +231,11 @@ def add_sent_record(alma_id: str, record_data: bytes, job_timestamp: datetime, s
     session.add(line_for_table_sent_records)
 
 
-def add_response_content_to_fetched_records(alma_id: str, record_data, job_timestamp: datetime, session: Session):
+def add_response_content_to_fetched_records(
+        alma_id: str,
+        record_data,
+        job_timestamp: datetime,
+        session: Session) -> None:
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
@@ -273,14 +278,18 @@ def add_csv_line_to_tables(
     add_alma_ids_to_job_status_per_id(list(csv_line.values())[0], action, job_timestamp, session)
 
 
-def add_alma_ids_to_job_status_per_id(alma_id: str, action: str, job_timestamp: datetime, session: Session):
+def add_alma_ids_to_job_status_per_id(
+        alma_id: str,
+        action: str,
+        job_timestamp: datetime,
+        session: Session) -> None:
     """
     For a string of Alma IDs create an entry in job_status_per_id.
     :param alma_id: IDs of the record to be manipulated.
     :param action: REST action - GET, PUT, POST or DELETE
     :param job_timestamp: Timestamp to identify the job which created the line.
     :param session: DB session to add the data to.
-    :return:
+    :return: None
     """
     line_for_table_job_status_per_id = db_setup.JobStatusPerId(
         job_timestamp=job_timestamp,
@@ -308,7 +317,7 @@ def log_success_rate(action: str, job_timestamp: datetime, db_session: Session) 
     logger.info(f"{action} was not handled for {ids_new.count()} record(s).")
 
 
-def create_db_session():
+def create_db_session() -> Session:
     """
     Create a DB session to manipulate the contents of the DB.
     :return: Session for connection to the DB.
@@ -319,7 +328,7 @@ def create_db_session():
     return session
 
 
-def create_db_engine(verbosity: bool = db_setup.does_sqlalchemy_log):
+def create_db_engine(verbosity: bool = db_setup.does_sqlalchemy_log) -> Engine:
     """
     Create the DB engine according to the information provided in env vars.
     :return: DB engine.
