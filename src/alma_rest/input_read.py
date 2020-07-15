@@ -51,13 +51,11 @@ def set_csv_path_from_argv1() -> str:
     try:
         argv1 = sys.argv[1]
     except IndexError:
-        logger.error('Please provide CSV-file as argument.')
-        sys.exit(1)
+        sys.exit('Please provide csv or tsv file as argument.')
     else:
         if check_file_path(argv1):
             return sys.argv[1]
-        else:
-            sys.exit('Exiting: Check for file-path failed.')
+        sys.exit('Exiting: Check for file path failed. See log for details.')
 
 
 def check_file_path(file_path: str) -> bool:
@@ -72,7 +70,7 @@ def check_file_path(file_path: str) -> bool:
     elif not access(file_path, R_OK):
         logger.error(f'File {file_path} is not readable.')
     elif file_path[-4:] != '.csv' and file_path[-4:] != '.tsv':
-        logger.error(f'File {file_path} does not seem to be a csv- or tsv-file?')
+        logger.error(f'File {file_path} does not seem to be a csv or tsv file?')
     else:
         return True
 
