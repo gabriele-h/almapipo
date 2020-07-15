@@ -31,9 +31,9 @@ logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
 def restore_records_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
     """
     For a list of Alma-IDs given in a CSV file, this function does the following:
-    * Query for the latest version of the fetched record's xml in the local database
+    * Query for the latest XML of the fetched record's xml in the database
     * Call POST with the XML on the API defined in the parameters
-    * Save the response from the API in table fetched_records
+    * Save the response from the API in table put_post_responses
     * Set status of API call in job_status_per_id
     :param csv_path: Path of the CSV file containing the Alma IDs.
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
@@ -51,6 +51,7 @@ def restore_records_for_csv_list(csv_path: str, api: str, record_type: str) -> N
             db_read_write.update_job_status('error', alma_id, 'POST', job_timestamp, db_session)
         else:
             db_read_write.update_job_status('done', alma_id, 'POST', job_timestamp, db_session)
+            db_read_write.add_put_post_response(alma_id, alma_response, job_timestamp, db_session)
     db_session.commit()
     db_read_write.log_success_rate('POST', job_timestamp, db_session)
     db_session.close()
