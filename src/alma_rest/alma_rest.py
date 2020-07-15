@@ -28,7 +28,7 @@ logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
 
 
-def restore_records_from_db_via_api_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
+def restore_records_for_csv_list(csv_path: str, api: str, record_type: str) -> None:
     """
     For a list of Alma-IDs given in a CSV file, this function does the following:
     * Query for the latest version of the fetched record's xml in the local database
