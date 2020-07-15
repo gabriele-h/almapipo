@@ -83,13 +83,15 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterator[str]:
     :return: Generator of csv/tsv file lines as dictionaries.
     """
     logger.info(f"Reading file {csv_path} into generator.")
-    if csv_path[-4:] == '.csv':
+
+    if csv_path[-4:] in ['.csv', '.CSV']:
         delimit = ';'
-    elif csv_path[-4:] == '.tsv':
+    elif csv_path[-4:] in ['.tsv', '.TSV']:
         delimit = '\t'
     else:
         logger.error(f"Extension of the given file not expected (csv for semicolon, tsv for tabs).")
         sys.exit(1)
+
     with open(csv_path, newline="") as csv_file:
         csv_reader = DictReader(csv_file, delimiter=delimit)
         for row in csv_reader:
