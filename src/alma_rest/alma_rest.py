@@ -144,7 +144,7 @@ def import_csv_and_ids_to_db_tables(file_path: str, action: str, validation: boo
         csv_generator = input_read.read_csv_contents(file_path, validation)
         for csv_line in csv_generator:
             # noinspection PyTypeChecker
-            db_read_write.add_csv_line_to_session(csv_line, job_timestamp, db_session, action)
+            db_read_write.add_csv_line_to_tables(csv_line, job_timestamp, db_session, action)
         db_session.commit()
         db_session.close()
     logger.error('No valid file path provided.')

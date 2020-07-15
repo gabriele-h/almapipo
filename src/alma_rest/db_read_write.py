@@ -249,7 +249,11 @@ def add_response_content_to_fetched_records(alma_id: str, record_data, job_times
     session.add(line_for_table_fetched_records)
 
 
-def add_csv_line_to_session(csv_line: OrderedDict, job_timestamp, session: Session, action: str = 'GET'):
+def add_csv_line_to_tables(
+        csv_line: OrderedDict,
+        job_timestamp: datetime,
+        session: Session,
+        action: str) -> None:
     """
     For an ordered Dictionary of values retrieved from a csv/tsv file
     create an entry in the database that identifies the job
