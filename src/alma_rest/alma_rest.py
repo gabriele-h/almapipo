@@ -219,74 +219,30 @@ def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, 
     :return: API response as a string.
     """
     split_alma_ids = str.split(alma_ids, ',')
+    record_id = split_alma_ids[-1]
+
     if api == 'bibs':
         if record_type == 'bibs':
-            if action == 'DELETE':
-                return rest_bibs.delete_bib(split_alma_ids[0])
-            elif action == 'GET':
-                return rest_bibs.get_bib(split_alma_ids[0])
-            elif action == 'POST':
-                return rest_bibs.create_bib(record_data, split_alma_ids[0])
-            elif action == 'PUT':
-                return rest_bibs.update_bib(record_data, split_alma_ids[0])
+            ApiCaller = rest_bibs.BibsApiCallerForBibs()
         elif record_type == 'holdings':
-            if action == 'DELETE':
-                return rest_bibs.delete_hol(split_alma_ids[0], split_alma_ids[1])
-            elif action == 'GET':
-                return rest_bibs.get_hol(split_alma_ids[0], split_alma_ids[1])
-            elif action == 'POST':
-                return rest_bibs.create_hol(record_data, split_alma_ids[0], split_alma_ids[1])
-            elif action == 'PUT':
-                return rest_bibs.update_hol(record_data, split_alma_ids[0], split_alma_ids[1])
+            ApiCaller = rest_bibs.BibsApiCallerForHoldings(split_alma_ids[0])
         elif record_type == 'items':
-            if action == 'DELETE':
-                return rest_bibs.delete_item(split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
-            elif action == 'GET':
-                return rest_bibs.get_item(split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
-            elif action == 'POST':
-                return rest_bibs.create_item(record_data, split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
-            elif action == 'PUT':
-                return rest_bibs.update_item(record_data, split_alma_ids[0], split_alma_ids[1], split_alma_ids[2])
+            ApiCaller = rest_bibs.BibsApiCallerForItems(split_alma_ids[0], split_alma_ids[1])
         elif record_type == 'portfolios':
-            if action == 'DELETE':
-                return rest_bibs.delete_portfolio(split_alma_ids[0], split_alma_ids[1])
-            elif action == 'GET':
-                return rest_bibs.get_portfolio(split_alma_ids[0], split_alma_ids[1])
-            elif action == 'POST':
-                return rest_bibs.create_portfolio(record_data, split_alma_ids[0], split_alma_ids[1])
-            elif action == 'PUT':
-                return rest_bibs.update_portfolio(record_data, split_alma_ids[0], split_alma_ids[1])
-        elif record_type == 'e-collections':
-            if action == 'GET':
-                return rest_bibs.get_e_collection_with_mms_id(split_alma_ids[0], split_alma_ids[1])
-        elif record_type == 'all_holdings':
-            if action == 'GET':
-                return rest_bibs.get_all_holdings_for_bib(split_alma_ids[0])
-        elif record_type == 'all_items_for_bib':
-            if action == 'GET':
-                return rest_bibs.get_all_items_for_bib(split_alma_ids[0])
-        elif record_type == 'all_items_for_holding':
-            if action == 'GET':
-                return rest_bibs.get_all_items_for_holding(split_alma_ids[0], split_alma_ids[1])
-        elif record_type == 'all_portfolios':
-            if action == 'GET':
-                return rest_bibs.get_all_portfolios_for_bib(split_alma_ids[0])
-        elif record_type == 'all_e_collections':
-            if action == 'GET':
-                return rest_bibs.get_all_e_collections_for_bib(split_alma_ids[0])
-    elif api == 'items':
-        if record_type == 'items':
-            if action == 'GET':
-                return rest_bibs.get_item_by_barcode(split_alma_ids[0])
-    elif api == 'users':
-        if record_type == 'users':
-            if action == 'GET':
-                return rest_users.get_user(split_alma_ids[0])
-    elif api == 'electronic':
-        if record_type == 'e-collections':
-            if action == 'GET':
-                return rest_electronic.get_e_collection(split_alma_ids[0])
-            elif action == 'PUT':
-                return rest_electronic.update_e_collection(record_data, split_alma_ids[0])
-    logger.error('No valid combination of API and record type provided.')
-    raise ValueError
+            ApiCaller = rest_bibs.BibsApiCallerForPortfolios(split_alma_ids[0])
+        else:
+            raise NotImplementedError
+    else:
+        raise NotImplementedError
+
+    if action == 'DELETE':
+        return ApiCaller.delete(record_id)
+    elif action == 'GET':
+        return ApiCaller.get(record_id)
+    elif action == 'POST':
+        return ApiCaller.create(record_data)
+    elif action == 'PUT':
+        return ApiCaller.update(record_data, record_id)
+
+    logger.error('The API you are trying to call is not implemented yet.')
+    raise NotImplementedError

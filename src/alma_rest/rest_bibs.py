@@ -13,57 +13,207 @@ from . import logfile_setup
 logger = getLogger(__name__)
 
 
-#######
-# GET #
-#######
+class BibsApiCaller:
+    """
+    Makes calls to the /bibs API.
+    """
+    def __init__(self, base_path: str):
+        """
+        Initialize API calls for Bibliographic Records and Inventory.
+        :param base_path: Path used for API calls
+        """
+        self.base_path = base_path
+
+    def create(self, record_data: bytes) -> str:
+        """
+        Create a record via Alma API /bibs.
+        :param record_data: XML of the record to be created
+        :return: Response data in XML format
+        """
+        logger.info(f"Trying POST for /bibs API.")
+        record = rest_call_api.create_record(record_data, self.base_path)
+        return record
+
+    def delete(self, record_id: str) -> str:
+        """
+        Delete BIB record by ID via Alma API.
+        :param record_id: Unique ID of Alma BIB records
+        :return: API response
+        """
+        logger.info(f"Trying DELETE for record {record_id}.")
+        delete_response = rest_call_api.delete_record(f'{self.base_path}{record_id}')
+        return delete_response
+
+    def get(self, record_id: str) -> str:
+        """
+        Get record by ID via Alma API.
+        :param record_id: Unique ID of an Alma BIB record
+        :return: Record data of the bib record
+        """
+        logger.info(f"Trying GET for record {record_id}.")
+        record = rest_call_api.get_record(f'{self.base_path}{record_id}')
+        return record
+
+    def update(self, record_data: bytes, record_id: str) -> str:
+        """
+        Update record via Alma API by ID.
+        :param record_data: XML of the record to be updated
+        :param record_id: Unique ID of the BIB record
+        :return: Response data in XML format
+        """
+        logger.info(f"Trying PUT for record {record_id}.")
+        record = rest_call_api.update_record(record_data, f'{self.base_path}{record_id}')
+        return record
 
 
-def get_bib(mms_id: str) -> str:
+class BibsApiCallerForBibs(BibsApiCaller):
     """
-    Get BIB record by MMS-ID via Alma API.
-    :param mms_id: Unique ID of Alma BIB records.
-    :return: Record data in XML format.
+    Make calls for bibliographic records. Here the record_id is the MMS ID.
     """
-    logger.info(f'Trying to fetch BIB with mms_id {mms_id}.')
-    bib_record = rest_call_api.get_record(f'/bibs/{mms_id}')
-    return bib_record
+    def __init__(self):
+        """
+        Initialize API calls for bibliographic records.
+        """
+
+        base_path = '/bibs/'
+
+        logger.info(f'Instantiating {type(self).__name__}.')
+
+        super().__init__(base_path)
+
+    def get_all_holdings(self, mms_id: str) -> str:
+        """
+        For a given mms_id, get all holdings information.
+        :param mms_id: Unique ID of the BIB record the holdings are connected to.
+        :return: Record in XML format.
+        """
+        logger.info(f'Trying to fetch all holdings information for bib record {mms_id}.')
+        record = rest_call_api.get_record(f'{self.base_path}{mms_id}/holdings')
+        return record
+
+    def get_all_items(self, mms_id: str) -> str:
+        """
+        For a given mms_id, get all holding and item information.
+        :param mms_id: Unique ID of the BIB record the holdings and items are connected to.
+        :return: Record in XML format.
+        """
+        logger.info(f'Trying to fetch all holdings and items information for bib record {mms_id}.')
+        physical_inventory_record = rest_call_api.get_record(f'{self.base_path}{mms_id}/holdings/ALL/items')
+        return physical_inventory_record
+
+    def get_all_portfolios(self, mms_id: str) -> str:
+        """
+        For a given mms_id, get all portfolios.
+        param: mms_id: Unique ID of the BIB record the portfolios are connected to.
+        :return: Record in XML format.
+        """
+        logger.info(f'Trying to fetch all portfolios for bib record {mms_id}.')
+        e_inventory_record = rest_call_api.get_record(f'{self.base_path}{mms_id}/portfolios/')
+        return e_inventory_record
+
+    def get_all_e_collections(self, mms_id: str) -> str:
+        """
+        For a given mms_id, get all e-collection information.
+        :param mms_id: Unique ID of the BIB record the e-collections are connected to.
+        :return: Record in XML format.
+        """
+        logger.info(f'Trying to fetch all e-collections for bib record {mms_id}.')
+        e_inventory_record = rest_call_api.get_record(f'{self.base_path}{mms_id}/e-collections/')
+        return e_inventory_record
+
+    def get_by_query(self, id_type: str, other_id: str) -> str:
+        """
+        Get bibliographic records by ID via Alma API. Possible ID types:
+        * mms_id
+        * ie_id
+        * holdings_id
+        * representation_id
+        * nz_mms_id
+        * cz_mms_id
+        * other_system_id
+        :param id_type: Query key. One of the ID types listed above.
+        :param other_id: Query value. ID of the record to be fetched.
+        :return: Record in XML format.
+        """
+        logger.info(f'Trying to fetch record by query with id_type {id_type} and other_id {other_id}.')
+        api_url_query = {id_type: other_id}
+        api_url_query_encoded = parse.urlencode(api_url_query)
+        api_url = self.base_path + '?' + api_url_query_encoded
+        bib_records_response = rest_call_api.get_record(api_url)
+        return bib_records_response
 
 
-def get_hol(mms_id: str, hol_id: str) -> str:
+class BibsApiCallerForHoldings(BibsApiCaller):
     """
-    Get HOL record via Alma API by MMS-ID and HOL-id.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
-    :param hol_id: ID of the HOL record.
-    :return: Record data in XML format.
+    Make calls for holding records. Here the record_id is the Holding PID.
     """
-    logger.info(f'Trying to fetch HOL with mms_id {mms_id} and hol_id {hol_id}.')
-    hol_record = rest_call_api.get_record(f'/bibs/{mms_id}/holdings/{hol_id}')
-    return hol_record
+    def __init__(self, mms_id: str):
+        """
+        Initialize API calls for holding records connected to a bibliographic record.
+        :param mms_id: MMS ID of the bibliographic record the holding is connected to.
+        """
+        self.mms_id = mms_id
+
+        base_path = f'/bibs/{self.mms_id}/holdings/'
+
+        logger.info(f'Instantiating {type(self).__name__} with mms_id {self.mms_id}.')
+
+        super().__init__(base_path)
+
+    def get_all_items(self, hol_id: str) -> str:
+        """
+        For a given mms_id, get all holding and item information.
+        :param hol_id: ID of the HOL record the ITMs are connected to.
+        :return: Record in XML format.
+        """
+        logger.info(f'Trying to fetch all items information for hol_id {hol_id}.')
+        physical_inventory_record = rest_call_api.get_record(f'{self.base_path}{hol_id}/items')
+        return physical_inventory_record
 
 
-def get_item(mms_id: str, hol_id: str, itm_id: str) -> str:
+class BibsApiCallerForItems(BibsApiCaller):
     """
-    Get Item record via Alma API by MMS-ID, HOL-id and ITM-ID.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
-    :param hol_id: ID of the HOL record the ITM is connected to.
-    :param itm_id: ID of the ITM record.
-    :return: Record data in XML format.
+    Make calls for item records. Here the record_id is the Item PID.
     """
-    logger.info(f'Trying to fetch ITM with mms_id {mms_id} and hol_id {hol_id} and itm_id {itm_id}.')
-    itm_record = rest_call_api.get_record(f'/bibs/{mms_id}/holdings/{hol_id}/items/{itm_id}')
-    return itm_record
+    def __init__(self, mms_id: str, hol_id: str):
+        """
+        Initialize API calls for holding records connected to a bibliographic record.
+        :param mms_id: MMS ID of the bibliographic record the item's holding record is connected to.
+        :param hol_id: Holding PID of the holding the item is connected to.
+        """
+        self.mms_id = mms_id
+        self.hol_id = hol_id
+
+        base_path = f'/bibs/{self.mms_id}/holdings/{self.hol_id}/items/'
+
+        logger.info(f'Instantiating {type(self).__name__} with mms_id {self.mms_id} and hol_id {self.hol_id}.')
+
+        super().__init__(base_path)
 
 
-def get_portfolio(mms_id: str, portfolio_id: str) -> str:
+class BibsApiCallerForPortfolios(BibsApiCaller):
     """
-    Get portfolio record via Alma API by MMS-ID and portfolio-ID.
-    :param mms_id: Unique ID of the BIB record the portfolio is connected to.
-    :param portfolio_id: ID of the portfolio record.
-    :return: Record data in XML format.
+    Make calls for portfolio records. Here the record_id is the Portfolio PID.
     """
-    logger.info(f'Trying to fetch portfolio record with mms_id {mms_id} and portfolio_id {portfolio_id}.')
-    portfolio_record = rest_call_api.get_record(f'/bibs/{mms_id}/portfolios/{portfolio_id}')
-    return portfolio_record
+    def __init__(self, mms_id: str):
+        """
+        Initialize API calls for holding records connected to a bibliographic record.
+        :param mms_id: MMS ID of the bibliographic record the portfolio is connected to.
+        :param portfolio_id: ID of the portfolio record.
+        """
+        self.mms_id = mms_id
+        self.portfolio_id = portfolio_id
+
+        base_path = f'/bibs/{self.mms_id}/portfolios/'
+
+        log_string = f"""Instantiating {type(self).__name__} with mms_id {self.mms_id} """
+        log_string += f"""and portfolio_id {self.portfolio_id}."""
+        logger.info(log_string)
+
+        super().__init__(base_path)
+
+
+# TODO Extraneous functions not yet refactored to meet OOP style
 
 
 def get_e_collection_with_mms_id(mms_id: str, collection_id: str) -> str:
@@ -78,62 +228,6 @@ def get_e_collection_with_mms_id(mms_id: str, collection_id: str) -> str:
     return collection_record
 
 
-def get_all_holdings_for_bib(mms_id: str) -> str:
-    """
-    For a given mms_id, get all holdings information.
-    :param mms_id: Unique ID of the BIB record the holdings are connected to.
-    :return: Record in XML format.
-    """
-    logger.info(f'Trying to fetch all holdings information for bib record {mms_id}.')
-    physical_inventory_record = rest_call_api.get_record(f'/bibs/{mms_id}/holdings')
-    return physical_inventory_record
-
-
-def get_all_items_for_bib(mms_id: str) -> str:
-    """
-    For a given mms_id, get all holding and item information.
-    :param mms_id: Unique ID of the BIB record the holdings and items are connected to.
-    :return: Record in XML format.
-    """
-    logger.info(f'Trying to fetch all holdings and items information for bib record {mms_id}.')
-    physical_inventory_record = rest_call_api.get_record(f'/bibs/{mms_id}/holdings/ALL/items')
-    return physical_inventory_record
-
-
-def get_all_items_for_holding(mms_id: str, hol_id: str) -> str:
-    """
-    For a given mms_id, get all holding and item information.
-    :param mms_id: Unique ID of the BIB record the holdings and items are connected to.
-    :param hol_id: ID of the HOL record the ITMs are connected to.
-    :return: Record in XML format.
-    """
-    logger.info(f'Trying to fetch all items information for mms_id {mms_id} and hol_id {hol_id}.')
-    physical_inventory_record = rest_call_api.get_record(f'/bibs/{mms_id}/holdings/{hol_id}/items')
-    return physical_inventory_record
-
-
-def get_all_portfolios_for_bib(mms_id: str) -> str:
-    """
-    For a given mms_id, get all portfolios.
-    param: mms_id: Unique ID of the BIB record the portfolios are connected to.
-    :return: Record in XML format.
-    """
-    logger.info(f'Trying to fetch all portfolios for bib record {mms_id}.')
-    e_inventory_record = rest_call_api.get_record(f'/bibs/{mms_id}/portfolios/')
-    return e_inventory_record
-
-
-def get_all_e_collections_for_bib(mms_id: str) -> str:
-    """
-    For a given mms_id, get all e-collection information.
-    :param mms_id: Unique ID of the BIB record the e-collections are connected to.
-    :return: Record in XML format.
-    """
-    logger.info(f'Trying to fetch all e-collections for bib record {mms_id}.')
-    e_inventory_record = rest_call_api.get_record(f'/bibs/{mms_id}/e-collections/')
-    return e_inventory_record
-
-
 def get_item_by_barcode(item_barcode: str) -> str:
     """
     Get item information by barcode. Please note that this equals a scan-in operation!
@@ -145,193 +239,3 @@ def get_item_by_barcode(item_barcode: str) -> str:
     api_url_query_encoded = parse.urlencode(api_url_query)
     item_record = rest_call_api.get_record(f'/items?{api_url_query_encoded}')
     return item_record
-
-
-def get_bibs_by_query(id_type: str, other_id: str) -> str:
-    """
-    Get records by ID via Alma API. Possible ID types:
-    * mms_id
-    * ie_id
-    * holdings_id
-    * representation_id
-    * nz_mms_id
-    * cz_mms_id
-    * other_system_id
-    :param id_type: Query key. One of the ID types listed above.
-    :param other_id: Query value. ID of the record to be fetched.
-    :return: Record in XML format.
-    """
-    logger.info(f'Trying to fetch record by query with id_type {id_type} and other_id {other_id}.')
-    api_url_path = '/bibs?'
-    api_url_query = {id_type: other_id}
-    api_url_query_encoded = parse.urlencode(api_url_query)
-    api_url = api_url_path + api_url_query_encoded
-    bib_records_response = rest_call_api.get_record(api_url)
-    return bib_records_response
-
-
-########
-# POST #
-########
-
-
-def create_bib(record_data: bytes, mms_id: str) -> str:
-    """
-    Create BIB record by MMS-ID via Alma API.
-    :param record_data: XML of the record to be created.
-    :param mms_id: Unique ID of Alma BIB records.
-    :return: Response data in XML format.
-    """
-    logger.info(f'Trying to create BIB with mms_id {mms_id}.')
-    bib_record = rest_call_api.create_record(record_data, f'/bibs/')
-    return bib_record
-
-
-def create_hol(record_data: bytes, mms_id: str, hol_id: str) -> str:
-    """
-    Create HOL record via Alma API by MMS-ID and HOL-id.
-    :param record_data: XML of the record to be created.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
-    :param hol_id: ID of the HOL record.
-    :return: Response data in XML format.
-    """
-    logger.info(f'Trying to create HOL with mms_id {mms_id} and hol_id {hol_id}.')
-    hol_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/holdings/')
-    return hol_record
-
-
-def create_item(record_data: bytes, mms_id: str, hol_id: str, itm_id: str) -> str:
-    """
-    Create Item record via Alma API by MMS-ID, HOL-id and ITM-ID.
-    :param record_data: XML of the record to be created.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
-    :param hol_id: ID of the HOL record the ITM is connected to.
-    :param itm_id: ID of the ITM record.
-    :return: Response data in XML format.
-    """
-    logger.info(f'Trying to create ITM with mms_id {mms_id} and hol_id {hol_id} and itm_id {itm_id}.')
-    itm_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}/items/')
-    return itm_record
-
-
-def create_portfolio(record_data: bytes, mms_id: str, portfolio_id: str) -> str:
-    """
-    Create portfolio record via Alma API by MMS-ID and portfolio-ID.
-    :param record_data: XML of the record to be created.
-    :param mms_id: Unique ID of the BIB record the portfolio is connected to.
-    :param portfolio_id: ID of the portfolio record.
-    :return: Response data in XML format.
-    """
-    logger.info(f'Trying to create portfolio record with mms_id {mms_id} and portfolio_id {portfolio_id}.')
-    portfolio_record = rest_call_api.create_record(record_data, f'/bibs/{mms_id}/portfolios/')
-    return portfolio_record
-
-
-#######
-# PUT #
-#######
-
-
-def update_bib(record_data: bytes, mms_id: str) -> str:
-    """
-    Update BIB record via Alma API by MMS-ID.
-    :param record_data: XML of the record to be updated.
-    :param mms_id: Unique ID of the BIB record.
-    :return: Response data in XML format.
-    """
-    logger.info(f'Trying to update BIB with mms_id {mms_id}.')
-    bib_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}')
-    return bib_record
-
-
-def update_hol(record_data: bytes, mms_id: str, hol_id: str) -> str:
-    """
-    Update HOL record via Alma API by MMS-ID and HOL-ID.
-    :param record_data: XML of the record to be updated.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
-    :param hol_id: ID of the HOL record.
-    :return: Response data in XML format.
-    """
-    logger.info(f'Trying to update HOL with mms_id {mms_id} and hol_id {hol_id}.')
-    hol_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}')
-    return hol_record
-
-
-def update_item(record_data: bytes, mms_id: str, hol_id: str, itm_id: str) -> str:
-    """
-    Update ITM record via Alma API by MMS-ID, HOL-ID and ITM-ID.
-    :param record_data: XML of the record to be updated.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
-    :param hol_id: ID of the HOL record the ITM is connected to.
-    :param itm_id: ID of the ITM record.
-    :return: Response data in XML format.
-    """
-    logger.info(f'Trying to update ITM with mms_id {mms_id}, hol_id {hol_id}, and itm_id {itm_id}.')
-    itm_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}/holdings/{hol_id}/items/{itm_id}')
-    return itm_record
-
-
-def update_portfolio(record_data: bytes, mms_id: str, portfolio_id: str) -> str:
-    """
-    Update portfolio record via Alma API by MMS-ID and portfolio-ID.
-    :param record_data: XML of the record to be updated.
-    :param mms_id: Unique ID of the BIB record the portfolio is connected to.
-    :param portfolio_id: ID of the portfolio.
-    :return: Response data in XML format.
-    """
-    logger.info(f'Trying to update portfolio with mms_id {mms_id} and portfolio-id {portfolio_id}.')
-    portfolio_record = rest_call_api.update_record(record_data, f'/bibs/{mms_id}/portfolios/{portfolio_id}.')
-    return portfolio_record
-
-
-##########
-# DELETE #
-##########
-
-
-def delete_bib(mms_id: str) -> str:
-    """
-    Delete BIB record by MMS-ID via Alma API.
-    :param mms_id: Unique ID of Alma BIB records.
-    :return: API response
-    """
-    logger.info(f'Trying to DELETE BIB with mms_id {mms_id}.')
-    delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}')
-    return delete_response
-
-
-def delete_hol(mms_id: str, hol_id: str) -> str:
-    """
-    Delete HOL record via Alma API by MMS-ID and HOL-id.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
-    :param hol_id: ID of the HOL record.
-    :return: API response
-    """
-    logger.info(f'Trying to DELETE HOL with mms_id {mms_id} and hol_id {hol_id}.')
-    delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}/holdings/{hol_id}')
-    return delete_response
-
-
-def delete_item(mms_id: str, hol_id: str, itm_id: str) -> str:
-    """
-    Delete Item record via Alma API by MMS-ID, HOL-id and ITM-ID.
-    :param mms_id: Unique ID of the BIB record the HOL is connected to.
-    :param hol_id: ID of the HOL record the ITM is connected to.
-    :param itm_id: ID of the ITM record.
-    :return: API response
-    """
-    logger.info(f'Trying to DELETE ITM with mms_id {mms_id} and hol_id {hol_id} and itm_id {itm_id}.')
-    delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}/holdings/{hol_id}/items/{itm_id}')
-    return delete_response
-
-
-def delete_portfolio(mms_id: str, portfolio_id: str) -> str:
-    """
-    Delete portfolio record via Alma API by MMS-ID and portfolio-ID.
-    :param mms_id: Unique ID of the BIB record the portfolio is connected to.
-    :param portfolio_id: ID of the portfolio record.
-    :return: API response
-    """
-    logger.info(f'Trying to DELETE portfolio record with mms_id {mms_id} and portfolio_id {portfolio_id}.')
-    delete_response = rest_call_api.delete_record(f'/bibs/{mms_id}/portfolios/{portfolio_id}')
-    return delete_response
