@@ -16,9 +16,8 @@ except ImportError:
     from typing import MutableMapping
     OrderedDict = MutableMapping
 
-from sqlalchemy import create_engine, func, String
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import func, String
+from sqlalchemy.orm import Session
 
 from . import db_setup
 from . import logfile_setup
@@ -98,7 +97,7 @@ def get_value_from_source_csv(
     :param json_key: Heading of the column that has the desired information
     :return: Value from source_csv json for json_key
     """
-    db_session = create_db_session()
+    db_session = db_setup.create_db_session()
     value_query = db_session.query(
         db_setup.SourceCsv
     ).filter(
@@ -118,7 +117,7 @@ def get_record_from_fetched_records(alma_ids: str):
     :param alma_ids: Comma separated string of Alma IDs to identify the record.
     :return: SQLAlchemy query object of the record.
     """
-    db_session = create_db_session()
+    db_session = db_setup.create_db_session()
     record_query = db_session.query(
         db_setup.FetchedRecords
     ).filter_by(
@@ -302,25 +301,3 @@ def log_success_rate(action: str, job_timestamp: datetime, db_session: Session) 
     logger.info(f"{action} was done for {ids_done.count()} record(s).")
     logger.info(f"{action} had errors for {ids_error.count()} record(s).")
     logger.info(f"{action} was not handled for {ids_new.count()} record(s).")
-
-
-def create_db_session() -> Session:
-    """
-    Create a DB session to manipulate the contents of the DB.
-    :return: Session for connection to the DB.
-    """
-    db_engine = create_db_engine()
-    DBSession = sessionmaker(bind=db_engine)
-    session = DBSession()
-    return session
-
-
-def create_db_engine(verbosity: bool = db_setup.does_sqlalchemy_log) -> Engine:
-    """
-    Create the DB engine according to the information provided in env vars.
-    :return: DB engine.
-    """
-    connection_params = db_setup.prepare_connection_params_from_env()
-    db_engine = create_engine(connection_params, echo=verbosity)
-    return db_engine
-

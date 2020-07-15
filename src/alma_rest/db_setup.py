@@ -12,7 +12,9 @@ import xml.etree.ElementTree as etree
 from os import environ
 
 # more sqlalchemy setup below with conditions
-from sqlalchemy import Column, DateTime, Integer, MetaData, String
+from sqlalchemy import Column, DateTime, Integer, MetaData, String, create_engine
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.types import UserDefinedType
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import JSON
@@ -58,10 +60,10 @@ class XMLType(UserDefinedType):
 
 
 # Connection setup
-def prepare_connection_params_from_env():
+def prepare_connection_params_from_env() -> str:
     """
     Set up the engine for connections to the PostgreSQL database.
-    :return: SQL Engine with connection params as provided via env vars.
+    :return: String with connection params as provided via env vars.
     """
     database = environ["ALMA_REST_DB"]
     db_user = environ["ALMA_REST_DB_USER"]
@@ -69,6 +71,27 @@ def prepare_connection_params_from_env():
     db_url = environ["ALMA_REST_DB_URL"]
     connection_params = f'postgresql://{db_user}:{db_pw}@{db_url}/{database}'
     return connection_params
+
+
+def create_db_session() -> Session:
+    """
+    Create a DB session to manipulate the contents of the DB.
+    :return: Session for connection to the DB.
+    """
+    db_engine = create_db_engine()
+    DBSession = sessionmaker(bind=db_engine)
+    session = DBSession()
+    return session
+
+
+def create_db_engine(verbosity: bool = does_sqlalchemy_log) -> Engine:
+    """
+    Create the DB engine according to the information provided in env vars.
+    :return: DB engine.
+    """
+    connection_params = prepare_connection_params_from_env()
+    db_engine = create_engine(connection_params, echo=verbosity)
+    return db_engine
 
 
 class JobStatusPerId(Base):

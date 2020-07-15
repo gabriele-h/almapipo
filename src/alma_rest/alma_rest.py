@@ -11,6 +11,7 @@ from logging import getLogger
 from datetime import datetime, timezone
 from typing import Callable
 
+from . import db_setup
 from . import db_read_write
 from . import input_read
 # noinspection PyUnresolvedReferences
@@ -41,7 +42,7 @@ def restore_records_for_csv_list(csv_path: str, api: str, record_type: str) -> N
     :return: None
     """
     logger.info(f"Trying to restore records listed in {csv_path} with latest version in the database.")
-    db_session = db_read_write.create_db_session()
+    db_session = db_setup.create_db_session()
     import_csv_and_ids_to_db_tables(csv_path, 'POST')
     list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', 'POST', job_timestamp, db_session)
     for alma_id, in list_of_ids:
@@ -83,7 +84,7 @@ def call_api_for_csv_list(
     if action == 'POST':
         raise NotImplementedError
 
-    db_session = db_read_write.create_db_session()
+    db_session = db_setup.create_db_session()
     import_csv_and_ids_to_db_tables(csv_path, action)
 
     list_of_ids = db_read_write.get_list_of_ids_by_status_and_action('new', action, job_timestamp, db_session)
@@ -140,7 +141,7 @@ def import_csv_and_ids_to_db_tables(file_path: str, action: str, validation: boo
     :return: None
     """
     if input_read.check_file_path(file_path):
-        db_session = db_read_write.create_db_session()
+        db_session = db_setup.create_db_session()
         csv_generator = input_read.read_csv_contents(file_path, validation)
         for csv_line in csv_generator:
             # noinspection PyTypeChecker
