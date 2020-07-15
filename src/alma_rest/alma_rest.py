@@ -53,7 +53,7 @@ def restore_records_for_csv_list(csv_path: str, api: str, record_type: str) -> N
         else:
             db_read_write.update_job_status('done', alma_id, 'POST', job_timestamp, db_session)
             db_read_write.add_put_post_response(alma_id, alma_response, job_timestamp, db_session)
-    db_session.commit()
+        db_session.commit()
     db_read_write.log_success_rate('POST', job_timestamp, db_session)
     db_session.close()
 
@@ -124,8 +124,8 @@ def call_api_for_csv_list(
                                 db_read_write.check_data_sent_equals_response(alma_id, job_timestamp, db_session)
                             logger.error(f'Did not receive a response for {alma_id}?')
                             db_read_write.update_job_status('error', alma_id, action, job_timestamp, db_session)
+        db_session.commit()
 
-    db_session.commit()
     db_read_write.log_success_rate(action, job_timestamp, db_session)
     db_session.close()
 
@@ -146,7 +146,7 @@ def import_csv_and_ids_to_db_tables(file_path: str, action: str, validation: boo
         for csv_line in csv_generator:
             # noinspection PyTypeChecker
             db_read_write.add_csv_line_to_tables(csv_line, job_timestamp, db_session, action)
-        db_session.commit()
+            db_session.commit()
         db_session.close()
     logger.error('No valid file path provided.')
     raise ValueError
