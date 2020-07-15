@@ -27,19 +27,6 @@ from . import logfile_setup
 logger = getLogger(__name__)
 
 
-def main():
-    """
-    When used from commandline, the module will test the database
-    connection and give according information on stdout. Please set
-    env var ALMA_REST_DB_VERBOSE to 1 for the necessary feedback.
-    :return: None
-    """
-    logfile_setup.log_to_stdout(logger)
-
-    db_engine = create_db_engine(True)
-    db_engine.connect()
-
-
 def check_data_sent_equals_response(
         alma_ids: str,
         job_timestamp: datetime,
@@ -337,6 +324,3 @@ def create_db_engine(verbosity: bool = db_setup.does_sqlalchemy_log) -> Engine:
     db_engine = create_engine(connection_params, echo=verbosity)
     return db_engine
 
-
-if __name__ == "__main__":
-    main()
