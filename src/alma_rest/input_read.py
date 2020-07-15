@@ -65,14 +65,11 @@ def check_file_path(file_path: str) -> bool:
     :param file_path: Absolute or relative path to the csv/tsv file.
     :return: Boolean to indicate if the provided file exists, is readable and ends on .csv or .tsv.
     """
-    if not path.exists(file_path):
-        logger.error(f'File {file_path} does not exist.')
-    elif not access(file_path, R_OK):
-        logger.error(f'File {file_path} is not readable.')
-    elif file_path[-4:] != '.csv' and file_path[-4:] != '.tsv':
-        logger.error(f'File {file_path} does not seem to be a csv or tsv file?')
-    else:
+    if path.exists(file_path)\
+            and access(file_path, R_OK)\
+            and file_path[-4:] in ['.csv', '.tsv', '.CSV', '.TSV']:
         return True
+    logger.error(f"File {file_path} does not exist, is not readable, or does not end on csv, tsv, CSV or TSV.")
 
 
 def read_csv_contents(csv_path: str, validation: bool = True) -> Iterator[str]:
