@@ -356,6 +356,22 @@ SELECT csv_line -> 'MMS Id,HOL Id', csv_line -> 'HOL 245' as info
   AND csv_line ->> 'MMS Id,HOL Id' = '990068822450203332,22337530320003332';
 ```
 
-## Author
+# Acknowledgements
+
+I could not have written this package without meeting the following people:
+
+Stefan Karner, who I worked with on the [ONB Labs](https://labs.onb.ac.at/en/).
+With patience and empathy he taught me a lot about programming with Python
+in general and OOP in special.
+
+Christoph Schindler, who keeps telling me to write something that works first
+and worry about everything else later. I might not have come far without
+his constant and kind support.
+
+The system librarian team of the Vienna University Library, who are a joy
+to work with! They provided me with real life examples to test my code on
+and helped me with some design decisions.
+
+# Author
 
 Gabriele Höfler
