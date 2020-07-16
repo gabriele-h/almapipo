@@ -3,7 +3,7 @@
 ## Scenario
 
 A set of
-[Alma](https://knowledge.exlibrisgroup.com/Alma/Product_Documentation/010Alma_Online_Help_(English)/010Getting_Started/010Alma_Introduction/010Alma_Overview)
+[Alma](https://knowledge.exlibrisgroup.com/Alma/Product_Documentation/010Alma_Online_Help_%28English%29/010Getting_Started/010Alma_Introduction/010Alma_Overview)
 records needs to be created, deleted, updated, or fetched for analysis.
 
 ## Preparation
@@ -16,14 +16,14 @@ or a list of Alma-IDs (see below "Input data").
 
 In a **database** both the **input** used as well as the
 **status of the api call** are saved on a per-line or per-record basis.
-All records will be fetched prior to deletion, update, or creation and a
-**copy of each record before the action** (plus where applicable the
-according response received) will be kept as a backup.
+All records will be fetched prior to deletion, update, or creation. A
+**copy of each record before the action** will be saved to the database.
+**Responses to PUT and POST** requests will be saved too.
 
 Another module of the package will handle the actual **api calls**.
 If the manipulation is successful, the status for that
-record will be changed from "new" to "done" in the database table
-`job_status_per_id`. If anything goes wrong, the status will be set to "error".
+record will be changed from *new* to *done* in the database table
+`job_status_per_id`. If anything goes wrong, the status will be set to *error*.
 
 **Note:** Currently all API-calls will be made with xml as the format. See 
 how the format is set in the headers within `rest_call_api.py`:
@@ -40,7 +40,8 @@ At the time I write this: A lot!
 
 Currently I am not implementing all the APIs with some kind of grand
 scheme, but as I need them. If you want and are able to contribute, I
-will be happy to receive your pull requests. If that is not an option:
+will be happy to receive your pull requests. Or you can try using the
+generic functions included in `rest_call_api.py`. If both is not an option:
 Get in touch!
 
 ## What Is *Not* Covered in This README
@@ -64,7 +65,7 @@ See https://docs.python.org/3/library/venv.html for further info.
 ## Install All From `requirements.txt`
 
 The requirements are actually defined within `setup.py` and `requirements.txt`
-has actually just one entry referring to that.
+has just one entry referring to that.
 
 ```bash
 pip install -r requirements.txt
