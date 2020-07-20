@@ -51,7 +51,7 @@ def get_all_locations_generator() -> Iterator[str]:
         if locations_xml:
             locations_xml.set('library', library_code)
             yield tostring(locations_xml, encoding='unicode')
-        logger.warning(f'Library {library} has no locations.')
+        logger.warning(f'Library {library_code} has no locations.')
 
 
 def get_locations(library: str) -> str:
