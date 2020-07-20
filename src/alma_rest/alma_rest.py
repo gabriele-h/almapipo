@@ -148,8 +148,9 @@ def import_csv_and_ids_to_db_tables(file_path: str, action: str, validation: boo
             db_read_write.add_csv_line_to_tables(csv_line, job_timestamp, db_session, action)
             db_session.commit()
         db_session.close()
-    logger.error('No valid file path provided.')
-    raise ValueError
+    else:
+        logger.error('No valid file path provided.')
+        raise ValueError
 
 
 def update_record_for_alma_ids(alma_ids: str, api: str, record_type: str, record_data: bytes) -> str:
