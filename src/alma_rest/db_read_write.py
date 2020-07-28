@@ -27,15 +27,15 @@ logger = getLogger(__name__)
 
 
 def check_data_sent_equals_response(
-        alma_ids: str,
+        alma_id: str,
         job_timestamp: datetime,
         session: Session) -> bool:
     """
-    For given alma_ids and job_timestamp check if the data sent via PUT/POST
+    For given alma_id and job_timestamp check if the data sent via PUT/POST
     and the data received in the API's response are the same. If no data is
     available in one of the two tables (sent_records and put_post_responses)
     this check will also return False.
-    :param alma_ids: Comma separated string of Alma IDs to identify the record
+    :param alma_id: Comma separated string of Alma IDs to identify the record
     :param job_timestamp: Job that created the entry in source_csv
     :param session: Session to be used for the check.
     :return: True if matches, False if non-existent or does not match.
@@ -48,7 +48,7 @@ def check_data_sent_equals_response(
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(
-        alma_id=alma_ids
+        alma_id=alma_id
     )
 
     record_received = session.query(
@@ -56,7 +56,7 @@ def check_data_sent_equals_response(
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(
-        alma_id=alma_ids
+        alma_id=alma_id
     )
 
     sent_received_matching = session.query(
@@ -69,30 +69,30 @@ def check_data_sent_equals_response(
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(
-        alma_id=alma_ids
+        alma_id=alma_id
     )
 
     if record_sent.count() == 0 or record_received.count() == 0:
-        logger.error(f'No data in either sent_records or put_post_responses for {alma_ids} and {job_timestamp}.')
+        logger.error(f'No data in either sent_records or put_post_responses for {alma_id} and {job_timestamp}.')
         return False
 
     if sent_received_matching.count() > 0:
         return True
     else:
-        logger.warning(f'Data in sent_records and put_post_responses for {alma_ids} and {job_timestamp} did not match.')
+        logger.warning(f'Data in sent_records and put_post_responses for {alma_id} and {job_timestamp} did not match.')
         return False
 
 
 def get_value_from_source_csv(
         alma_id_name: str,
-        alma_ids: str,
+        alma_id: str,
         job_timestamp: datetime,
         json_key: str) -> str:
     """
-    For a given string of alma_ids and job_timestamp, retrieve a
+    For a given string of alma_id and job_timestamp, retrieve a
     specific value from the csv as it was saved in json-format in source_csv table.
     :param alma_id_name: Key of the alma_id, heading of first column in csv
-    :param alma_ids: Comma separated string of Alma IDs to identify the record
+    :param alma_id: Comma separated string of Alma IDs to identify the record
     :param job_timestamp: Job that created the entry in source_csv
     :param json_key: Heading of the column that has the desired information
     :return: Value from source_csv json for json_key
@@ -101,7 +101,7 @@ def get_value_from_source_csv(
     value_query = db_session.query(
         db_setup.SourceCsv
     ).filter(
-        db_setup.SourceCsv.csv_line[alma_id_name].astext == alma_ids
+        db_setup.SourceCsv.csv_line[alma_id_name].astext == alma_id
     ).filter_by(
         job_timestamp=job_timestamp
     )
@@ -110,18 +110,18 @@ def get_value_from_source_csv(
     return json_value
 
 
-def get_most_recent_version_from_fetched_records(alma_ids: str):
+def get_most_recent_version_from_fetched_records(alma_id: str):
     """
     For a comma separated string of Alma IDs query for the record's
     most recently saved XML in the table fetched_records.
-    :param alma_ids: Comma separated string of Alma IDs to identify the record.
+    :param alma_id: Comma separated string of Alma IDs to identify the record.
     :return: SQLAlchemy query object of the record.
     """
     db_session = db_setup.create_db_session()
     record_query = db_session.query(
         db_setup.FetchedRecords
     ).filter_by(
-        alma_id=alma_ids
+        alma_id=alma_id
     ).order_by(
         db_setup.FetchedRecords.job_timestamp.desc()
     ).limit(1)
@@ -261,10 +261,10 @@ def add_csv_line_to_tables(
         csv_line=csv_line
     )
     session.add(line_for_table_source_csv)
-    add_alma_ids_to_job_status_per_id(list(csv_line.values())[0], method, job_timestamp, session)
+    add_alma_id_to_job_status_per_id(list(csv_line.values())[0], method, job_timestamp, session)
 
 
-def add_alma_ids_to_job_status_per_id(
+def add_alma_id_to_job_status_per_id(
         alma_id: str,
         method: str,
         job_timestamp: datetime,

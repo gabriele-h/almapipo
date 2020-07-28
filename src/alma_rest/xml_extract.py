@@ -14,13 +14,13 @@ from . import logfile_setup
 logger = getLogger(__name__)
 
 
-def extract_response_from_fetched_records(alma_ids: str) -> ElementTree:
+def extract_response_from_fetched_records(alma_id: str) -> ElementTree:
     """
     From the table fetched_records extract the whole response for the record.
-    :param alma_ids: Comma separated string of Alma IDs to identify the record.
+    :param alma_id: Comma separated string of Alma IDs to identify the record.
     :return: ElementTree of the record.
     """
-    logger.info(f'Extracting most recent response for alma_ids {alma_ids} from table fetched_records.')
-    response_query = db_read_write.get_most_recent_version_from_fetched_records(alma_ids)
+    logger.info(f'Extracting most recent response for alma_id {alma_id} from table fetched_records.')
+    response_query = db_read_write.get_most_recent_version_from_fetched_records(alma_id)
     response = response_query.alma_record
     return response

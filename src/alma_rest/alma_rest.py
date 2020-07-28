@@ -75,7 +75,7 @@ def call_api_for_csv_list(
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of the record to call the API for (e. g. "holdings")
     :param method: As in job_status_per_id, possible values are "DELETE", "GET", "PUT" - POST not implemented yet!
-    :param manipulate_record: Function with arguments alma_ids and data retrieved via GET that returns record_data
+    :param manipulate_record: Function with arguments alma_id and data retrieved via GET that returns record_data
     :return: None
     """
     if method not in ['DELETE', 'GET', 'PUT', 'POST']:
@@ -92,7 +92,7 @@ def call_api_for_csv_list(
     if method in ['DELETE', 'GET', 'PUT']:
         for alma_id, in list_of_ids:
             if method != 'GET' and method != 'POST':
-                db_read_write.add_alma_ids_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
+                db_read_write.add_alma_id_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
             if method != 'POST':
                 record_data = call_api_for_record('GET', alma_id, api, record_type)
                 if not record_data:
@@ -153,30 +153,30 @@ def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool
         raise ValueError
 
 
-def call_api_for_record(method: str, alma_ids: str, api: str, record_type: str, record_data: bytes = None) -> str:
+def call_api_for_record(method: str, alma_id: str, api: str, record_type: str, record_data: bytes = None) -> str:
     """
     Meta-function for all api_calls. Please note that for some API calls there is a fake
     record_type available, such as 'all_items_for_bib'. These will not take additional
     query-parameters, though, and are only meant as convenience functions.
     :param method: DELETE, GET, POST or PUT.
-    :param alma_ids: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
+    :param alma_id: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of the record, usually last path-argument with hardcoded string (e. g. "holdings")
     :param record_data: Only necessary for POST and PUT methods.
     :return: API response as a string.
     """
-    split_alma_ids = str.split(alma_ids, ',')
-    record_id = split_alma_ids[-1]
+    split_alma_id = str.split(alma_id, ',')
+    record_id = split_alma_id[-1]
 
     if api == 'bibs':
         if record_type == 'bibs':
             ApiCaller = rest_bibs.BibsApiCallerForBibs()
         elif record_type == 'holdings':
-            ApiCaller = rest_bibs.BibsApiCallerForHoldings(split_alma_ids[0])
+            ApiCaller = rest_bibs.BibsApiCallerForHoldings(split_alma_id[0])
         elif record_type == 'items':
-            ApiCaller = rest_bibs.BibsApiCallerForItems(split_alma_ids[0], split_alma_ids[1])
+            ApiCaller = rest_bibs.BibsApiCallerForItems(split_alma_id[0], split_alma_id[1])
         elif record_type == 'portfolios':
-            ApiCaller = rest_bibs.BibsApiCallerForPortfolios(split_alma_ids[0])
+            ApiCaller = rest_bibs.BibsApiCallerForPortfolios(split_alma_id[0])
         else:
             raise NotImplementedError
     else:
