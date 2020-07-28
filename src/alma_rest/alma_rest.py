@@ -72,6 +72,7 @@ def call_api_for_csv_list(
         manipulate_record: Callable[[str, str], bytes] = None) -> None:
     """
     For a list of Alma-IDs given in a CSV file, this function does the following:
+    * Add csv list to job_status_per_id and source_csv for the given method
     * Call GET for the Alma-IDs and store it in fetched_records
     * For method PUT: Manipulate the retrieved record with the manipulation_function
     * For methods PUT or POST: Save the response to put_post_responses
