@@ -13,7 +13,7 @@ from . import logfile_setup
 logger = getLogger(__name__)
 
 
-class BibsApiCallerForBibs(rest_call_api.ApiCaller):
+class BibsApi(rest_call_api.GenericApi):
     """
     Make calls for bibliographic records. Here the record_id is the MMS ID.
     """
@@ -21,7 +21,6 @@ class BibsApiCallerForBibs(rest_call_api.ApiCaller):
         """
         Initialize API calls for bibliographic records.
         """
-
         base_path = '/bibs/'
 
         logger.info(f'Instantiating {type(self).__name__}.')
@@ -90,7 +89,7 @@ class BibsApiCallerForBibs(rest_call_api.ApiCaller):
         return bib_records_response
 
 
-class BibsApiCallerForHoldings(rest_call_api.ApiCaller):
+class HoldingsApi(rest_call_api.GenericApi):
     """
     Make calls for holding records. Here the record_id is the Holding PID.
     """
@@ -118,7 +117,7 @@ class BibsApiCallerForHoldings(rest_call_api.ApiCaller):
         return physical_inventory_record
 
 
-class BibsApiCallerForItems(rest_call_api.ApiCaller):
+class ItemsApi(rest_call_api.GenericApi):
     """
     Make calls for item records. Here the record_id is the Item PID.
     """
@@ -138,7 +137,7 @@ class BibsApiCallerForItems(rest_call_api.ApiCaller):
         super().__init__(base_path)
 
 
-class BibsApiCallerForPortfolios(rest_call_api.ApiCaller):
+class PortfoliosApi(rest_call_api.GenericApi):
     """
     Make calls for portfolio records. Here the record_id is the Portfolio PID.
     """

@@ -192,26 +192,20 @@ def instantiate_api_caller(
 
     if api == 'bibs':
         if record_type == 'bibs':
-            ApiCaller = rest_bibs.BibsApiCallerForBibs()
+            return rest_bibs.BibsApi()
         elif record_type == 'holdings':
-            ApiCaller = rest_bibs.BibsApiCallerForHoldings(split_alma_id[0])
+            return rest_bibs.HoldingsApi(split_alma_id[0])
         elif record_type == 'items':
-            ApiCaller = rest_bibs.BibsApiCallerForItems(split_alma_id[0], split_alma_id[1])
+            return rest_bibs.ItemsApi(split_alma_id[0], split_alma_id[1])
         elif record_type == 'portfolios':
-            ApiCaller = rest_bibs.BibsApiCallerForPortfolios(split_alma_id[0])
+            return rest_bibs.PortfoliosApi(split_alma_id[0])
         else:
             raise NotImplementedError
-    else:
-        raise NotImplementedError
-
-    if method == 'DELETE':
-        return ApiCaller.delete(record_id)
-    elif method == 'GET':
-        return ApiCaller.retrieve(record_id)
-    elif method == 'POST':
-        return ApiCaller.create(record_data)
-    elif method == 'PUT':
-        return ApiCaller.update(record_data, record_id)
+    elif api == 'electronic':
+        if record_type == 'e-collections':
+            return rest_electronic.EcollectionApiCaller(split_alma_id[0])
+        else:
+            raise NotImplementedError
 
     logger.error('The API you are trying to call is not implemented yet.')
     raise NotImplementedError
