@@ -47,13 +47,19 @@ def restore_records_for_csv_list(csv_path: str, api: str, record_type: str) -> N
     list_of_ids = db_read_write.get_list_of_ids_by_status_and_method('new', 'POST', job_timestamp, db_session)
     for alma_id, in list_of_ids:
         record_data = xml_extract.extract_response_from_fetched_records(alma_id)
-        alma_response = call_api_for_record('POST', alma_id, api, record_type, record_data)
+
+        ApiCallerRecord = instantiate_api_caller(alma_id, api, record_type)
+        record_id = str.split(alma_id, ',')[-1]
+        alma_response = ApiCallerRecord.create(record_data, record_id)
+
         if alma_response is None:
             db_read_write.update_job_status('error', alma_id, 'POST', job_timestamp, db_session)
         else:
             db_read_write.update_job_status('done', alma_id, 'POST', job_timestamp, db_session)
             db_read_write.add_put_post_response(alma_id, alma_response, job_timestamp, db_session)
+
         db_session.commit()
+
     db_read_write.log_success_rate('POST', job_timestamp, db_session)
     db_session.close()
 
@@ -81,6 +87,7 @@ def call_api_for_csv_list(
     if method not in ['DELETE', 'GET', 'PUT', 'POST']:
         logger.error(f'Provided method {method} does not match any of the expected values.')
         raise ValueError
+
     if method == 'POST':
         raise NotImplementedError
 
@@ -89,41 +96,55 @@ def call_api_for_csv_list(
 
     list_of_ids = db_read_write.get_list_of_ids_by_status_and_method('new', method, job_timestamp, db_session)
 
-    if method in ['DELETE', 'GET', 'PUT']:
-        for alma_id, in list_of_ids:
-            if method != 'GET' and method != 'POST':
-                db_read_write.add_alma_id_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
-            if method != 'POST':
-                record_data = call_api_for_record('GET', alma_id, api, record_type)
-                if not record_data:
-                    logger.error(f'Could not fetch record {alma_id}.')
-                    db_read_write.update_job_status('error', alma_id, 'GET', job_timestamp, db_session)
-                else:
-                    db_read_write.add_response_content_to_fetched_records(
-                        alma_id, record_data, job_timestamp, db_session
-                    )
-                    db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
-                    if method == 'DELETE':
-                        alma_response = call_api_for_record(method, alma_id, api, record_type)
-                        if alma_response is None:
-                            db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
-                        else:
+    for alma_id, in list_of_ids:
+
+        if method != 'GET' and method != 'POST':
+            db_read_write.add_alma_id_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
+
+        if method != 'POST':
+
+            ApiCallerRecord = instantiate_api_caller(alma_id, api, record_type)
+            record_id = str.split(alma_id, ',')[-1]
+            record_data = ApiCallerRecord.retrieve(record_id)
+
+            if not record_data:
+                logger.error(f'Could not fetch record {alma_id}.')
+                db_read_write.update_job_status('error', alma_id, 'GET', job_timestamp, db_session)
+            else:
+                db_read_write.add_response_content_to_fetched_records(
+                    alma_id, record_data, job_timestamp, db_session
+                )
+                db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
+                if method == 'DELETE':
+
+                    alma_response = ApiCallerRecord.delete(record_id)
+
+                    if alma_response is None:
+                        db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
+                    else:
+                        db_read_write.update_job_status('done', alma_id, method, job_timestamp, db_session)
+
+                elif method == 'PUT':
+
+                    new_record_data = manipulate_record(alma_id, record_data)
+
+                    if not new_record_data:
+                        logger.error(f'Could not manipulate data of record {alma_id}.')
+                        db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
+                    else:
+
+                        response = ApiCallerRecord.update(new_record_data, record_id)
+
+                        if response:
+                            logger.info(f'Manipulation for {alma_id} successful. Adding to put_post_responses.')
+                            db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
+                            db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
                             db_read_write.update_job_status('done', alma_id, method, job_timestamp, db_session)
-                    elif method == 'PUT':
-                        new_record_data = manipulate_record(alma_id, record_data)
-                        if not new_record_data:
-                            logger.error(f'Could not manipulate data of record {alma_id}.')
-                            db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
-                        else:
-                            response = call_api_for_record(method, alma_id, api, record_type, new_record_data)
-                            if response:
-                                logger.info(f'Manipulation for {alma_id} successful. Adding to put_post_responses.')
-                                db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
-                                db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
-                                db_read_write.update_job_status('done', alma_id, method, job_timestamp, db_session)
-                                db_read_write.check_data_sent_equals_response(alma_id, job_timestamp, db_session)
-                            logger.error(f'Did not receive a response for {alma_id}?')
-                            db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
+                            db_read_write.check_data_sent_equals_response(alma_id, job_timestamp, db_session)
+
+                        logger.error(f'Did not receive a response for {alma_id}?')
+                        db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
+
         db_session.commit()
 
     db_read_write.log_success_rate(method, job_timestamp, db_session)
@@ -153,20 +174,20 @@ def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool
         raise ValueError
 
 
-def call_api_for_record(method: str, alma_id: str, api: str, record_type: str, record_data: bytes = None) -> str:
+def instantiate_api_caller(
+        alma_id: str,
+        api: str,
+        record_type: str) -> rest_call_api.GenericApi:
     """
     Meta-function for all api_calls. Please note that for some API calls there is a fake
     record_type available, such as 'all_items_for_bib'. These will not take additional
     query-parameters, though, and are only meant as convenience functions.
-    :param method: DELETE, GET, POST or PUT.
     :param alma_id: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of the record, usually last path-argument with hardcoded string (e. g. "holdings")
-    :param record_data: Only necessary for POST and PUT methods.
     :return: API response as a string.
     """
     split_alma_id = str.split(alma_id, ',')
-    record_id = split_alma_id[-1]
 
     if api == 'bibs':
         if record_type == 'bibs':
