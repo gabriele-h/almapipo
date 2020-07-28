@@ -25,7 +25,7 @@ api_key = environ['ALMA_REST_API_KEY']
 api_base_url = environ['ALMA_REST_API_BASE_URL']
 
 
-class ApiCaller:
+class GenericApi:
     """
     Make generic calls to an API that supports all aspects of CRUD.
     """
