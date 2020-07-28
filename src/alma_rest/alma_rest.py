@@ -130,12 +130,12 @@ def call_api_for_csv_list(
     db_session.close()
 
 
-def import_csv_and_ids_to_db_tables(file_path: str, method: str, validation: bool = True) -> None:
+def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool = True) -> None:
     """
     Imports a whole csv or tsv file to the table source_csv.
     Imports valid Alma-IDs to table job_status_per_id.
     Checks for file existence first.
-    :param file_path: Path to the CSV file to be imported
+    :param csv_path: Path to the CSV file to be imported
     :param method: GET, PUT, POST or DELETE
     :param validation: If set to "False", the first column will not be checked for validity. Defaults to True.
     :return: None
