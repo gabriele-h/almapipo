@@ -131,14 +131,14 @@ def get_most_recent_version_from_fetched_records(alma_ids: str):
 
 def update_job_status(status: str,
                       alma_id: str,
-                      action: str,
+                      method: str,
                       job_timestamp: datetime,
                       session: Session) -> None:
     """
     For a given alma_id and job_timestamp update the job_status in table job_status_per_id.
     :param status: New status to be set.
     :param alma_id: Alma ID to set the status for.
-    :param action: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
+    :param method: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
     :param job_timestamp: Job for which the status should be changed.
     :param session: Session to be used for the manipulation.
     :return: None
@@ -150,17 +150,17 @@ def update_job_status(status: str,
     ).filter_by(
         alma_id=alma_id
     ).filter_by(
-        job_action=action
+        job_action=method
     )
     list_of_matched_rows[0].job_status = status
 
 
-def get_list_of_ids_by_status_and_action(status: str, action: str, job_timestamp: datetime, session: Session) -> list:
+def get_list_of_ids_by_status_and_method(status: str, method: str, job_timestamp: datetime, session: Session) -> list:
     """
     From table job_status_per_id get all Alma IDs that match the status
     given as the parameter.
     :param status: As in job_status_per_id, possible values are "new", "done" and "error".
-    :param action: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
+    :param method: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
     :param session: DB session to connect to.
     :param job_timestamp: Timestamp to identify the job responsible for the ID.
     :return: List of IDs.
@@ -172,7 +172,7 @@ def get_list_of_ids_by_status_and_action(status: str, action: str, job_timestamp
     ).filter_by(
         job_status=status
     ).filter_by(
-        job_action=action
+        job_action=method
     )
     return list_of_ids
 
@@ -244,7 +244,7 @@ def add_csv_line_to_tables(
         csv_line: OrderedDict,
         job_timestamp: datetime,
         session: Session,
-        action: str) -> None:
+        method: str) -> None:
     """
     For an ordered Dictionary of values retrieved from a csv/tsv file
     create an entry in the database that identifies the job
@@ -253,7 +253,7 @@ def add_csv_line_to_tables(
     :param csv_line: Ordered dictionary of values from a line of the input file.
     :param job_timestamp: Timestamp to identify the job which created the line.
     :param session: DB session to add the data to.
-    :param action: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
+    :param method: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
     :return: None
     """
     line_for_table_source_csv = db_setup.SourceCsv(
@@ -261,18 +261,18 @@ def add_csv_line_to_tables(
         csv_line=csv_line
     )
     session.add(line_for_table_source_csv)
-    add_alma_ids_to_job_status_per_id(list(csv_line.values())[0], action, job_timestamp, session)
+    add_alma_ids_to_job_status_per_id(list(csv_line.values())[0], method, job_timestamp, session)
 
 
 def add_alma_ids_to_job_status_per_id(
         alma_id: str,
-        action: str,
+        method: str,
         job_timestamp: datetime,
         session: Session) -> None:
     """
     For a string of Alma IDs create an entry in job_status_per_id.
     :param alma_id: IDs of the record to be manipulated.
-    :param action: REST action - GET, PUT, POST or DELETE
+    :param method: GET, PUT, POST or DELETE
     :param job_timestamp: Timestamp to identify the job which created the line.
     :param session: DB session to add the data to.
     :return: None
@@ -281,23 +281,23 @@ def add_alma_ids_to_job_status_per_id(
         job_timestamp=job_timestamp,
         alma_id=alma_id,
         job_status='new',
-        job_action=action
+        job_action=method
     )
     session.add(line_for_table_job_status_per_id)
 
 
 # noinspection PyArgumentList
-def log_success_rate(action: str, job_timestamp: datetime, db_session: Session) -> None:
+def log_success_rate(method: str, job_timestamp: datetime, db_session: Session) -> None:
     """
     For the current job check how many records have a specific status in job_status_per_id.
-    :param action: REST action - GET, PUT, POST or DELETE
+    :param method: GET, PUT, POST or DELETE
     :param job_timestamp: Timestamp to identify the job which created the line.
     :param db_session: DB session to make use of.
     :return: None
     """
-    ids_done = get_list_of_ids_by_status_and_action('done', action, job_timestamp, db_session)
-    ids_error = get_list_of_ids_by_status_and_action('error', action, job_timestamp, db_session)
-    ids_new = get_list_of_ids_by_status_and_action('new', action, job_timestamp, db_session)
-    logger.info(f"{action} was done for {ids_done.count()} record(s).")
-    logger.info(f"{action} had errors for {ids_error.count()} record(s).")
-    logger.info(f"{action} was not handled for {ids_new.count()} record(s).")
+    ids_done = get_list_of_ids_by_status_and_method('done', method, job_timestamp, db_session)
+    ids_error = get_list_of_ids_by_status_and_method('error', method, job_timestamp, db_session)
+    ids_new = get_list_of_ids_by_status_and_method('new', method, job_timestamp, db_session)
+    logger.info(f"{method} was done for {ids_done.count()} record(s).")
+    logger.info(f"{method} had errors for {ids_error.count()} record(s).")
+    logger.info(f"{method} was not handled for {ids_new.count()} record(s).")

@@ -97,7 +97,7 @@ class ApiCaller:
         return response_content
 
 
-def call_api(url_parameters: str, action: str, status_code: int, record_data: bytes = None) -> str:
+def call_api(url_parameters: str, method: str, status_code: int, record_data: bytes = None) -> str:
     """
     Generic function for all API calls.
 
@@ -111,19 +111,19 @@ def call_api(url_parameters: str, action: str, status_code: int, record_data: by
     and the error will be added to the logfile as an ERROR.
 
     :param url_parameters: Necessary path and arguments for the API call.
-    :param action: DELETE, GET, POST or PUT
-    :param status_code: Status code of a successful action.
+    :param method: DELETE, GET, POST or PUT
+    :param status_code: Status code of a successful API call for the given method.
     :param record_data: Necessary input for POST and PUT, defaults to None.
     :return: The API response's content in XML format as a string.
     """
     with create_alma_api_session('xml') as session:
         alma_url = api_base_url+url_parameters
-        alma_response = fetch_api_response(alma_url, action, session, record_data)
+        alma_response = switch_api_method(alma_url, method, session, record_data)
 
         if alma_response.status_code == status_code:
             alma_response_content = alma_response.content.decode("utf-8")
             logger.info(
-                f'{action} for record "{url_parameters}" completed.'
+                f'{method} for record "{url_parameters}" completed.'
             )
             if '<errorList>' in alma_response_content:
                 log_string = f"""The response contained an error, even though it had status code {status_code}. """
@@ -135,29 +135,29 @@ def call_api(url_parameters: str, action: str, status_code: int, record_data: by
                 logger.error(log_string)
             return alma_response_content
 
-        error_string = f"""{action} for record "{url_parameters}" failed. """
+        error_string = f"""{method} for record "{url_parameters}" failed. """
         error_string += f"""Reason: {alma_response.status_code} - {alma_response.content.decode("utf-8")}"""
         logger.error(error_string)
 
 
-def fetch_api_response(alma_url: str, action: str, session: Session, record_data: str = None) -> Response:
+def switch_api_method(alma_url: str, method: str, session: Session, record_data: str = None) -> Response:
     """
-    Make API calls according to the kind of action provided.
+    Make API calls according to the kind of method provided.
     :param alma_url: Combination of base-url and parameters necessary (path, arguments).
-    :param action: DELETE, GET, POST or PUT
+    :param method: DELETE, GET, POST or PUT
     :param session: Alma API session.
     :param record_data: Necessary input for POST and PUT, defaults to None.
     :return:
     """
-    if action == 'DELETE':
+    if method == 'DELETE':
         return session.delete(alma_url)
-    elif action == 'GET':
+    elif method == 'GET':
         return session.get(alma_url)
-    elif action == 'POST':
+    elif method == 'POST':
         return session.post(alma_url, data=record_data)
-    elif action == 'PUT':
+    elif method == 'PUT':
         return session.put(alma_url, data=record_data)
-    logger.error('No valid REST action supplied.')
+    logger.error('No valid REST method supplied.')
     raise ValueError
 
 
