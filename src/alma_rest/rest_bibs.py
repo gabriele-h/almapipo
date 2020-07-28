@@ -171,7 +171,7 @@ def get_e_collection_with_mms_id(mms_id: str, collection_id: str) -> str:
     :return: Record in XML format.
     """
     logger.info(f'Trying to fetch e-collection record with mms_id {mms_id} and collection_id {collection_id}.')
-    collection_record = rest_call_api.get_record(f'/bibs/{mms_id}/e-collections/{collection_id}')
+    collection_record = rest_call_api.call_api(f'/bibs/{mms_id}/e-collections/{collection_id}', 'GET', 200)
     return collection_record
 
 
@@ -184,5 +184,5 @@ def get_item_by_barcode(item_barcode: str) -> str:
     logger.info(f'Trying to fetch item by barcode {item_barcode}.')
     api_url_query = {"item_barcode": item_barcode}
     api_url_query_encoded = parse.urlencode(api_url_query)
-    item_record = rest_call_api.get_record(f'/items?{api_url_query_encoded}')
+    item_record = rest_call_api.call_api(f'/items?{api_url_query_encoded}', 'GET', 200)
     return item_record

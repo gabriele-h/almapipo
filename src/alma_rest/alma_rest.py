@@ -47,7 +47,7 @@ def restore_records_for_csv_list(csv_path: str, api: str, record_type: str) -> N
     list_of_ids = db_read_write.get_list_of_ids_by_status_and_method('new', 'POST', job_timestamp, db_session)
     for alma_id, in list_of_ids:
         record_data = xml_extract.extract_response_from_fetched_records(alma_id)
-        alma_response = create_record_for_alma_ids(alma_id, api, record_type, record_data)
+        alma_response = call_api_for_record('POST', alma_id, api, record_type, record_data)
         if alma_response is None:
             db_read_write.update_job_status('error', alma_id, 'POST', job_timestamp, db_session)
         else:
@@ -115,7 +115,7 @@ def call_api_for_csv_list(
                             logger.error(f'Could not manipulate data of record {alma_id}.')
                             db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
                         else:
-                            response = update_record_for_alma_ids(alma_id, api, record_type, new_record_data)
+                            response = call_api_for_record(method, alma_id, api, record_type, new_record_data)
                             if response:
                                 logger.info(f'Manipulation for {alma_id} successful. Adding to put_post_responses.')
                                 db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
@@ -153,61 +153,6 @@ def import_csv_and_ids_to_db_tables(file_path: str, method: str, validation: boo
         raise ValueError
 
 
-def update_record_for_alma_ids(alma_ids: str, api: str, record_type: str, record_data: bytes) -> str:
-    """
-    For a specific API and record type make the PUT call to that API
-    and return the resulting response.
-    :param alma_ids: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
-    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
-    :param record_type: Type of the record to call the API for (e. g. "holdings")
-    :param record_data: Data of the record to be updated (usually XML)
-    :return: API response
-    """
-    response = call_api_for_record('PUT', alma_ids, api, record_type, record_data)
-    return response
-
-
-def create_record_for_alma_ids(alma_ids: str, api: str, record_type: str, record_data: bytes) -> str:
-    """
-    For a specific API and record type make the POST call to that API
-    and return the resulting response.
-    :param alma_ids: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
-    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
-    :param record_type: Type of the record to call the API for (e. g. "holdings")
-    :param record_data: Data of the record to be created (usually XML)
-    :return: API response
-    """
-    response = call_api_for_record('POST', alma_ids, api, record_type, record_data)
-    return response
-
-
-def delete_record_for_alma_ids(alma_ids: str, api: str, record_type: str) -> str:
-    """
-    For a specific API and record type make the DELETE call to that API
-    and return the resulting response.
-    :param alma_ids: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
-    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
-    :param record_type: Type of the record to call the API for (e. g. "holdings")
-    :return: API response
-    """
-    response = call_api_for_record('DELETE', alma_ids, api, record_type)
-    return response
-
-
-def get_record_for_alma_ids(alma_ids: str, api: str, record_type: str) -> str:
-    """
-    For a specific API and record type make the GET call to that API
-    and return the resulting response.
-    :param alma_ids: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
-    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
-    :param record_type: Type of the record to call the API for (e. g. "holdings")
-    :return: API response
-    """
-    response = call_api_for_record('GET', alma_ids, api, record_type)
-    return response
-
-
-def call_api_for_record(action: str, alma_ids: str, api: str, record_type: str, record_data: bytes = None) -> str:
 def call_api_for_record(method: str, alma_ids: str, api: str, record_type: str, record_data: bytes = None) -> str:
     """
     Meta-function for all api_calls. Please note that for some API calls there is a fake
