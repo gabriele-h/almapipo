@@ -48,9 +48,9 @@ def restore_records_for_csv_list(csv_path: str, api: str, record_type: str) -> N
     for alma_id, in list_of_ids:
         record_data = xml_extract.extract_response_from_fetched_records(alma_id)
 
-        ApiCallerRecord = instantiate_api_caller(alma_id, api, record_type)
+        CurrentApi = instantiate_api_class(alma_id, api, record_type)
         record_id = str.split(alma_id, ',')[-1]
-        alma_response = ApiCallerRecord.create(record_data, record_id)
+        alma_response = CurrentApi.create(record_data)
 
         if alma_response is None:
             db_read_write.update_job_status('error', alma_id, 'POST', job_timestamp, db_session)
@@ -99,14 +99,15 @@ def call_api_for_csv_list(
 
     for alma_id, in list_of_ids:
 
+        CurrentApi = instantiate_api_class(alma_id, api, record_type)
+
         if method != 'GET' and method != 'POST':
             db_read_write.add_alma_id_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
 
         if method != 'POST':
 
-            ApiCallerRecord = instantiate_api_caller(alma_id, api, record_type)
             record_id = str.split(alma_id, ',')[-1]
-            record_data = ApiCallerRecord.retrieve(record_id)
+            record_data = CurrentApi.retrieve(record_id)
 
             if not record_data:
                 logger.error(f'Could not fetch record {alma_id}.')
@@ -118,7 +119,7 @@ def call_api_for_csv_list(
                 db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
                 if method == 'DELETE':
 
-                    alma_response = ApiCallerRecord.delete(record_id)
+                    alma_response = CurrentApi.delete(record_id)
 
                     if alma_response is None:
                         db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
@@ -134,7 +135,7 @@ def call_api_for_csv_list(
                         db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
                     else:
 
-                        response = ApiCallerRecord.update(new_record_data, record_id)
+                        response = CurrentApi.update(new_record_data, record_id)
 
                         if response:
                             logger.info(f'Manipulation for {alma_id} successful. Adding to put_post_responses.')
@@ -162,9 +163,9 @@ def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool
     :param validation: If set to "False", the first column will not be checked for validity. Defaults to True.
     :return: None
     """
-    if input_read.check_file_path(file_path):
+    if input_read.check_file_path(csv_path):
         db_session = db_setup.create_db_session()
-        csv_generator = input_read.read_csv_contents(file_path, validation)
+        csv_generator = input_read.read_csv_contents(csv_path, validation)
         for csv_line in csv_generator:
             # noinspection PyTypeChecker
             db_read_write.add_csv_line_to_tables(csv_line, job_timestamp, db_session, method)
@@ -175,7 +176,7 @@ def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool
         raise ValueError
 
 
-def instantiate_api_caller(
+def instantiate_api_class(
         alma_id: str,
         api: str,
         record_type: str) -> rest_call_api.GenericApi:
@@ -203,7 +204,7 @@ def instantiate_api_caller(
             raise NotImplementedError
     elif api == 'electronic':
         if record_type == 'e-collections':
-            return rest_electronic.EcollectionApiCaller(split_alma_id[0])
+            return rest_electronic.EcollectionsApi()
         else:
             raise NotImplementedError
 
