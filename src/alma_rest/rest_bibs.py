@@ -28,47 +28,47 @@ class BibsApiCallerForBibs(rest_call_api.ApiCaller):
 
         super().__init__(base_path)
 
-    def get_all_holdings(self, mms_id: str) -> str:
+    def retrieve_all_holdings(self, mms_id: str) -> str:
         """
         For a given mms_id, get all holdings information.
         :param mms_id: Unique ID of the BIB record the holdings are connected to.
         :return: Record in XML format.
         """
         logger.info(f'Trying to fetch all holdings information for bib record {mms_id}.')
-        record = rest_call_api.get_record(f'{self.base_path}{mms_id}/holdings')
+        record = retrieve(f'{self.base_path}{mms_id}/holdings')
         return record
 
-    def get_all_items(self, mms_id: str) -> str:
+    def retrieve_all_items(self, mms_id: str) -> str:
         """
         For a given mms_id, get all holding and item information.
         :param mms_id: Unique ID of the BIB record the holdings and items are connected to.
         :return: Record in XML format.
         """
         logger.info(f'Trying to fetch all holdings and items information for bib record {mms_id}.')
-        physical_inventory_record = rest_call_api.get_record(f'{self.base_path}{mms_id}/holdings/ALL/items')
+        physical_inventory_record = retrieve(f'{self.base_path}{mms_id}/holdings/ALL/items')
         return physical_inventory_record
 
-    def get_all_portfolios(self, mms_id: str) -> str:
+    def retrieve_all_portfolios(self, mms_id: str) -> str:
         """
         For a given mms_id, get all portfolios.
         param: mms_id: Unique ID of the BIB record the portfolios are connected to.
         :return: Record in XML format.
         """
         logger.info(f'Trying to fetch all portfolios for bib record {mms_id}.')
-        e_inventory_record = rest_call_api.get_record(f'{self.base_path}{mms_id}/portfolios/')
+        e_inventory_record = retrieve(f'{self.base_path}{mms_id}/portfolios/')
         return e_inventory_record
 
-    def get_all_e_collections(self, mms_id: str) -> str:
+    def retrieve_all_e_collections(self, mms_id: str) -> str:
         """
         For a given mms_id, get all e-collection information.
         :param mms_id: Unique ID of the BIB record the e-collections are connected to.
         :return: Record in XML format.
         """
         logger.info(f'Trying to fetch all e-collections for bib record {mms_id}.')
-        e_inventory_record = rest_call_api.get_record(f'{self.base_path}{mms_id}/e-collections/')
+        e_inventory_record = retrieve(f'{self.base_path}{mms_id}/e-collections/')
         return e_inventory_record
 
-    def get_by_query(self, id_type: str, other_id: str) -> str:
+    def retrieve_by_query(self, id_type: str, other_id: str) -> str:
         """
         Get bibliographic records by ID via Alma API. Possible ID types:
         * mms_id
@@ -86,7 +86,7 @@ class BibsApiCallerForBibs(rest_call_api.ApiCaller):
         api_url_query = {id_type: other_id}
         api_url_query_encoded = parse.urlencode(api_url_query)
         api_url = self.base_path + '?' + api_url_query_encoded
-        bib_records_response = rest_call_api.get_record(api_url)
+        bib_records_response = retrieve(api_url)
         return bib_records_response
 
 
@@ -107,14 +107,14 @@ class BibsApiCallerForHoldings(rest_call_api.ApiCaller):
 
         super().__init__(base_path)
 
-    def get_all_items(self, hol_id: str) -> str:
+    def retrieve_all_items(self, hol_id: str) -> str:
         """
-        For a given mms_id, get all holding and item information.
+        For a given mms_id, retrieve all holding and item information.
         :param hol_id: ID of the HOL record the ITMs are connected to.
         :return: Record in XML format.
         """
         logger.info(f'Trying to fetch all items information for hol_id {hol_id}.')
-        physical_inventory_record = rest_call_api.get_record(f'{self.base_path}{hol_id}/items')
+        physical_inventory_record = retrieve(f'{self.base_path}{hol_id}/items')
         return physical_inventory_record
 
 
@@ -163,7 +163,7 @@ class BibsApiCallerForPortfolios(rest_call_api.ApiCaller):
 # TODO Extraneous functions not yet refactored to meet OOP style
 
 
-def get_e_collection_with_mms_id(mms_id: str, collection_id: str) -> str:
+def retrieve_e_collection_with_mms_id(mms_id: str, collection_id: str) -> str:
     """
     Get e-collection record for id combination mms-ID and collection-ID.
     :param mms_id: Unique ID of the BIB record the collection is connected to.
@@ -175,7 +175,7 @@ def get_e_collection_with_mms_id(mms_id: str, collection_id: str) -> str:
     return collection_record
 
 
-def get_item_by_barcode(item_barcode: str) -> str:
+def retrieve_item_by_barcode(item_barcode: str) -> str:
     """
     Get item information by barcode. Please note that this equals a scan-in operation!
     :param item_barcode: Barcode of the item.

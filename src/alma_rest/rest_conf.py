@@ -14,7 +14,7 @@ from . import logfile_setup
 logger = getLogger(__name__)
 
 
-def get_libraries() -> str:
+def retrieve_libraries() -> str:
     """
     Retrieve all libraries configured in Alma.
     :return: str
@@ -24,7 +24,7 @@ def get_libraries() -> str:
     return libraries_record
 
 
-def get_library(library: str) -> str:
+def retrieve_library(library: str) -> str:
     """
     Retrieve one specific library.
     :param library:
@@ -35,18 +35,18 @@ def get_library(library: str) -> str:
     return library_record
 
 
-def get_all_locations_generator() -> Iterator[str]:
+def retrieve_all_locations_generator() -> Iterator[str]:
     """
     Retrieve all locations for all libraries in Alma. Note that this will add the attribute
     "library" to the root element "locations" of all xml strings in the generator.
     :return: Generator of strings containing get_locations() return values plus attribute "library"
     """
     logger.info(f"Trying to fetch all locations for all libraries configured in Alma.")
-    libraries_record = get_libraries()
+    libraries_record = retrieve_libraries()
     libraries_xml = fromstring(libraries_record)
     for library in libraries_xml.findall('library/code'):
         library_code = library.text
-        locations = get_locations(library_code)
+        locations = retrieve_locations(library_code)
         locations_xml = fromstring(locations)
         if locations_xml:
             locations_xml.set('library', library_code)
@@ -54,7 +54,7 @@ def get_all_locations_generator() -> Iterator[str]:
         logger.warning(f'Library {library_code} has no locations.')
 
 
-def get_locations(library: str) -> str:
+def retrieve_locations(library: str) -> str:
     """
     Get the locations of one specific library.
     :param library:

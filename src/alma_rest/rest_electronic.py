@@ -17,7 +17,7 @@ logger = getLogger(__name__)
 #######
 
 
-def get_e_collection(collection_id: str) -> str:
+def retrieve_e_collection(collection_id: str) -> str:
     """
     Get e-collection by collection-id only.
     :param collection_id: ID of the electronic collection.

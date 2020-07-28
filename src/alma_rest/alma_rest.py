@@ -184,8 +184,8 @@ def call_api_for_record(method: str, alma_ids: str, api: str, record_type: str, 
 
     if method == 'DELETE':
         return ApiCaller.delete(record_id)
-        return ApiCaller.get(record_id)
     elif method == 'GET':
+        return ApiCaller.retrieve(record_id)
     elif method == 'POST':
         return ApiCaller.create(record_data)
     elif method == 'PUT':

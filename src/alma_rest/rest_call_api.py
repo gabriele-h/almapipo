@@ -67,7 +67,7 @@ class ApiCaller:
         delete_response = call_api(f'{self.base_path}{record_id}', 'DELETE', 204)
         return delete_response
 
-    def get(self, record_id: str) -> str:
+    def retrieve(self, record_id: str) -> str:
         """
         Generic function for GET calls to the Alma API.
 

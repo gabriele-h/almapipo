@@ -17,7 +17,7 @@ logger = getLogger(__name__)
 #######
 
 
-def get_user(user_id: str) -> str:
+def retrieve_user(user_id: str) -> str:
     """
     Get user record by user-ID via Alma API.
     :param user_id: Unique ID of Alma user record.
