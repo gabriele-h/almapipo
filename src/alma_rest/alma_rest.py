@@ -210,6 +210,9 @@ def instantiate_api_class(
             return rest_electronic.PortfoliosApi(split_alma_id[0], split_alma_id[1])
         else:
             raise NotImplementedError
+    elif api == 'users':
+        if record_type == 'users':
+            return rest_users.UsersApi()
 
     logger.error('The API you are trying to call is not implemented yet.')
     raise NotImplementedError

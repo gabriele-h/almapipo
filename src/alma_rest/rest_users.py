@@ -12,17 +12,16 @@ from . import logfile_setup
 logger = getLogger(__name__)
 
 
-#######
-# GET #
-#######
-
-
-def retrieve_user(user_id: str) -> str:
+class UsersApi(rest_call_api.GenericApi):
     """
-    Get user record by user-ID via Alma API.
-    :param user_id: Unique ID of Alma user record.
-    :return: Record data in XML format.
+    Make calls for bibliographic records. Here the record_id is the MMS ID.
     """
-    logger.info(f'Trying to fetch user with user_id {user_id}.')
-    user_record = rest_call_api.get_record(f'/users/{user_id}')
-    return user_record
+    def __init__(self):
+        """
+        Initialize API calls for bibliographic records.
+        """
+        base_path = '/users/'
+
+        logger.info(f'Instantiating {type(self).__name__}.')
+
+        super().__init__(base_path)
