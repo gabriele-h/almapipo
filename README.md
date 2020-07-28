@@ -4,7 +4,7 @@
 
 A set of
 [Alma](https://knowledge.exlibrisgroup.com/Alma/Product_Documentation/010Alma_Online_Help_%28English%29/010Getting_Started/010Alma_Introduction/010Alma_Overview)
-records needs to be created, deleted, updated, or fetched for analysis.
+records needs to be created, deleted, updated, or retrieved for analysis.
 
 ## Preparation
 
@@ -16,7 +16,7 @@ or a list of Alma-IDs (see below "Input data").
 
 In a **database** both the **input** used as well as the
 **status of the api call** are saved on a per-line or per-record basis.
-All records will be fetched prior to deletion, update, or creation. A
+All records will be retrieved prior to deletion, update, or creation. A
 **copy of each record before the action** will be saved to the database.
 **Responses to PUT and POST** requests will be saved too.
 
@@ -137,7 +137,7 @@ Main part making use of most of the other modules.
 
 ## Actions on whole CSV lists
 
-There are four functions for create, delete, get, and update to
+There are four functions for create, delete, retrieve, and update to
 operate on whole CSV lists. These will
 add CSV Lines to `source_csv` and `job_status_per_id` (see below)
 and issue an Alma API request per alma-id. If successful,
@@ -166,12 +166,11 @@ module is used.
 
 First parameter of the function is the path to the csv-file. Then
 follow the API that needs to be called and what kind of record it
-should be called for. Besides `get` there are also functions for
-`update` (PUT), `create` (POST) and `delete`.
+should be called for. Final parameter is the method.
 
 ```python
 from alma_rest import alma_rest
-alma_rest.get_records_via_api_for_csv_list('./input/test.tsv', 'bibs', 'holdings')
+alma_rest.call_api_for_csv_list('./input/test.tsv', 'bibs', 'holdings', 'GET')
 ```
 
 # `alma_rest.xml_extract`
