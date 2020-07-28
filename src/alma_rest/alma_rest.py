@@ -49,7 +49,6 @@ def restore_records_for_csv_list(csv_path: str, api: str, record_type: str) -> N
         record_data = xml_extract.extract_response_from_fetched_records(alma_id)
 
         CurrentApi = instantiate_api_class(alma_id, api, record_type)
-        record_id = str.split(alma_id, ',')[-1]
         alma_response = CurrentApi.create(record_data)
 
         if alma_response is None:
@@ -205,6 +204,10 @@ def instantiate_api_class(
     elif api == 'electronic':
         if record_type == 'e-collections':
             return rest_electronic.EcollectionsApi()
+        elif record_type == 'e-services':
+            return rest_electronic.EservicesApi(split_alma_id[0])
+        elif record_type == 'portfolios':
+            return rest_electronic.PortfoliosApi(split_alma_id[0], split_alma_id[1])
         else:
             raise NotImplementedError
 
