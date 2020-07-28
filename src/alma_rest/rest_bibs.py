@@ -13,60 +13,7 @@ from . import logfile_setup
 logger = getLogger(__name__)
 
 
-class BibsApiCaller:
-    """
-    Makes calls to the /bibs API.
-    """
-    def __init__(self, base_path: str):
-        """
-        Initialize API calls for Bibliographic Records and Inventory.
-        :param base_path: Path used for API calls
-        """
-        self.base_path = base_path
-
-    def create(self, record_data: bytes) -> str:
-        """
-        Create a record via Alma API /bibs.
-        :param record_data: XML of the record to be created
-        :return: Response data in XML format
-        """
-        logger.info(f"Trying POST for /bibs API.")
-        record = rest_call_api.create_record(record_data, self.base_path)
-        return record
-
-    def delete(self, record_id: str) -> str:
-        """
-        Delete BIB record by ID via Alma API.
-        :param record_id: Unique ID of Alma BIB records
-        :return: API response
-        """
-        logger.info(f"Trying DELETE for record {record_id}.")
-        delete_response = rest_call_api.delete_record(f'{self.base_path}{record_id}')
-        return delete_response
-
-    def get(self, record_id: str) -> str:
-        """
-        Get record by ID via Alma API.
-        :param record_id: Unique ID of an Alma BIB record
-        :return: Record data of the bib record
-        """
-        logger.info(f"Trying GET for record {record_id}.")
-        record = rest_call_api.get_record(f'{self.base_path}{record_id}')
-        return record
-
-    def update(self, record_data: bytes, record_id: str) -> str:
-        """
-        Update record via Alma API by ID.
-        :param record_data: XML of the record to be updated
-        :param record_id: Unique ID of the BIB record
-        :return: Response data in XML format
-        """
-        logger.info(f"Trying PUT for record {record_id}.")
-        record = rest_call_api.update_record(record_data, f'{self.base_path}{record_id}')
-        return record
-
-
-class BibsApiCallerForBibs(BibsApiCaller):
+class BibsApiCallerForBibs(rest_call_api.ApiCaller):
     """
     Make calls for bibliographic records. Here the record_id is the MMS ID.
     """
@@ -143,7 +90,7 @@ class BibsApiCallerForBibs(BibsApiCaller):
         return bib_records_response
 
 
-class BibsApiCallerForHoldings(BibsApiCaller):
+class BibsApiCallerForHoldings(rest_call_api.ApiCaller):
     """
     Make calls for holding records. Here the record_id is the Holding PID.
     """
@@ -171,7 +118,7 @@ class BibsApiCallerForHoldings(BibsApiCaller):
         return physical_inventory_record
 
 
-class BibsApiCallerForItems(BibsApiCaller):
+class BibsApiCallerForItems(rest_call_api.ApiCaller):
     """
     Make calls for item records. Here the record_id is the Item PID.
     """
@@ -191,7 +138,7 @@ class BibsApiCallerForItems(BibsApiCaller):
         super().__init__(base_path)
 
 
-class BibsApiCallerForPortfolios(BibsApiCaller):
+class BibsApiCallerForPortfolios(rest_call_api.ApiCaller):
     """
     Make calls for portfolio records. Here the record_id is the Portfolio PID.
     """

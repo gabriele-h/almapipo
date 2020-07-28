@@ -25,59 +25,76 @@ api_key = environ['ALMA_REST_API_KEY']
 api_base_url = environ['ALMA_REST_API_BASE_URL']
 
 
-def update_record(record_data: bytes, url_parameters: str) -> str:
-    """Generic function for PUT calls to the Alma API.
-
-    Will return the response if HTTP status code is 200.
-    Otherwise the error returned by the API will be added to the
-    logfile as an ERROR.
-    :param record_data: XML of the record to be updated in bytes format.
-    :param url_parameters: Necessary path and arguments for API call.
-    :return: Contents of the response.
+class ApiCaller:
     """
-    response = call_api(url_parameters, 'PUT', 200, record_data)
-    return response
-
-
-def create_record(record_data: bytes, url_parameters: str) -> str:
-    """Generic function for POST calls to the Alma API.
-
-    Will return the response if HTTP status code is 200.
-    Otherwise the error returned by the API will be added to the
-    logfile as an ERROR.
-    :param record_data: XML of the record to be created in bytes format.
-    :param url_parameters: Necessary path and arguments for API call.
-    :return: Contents of the response.
+    Make generic calls to an API that supports all aspects of CRUD.
     """
-    response_content = call_api(url_parameters, 'POST', 200, record_data)
-    return response_content
+    def __init__(self, base_path: str):
+        """
+        Initialize API calls.
+        :param base_path: Path used for API calls
+        """
+        self.base_path = base_path
 
+    def create(self, record_data: bytes) -> str:
+        """
+        Generic function for POST calls to the Alma API.
 
-def delete_record(url_parameters: str) -> str:
-    """Generic function for DELETE calls to the Alma API.
+        Will return the response if HTTP status code is 200.
+        Otherwise the error returned by the API will be added to the
+        logfile as an ERROR.
+        :param record_data: XML of the record to be created
+        :return: Response data in XML format
+        """
+        logger.info(f"Trying POST for {self.base_path}.")
+        response_content = call_api(self.base_path, 'POST', 200, record_data)
+        return response_content
 
-    Will return the response if HTTP status code is 204.
-    Otherwise the error returned by the API will be added to the
-    logfile as an ERROR.
+    def delete(self, record_id: str) -> str:
+        """
+        Generic function for DELETE calls to the Alma API.
 
-    :param url_parameters: Necessary path and arguments for API call.
-    :return: Contents of the response.
-    """
-    response_content = call_api(url_parameters, 'DELETE', 204)
-    return response_content
+        Will return the response if HTTP status code is 204.
+        Otherwise the error returned by the API will be added to the
+        logfile as an ERROR.
+        
+        Usually the response *should* be empty, but in case it
+        is not, we might want to have access to it.
+        :param record_id: Unique ID of Alma BIB records
+        :return: API response
+        """
+        logger.info(f"Trying DELETE for record {record_id} at {self.base_path}.")
+        delete_response = call_api(f'{self.base_path}{record_id}', 'DELETE', 204)
+        return delete_response
 
+    def get(self, record_id: str) -> str:
+        """
+        Generic function for GET calls to the Alma API.
 
-def get_record(url_parameters: str) -> str:
-    """Generic function for GET calls to the Alma API.
+        Will return the response content if HTTP status code is 200.
+        Otherwise the error returned by the API will be added to the
+        logfile as an ERROR.
+        :param record_id: Unique ID of an Alma BIB record
+        :return: Record data of the bib record
+        """
+        logger.info(f"Trying GET for record {record_id} at {self.base_path}.")
+        response_content = call_api(f'{self.base_path}{record_id}', 'GET', 200)
+        return response_content
 
-    Will return the record if HTTP status code is 200.
-    Otherwise the error returned by the API will be added to the
-    logfile as an ERROR.
+    def update(self, record_data: bytes, record_id: str) -> str:
+        """
+        Generic function for PUT calls to the Alma API.
 
-    :param url_parameters: Necessary path and arguments for API call.
-    """
-    response_content = call_api(url_parameters, 'GET', 200)
-    return response_content
+        Will return the response if HTTP status code is 200.
+        Otherwise the error returned by the API will be added to the
+        logfile as an ERROR.
+        :param record_data: XML of the record to be updated
+        :param record_id: Unique ID of the BIB record
+        :return: Response data in XML format
+        """
+        logger.info(f"Trying PUT for record {record_id} at {self.base_path}.")
+        response_content = call_api(f'{self.base_path}{record_id}', 'PUT', 200, record_data)
+        return response_content
 
 
 def call_api(url_parameters: str, action: str, status_code: int, record_data: bytes = None) -> str:
@@ -97,7 +114,7 @@ def call_api(url_parameters: str, action: str, status_code: int, record_data: by
     :param action: DELETE, GET, POST or PUT
     :param status_code: Status code of a successful action.
     :param record_data: Necessary input for POST and PUT, defaults to None.
-    :return: The API's response in XML format as a string.
+    :return: The API response's content in XML format as a string.
     """
     with create_alma_api_session('xml') as session:
         alma_url = api_base_url+url_parameters
