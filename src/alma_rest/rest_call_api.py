@@ -14,6 +14,7 @@ function that the more specific modules (like rest_bibs) can make use of.
 from logging import getLogger
 from os import environ
 from requests import Session, Response
+from urllib import parse
 
 # noinspection PyUnresolvedReferences
 from . import logfile_setup
@@ -36,7 +37,7 @@ class GenericApi:
         """
         self.base_path = base_path
 
-    def create(self, record_data: bytes) -> str:
+    def create(self, record_data: bytes, url_parameters: dict = None) -> str:
         """
         Generic function for POST calls to the Alma API.
 
@@ -44,13 +45,16 @@ class GenericApi:
         Otherwise the error returned by the API will be added to the
         logfile as an ERROR.
         :param record_data: XML of the record to be created
+        :param url_parameters: Use if you need to add parameters to the URL
         :return: Response data in XML format
         """
         logger.info(f"Trying POST for {self.base_path}.")
+        if url_parameters:
+            add_parameters(self.base_path, url_parameters)
         response_content = call_api(self.base_path, 'POST', 200, record_data)
         return response_content
 
-    def delete(self, record_id: str) -> str:
+    def delete(self, record_id: str, url_parameters: dict = None) -> str:
         """
         Generic function for DELETE calls to the Alma API.
 
@@ -61,13 +65,16 @@ class GenericApi:
         Usually the response *should* be empty, but in case it
         is not, we might want to have access to it.
         :param record_id: Unique ID of Alma BIB records
+        :param url_parameters: Use if you need to add parameters to the URL
         :return: API response
         """
         logger.info(f"Trying DELETE for record {record_id} at {self.base_path}.")
+        if url_parameters:
+            add_parameters(self.base_path, url_parameters)
         delete_response = call_api(f'{self.base_path}{record_id}', 'DELETE', 204)
         return delete_response
 
-    def retrieve(self, record_id: str) -> str:
+    def retrieve(self, record_id: str, url_parameters: dict = None) -> str:
         """
         Generic function for GET calls to the Alma API.
 
@@ -75,13 +82,16 @@ class GenericApi:
         Otherwise the error returned by the API will be added to the
         logfile as an ERROR.
         :param record_id: Unique ID of an Alma BIB record
+        :param url_parameters: Use if you need to add parameters to the URL
         :return: Record data of the bib record
         """
         logger.info(f"Trying GET for record {record_id} at {self.base_path}.")
+        if url_parameters:
+            add_parameters(self.base_path, url_parameters)
         response_content = call_api(f'{self.base_path}{record_id}', 'GET', 200)
         return response_content
 
-    def update(self, record_data: bytes, record_id: str) -> str:
+    def update(self, record_data: bytes, record_id: str, url_parameters: dict = None) -> str:
         """
         Generic function for PUT calls to the Alma API.
 
@@ -90,11 +100,20 @@ class GenericApi:
         logfile as an ERROR.
         :param record_data: XML of the record to be updated
         :param record_id: Unique ID of the BIB record
+        :param url_parameters: Use if you need to add parameters to the URL
         :return: Response data in XML format
         """
         logger.info(f"Trying PUT for record {record_id} at {self.base_path}.")
+        if url_parameters:
+            add_parameters(self.base_path, url_parameters)
         response_content = call_api(f'{self.base_path}{record_id}', 'PUT', 200, record_data)
         return response_content
+
+
+def add_parameters(url: str, parameters: dict):
+    logger.info(f"Additional parameters provided: {parameters}.")
+    url_parameters = parse.urlencode(parameters)
+    url += f"?{url_parameters}"
 
 
 def call_api(url_parameters: str, method: str, status_code: int, record_data: bytes = None) -> str:
