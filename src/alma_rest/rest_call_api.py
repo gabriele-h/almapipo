@@ -26,6 +26,20 @@ api_key = environ['ALMA_REST_API_KEY']
 api_base_url = environ['ALMA_REST_API_BASE_URL']
 
 
+def test_calls_remaining_today():
+    """
+    Make a test call to the bibs API to see how many API calls are remaining
+    for the day.
+    :return: Number of calls left according to daily API Request Threshold
+    """
+    with create_alma_api_session('xml') as session:
+        alma_response = switch_api_method(f'{api_base_url}/bibs/test', 'GET', session)
+        alma_response_headers = alma_response.headers
+        info_string = f"""API calls left for today: {alma_response_headers['X-Exl-Api-Remaining']}"""
+        print(info_string)
+        logger.info(info_string)
+
+
 class GenericApi:
     """
     Make generic calls to an API that supports all aspects of CRUD.
