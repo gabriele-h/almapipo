@@ -136,10 +136,10 @@ python3 -m alma_rest.db_create_tables
 Usually you will not need to directly access the module `rest_call_api`.
 You might find `test_calls_remaining_today` useful though, as it creates a message
 with the number of remaining API calls. It's perfect for a first call to the API
-as it requires no parameters at all and provides information you might
-anyways.
+as it requires no parameters at all and provides information you will need
+in the future.
 
-**Note:** The message will be printed to stdout and appended to the logfile.
+**Note:** The function itself makes an API call and will be counted as one.
 
 ```python
 from alma_rest import rest_call_api
@@ -149,9 +149,10 @@ Output should look something like this:
 ```text
 API calls left for today: 54123
 ```
-If it does not and there is no python error message,
-check the logfile. There might be something missing and/or wrong
-in your configuration.
+If it does not and there is no python error message, check the logfile.
+There might be something missing and/or wrong in your configuration.
+
+If it does look like that, you can find the same message in the logfile.
 
 # `alma_rest.alma_rest`
 
