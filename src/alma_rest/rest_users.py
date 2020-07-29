@@ -26,3 +26,13 @@ class UsersApi(rest_call_api.GenericApi):
         logger.info(f'Instantiating {type(self).__name__}.')
 
         super().__init__(base_path)
+
+    def retrieve_all_fees(self, user_id: str) -> str:
+        """
+        For a given user_id retrieve all fines and fees.
+        :param user_id: Any unique ID of the user
+        :return: Record in XML format as a string
+        """
+        logger.info(f'Trying to fetch all fees for user_id {user_id}.')
+        all_fees = self.retrieve(f'{user_id}/fees')
+        return all_fees
