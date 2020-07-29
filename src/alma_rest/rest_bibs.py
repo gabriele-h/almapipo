@@ -35,7 +35,7 @@ class BibsApi(rest_call_api.GenericApi):
         :return: Record in XML format.
         """
         logger.info(f'Trying to fetch all holdings information for bib record {mms_id}.')
-        record = retrieve(f'{self.base_path}{mms_id}/holdings')
+        record = self.retrieve(f'{mms_id}/holdings')
         return record
 
     def retrieve_all_items(self, mms_id: str) -> str:
@@ -45,7 +45,7 @@ class BibsApi(rest_call_api.GenericApi):
         :return: Record in XML format.
         """
         logger.info(f'Trying to fetch all holdings and items information for bib record {mms_id}.')
-        physical_inventory_record = retrieve(f'{self.base_path}{mms_id}/holdings/ALL/items')
+        physical_inventory_record = self.retrieve(f'{mms_id}/holdings/ALL/items')
         return physical_inventory_record
 
     def retrieve_all_portfolios(self, mms_id: str) -> str:
@@ -55,7 +55,7 @@ class BibsApi(rest_call_api.GenericApi):
         :return: Record in XML format.
         """
         logger.info(f'Trying to fetch all portfolios for bib record {mms_id}.')
-        e_inventory_record = retrieve(f'{self.base_path}{mms_id}/portfolios/')
+        e_inventory_record = self.retrieve(f'{mms_id}/portfolios/')
         return e_inventory_record
 
     def retrieve_all_e_collections(self, mms_id: str) -> str:
@@ -65,7 +65,7 @@ class BibsApi(rest_call_api.GenericApi):
         :return: Record in XML format.
         """
         logger.info(f'Trying to fetch all e-collections for bib record {mms_id}.')
-        e_inventory_record = retrieve(f'{self.base_path}{mms_id}/e-collections/')
+        e_inventory_record = self.retrieve(f'{mms_id}/e-collections/')
         return e_inventory_record
 
     def retrieve_by_query(self, id_type: str, other_id: str) -> str:
@@ -114,7 +114,7 @@ class HoldingsApi(rest_call_api.GenericApi):
         :return: Record in XML format.
         """
         logger.info(f'Trying to fetch all items information for hol_id {hol_id}.')
-        physical_inventory_record = retrieve(f'{self.base_path}{hol_id}/items')
+        physical_inventory_record = self.retrieve(f'{hol_id}/items')
         return physical_inventory_record
 
 
