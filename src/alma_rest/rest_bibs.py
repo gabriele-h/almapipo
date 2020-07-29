@@ -28,6 +28,17 @@ class BibsApi(rest_call_api.GenericApi):
 
         super().__init__(base_path)
 
+    def retrieve_bib_by_query(self, url_parameters: dict) -> str:
+        """
+        Make a query to the bibs API with url_parameters.
+        E. g. {'other_system_id': 'AC08455773'}
+        :param url_parameters: Python dictionary of parameters.
+        :return: Search result in XML format.
+        """
+        logger.info(f'Trying to fetch bibs records with parameters {url_parameters}.')
+        search_result = self.retrieve('', url_parameters)
+        return search_result
+
     def retrieve_all_holdings(self, mms_id: str) -> str:
         """
         For a given mms_id, get all holdings information.
@@ -149,35 +160,19 @@ class PortfoliosApi(rest_call_api.GenericApi):
         :param portfolio_id: ID of the portfolio record.
         """
         self.mms_id = mms_id
-        self.portfolio_id = portfolio_id
 
         base_path = f'/bibs/{self.mms_id}/portfolios/'
 
-        log_string = f"""Instantiating {type(self).__name__} with mms_id {self.mms_id} """
-        log_string += f"""and portfolio_id {self.portfolio_id}."""
-        logger.info(log_string)
+        logger.info(f"""Instantiating {type(self).__name__} with mms_id {self.mms_id}.""")
 
         super().__init__(base_path)
 
 
-# TODO Extraneous functions not yet refactored to meet OOP style
-
-
-def retrieve_e_collection_with_mms_id(mms_id: str, collection_id: str) -> str:
+# The following has its own path and can hence not be included in one of the above classes.
+# Since it operates on items it is still listed in this module and not elsewhere.
+def scan_in_item_by_barcode(item_barcode: str) -> str:
     """
-    Get e-collection record for id combination mms-ID and collection-ID.
-    :param mms_id: Unique ID of the BIB record the collection is connected to.
-    :param collection_id: ID of the e-collection.
-    :return: Record in XML format.
-    """
-    logger.info(f'Trying to fetch e-collection record with mms_id {mms_id} and collection_id {collection_id}.')
-    collection_record = rest_call_api.call_api(f'/bibs/{mms_id}/e-collections/{collection_id}', 'GET', 200)
-    return collection_record
-
-
-def retrieve_item_by_barcode(item_barcode: str) -> str:
-    """
-    Get item information by barcode. Please note that this equals a scan-in operation!
+    Retrieve item information by barcode. Please note that this equals a scan-in operation!
     :param item_barcode: Barcode of the item.
     :return: Record in XML format.
     """
