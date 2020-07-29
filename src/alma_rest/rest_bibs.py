@@ -69,7 +69,7 @@ class BibsApi(rest_call_api.GenericApi):
         e_inventory_record = self.retrieve(f'{mms_id}/portfolios/')
         return e_inventory_record
 
-    def retrieve_all_e_collections(self, mms_id: str) -> str:
+    def retrieve_all_ecollections(self, mms_id: str) -> str:
         """
         For a given mms_id, get all e-collection information.
         :param mms_id: Unique ID of the BIB record the e-collections are connected to.
@@ -99,6 +99,18 @@ class BibsApi(rest_call_api.GenericApi):
         api_url = self.base_path + '?' + api_url_query_encoded
         bib_records_response = retrieve(api_url)
         return bib_records_response
+
+
+    def retrieve_ecollection(self, mms_id: str, collection_id: str) -> str:
+        """
+        For a given mms_id and collection_id, retrieve one e-collection.
+        :param mms_id: Unique ID of the BIB record the e-collection is connected to.
+        :param collection_id: Unique ID of the e-collection.
+        :return: Record in XML format.
+        """
+        logger.info(f'Trying to fetch all e-collections for mms_id {mms_id} and collection_id {collection_id}.')
+        e_inventory_record = self.retrieve(f'{mms_id}/e-collections/{collection_id}')
+        return e_inventory_record
 
 
 class HoldingsApi(rest_call_api.GenericApi):
