@@ -14,7 +14,7 @@ or a list of Alma-IDs (see below "Input data").
 
 ## What Does This Package Do?
 
-In a **database** both the **input** used as well as the
+In a **Postgres database** both the **input** used as well as the
 **status of the api call** are saved on a per-line or per-record basis.
 All records will be retrieved prior to deletion, update, or creation. A
 **copy of each record before the action** will be saved to the database.
@@ -299,7 +299,7 @@ python3 -m alma_rest.db_read_write
 
 # So you want to query the database
 
-There might be times when you need to have a look at the data that
+There will be times when you need to have a look at the data that
 is stored in the database. Here are some examples that might prove
 useful.
 
