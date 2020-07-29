@@ -114,11 +114,17 @@ class GenericApi:
         return response_content
 
 
-def add_parameters(url: str, parameters: dict):
+def add_parameters(url: str, parameters: dict) -> str:
+    """
+    Append URL-parameters in url-encoded form to a given URL with path.
+    :param url: URL with path to append the parameters to.
+    :param parameters: dictionary of the parameters.
+    :return:
+    """
     logger.info(f"Additional parameters provided: {parameters}.")
     url_parameters = parse.urlencode(parameters)
-    url += f"?{url_parameters}"
-    return url
+    full_url = f"{url}?{url_parameters}"
+    return full_url
 
 
 def call_api(url_parameters: str, method: str, status_code: int, record_data: bytes = None) -> str:
