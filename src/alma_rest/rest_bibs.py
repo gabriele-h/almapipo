@@ -1,5 +1,6 @@
 """
-Query the Alma API for bibs records
+Query the Alma API for bibs records.
+See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/openapi/bibs.json
 """
 
 from logging import getLogger

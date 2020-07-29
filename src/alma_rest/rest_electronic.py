@@ -1,5 +1,6 @@
 """
-Query the Alma API for electronic resources
+Query the Alma API for electronic resources.
+See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/openapi/electronic.json
 """
 
 from logging import getLogger

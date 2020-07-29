@@ -1,5 +1,6 @@
 """
 Query the Alma API for configurations in the system.
+See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/openapi/conf.json
 """
 
 from logging import getLogger

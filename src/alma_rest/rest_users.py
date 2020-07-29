@@ -1,5 +1,6 @@
 """
-Query the Alma API for users
+Query the Alma API for users.
+See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/openapi/users.json
 """
 
 from logging import getLogger
