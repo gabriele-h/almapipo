@@ -79,28 +79,6 @@ class BibsApi(rest_call_api.GenericApi):
         e_inventory_record = self.retrieve(f'{mms_id}/e-collections/')
         return e_inventory_record
 
-    def retrieve_by_query(self, id_type: str, other_id: str) -> str:
-        """
-        Get bibliographic records by ID via Alma API. Possible ID types:
-        * mms_id
-        * ie_id
-        * holdings_id
-        * representation_id
-        * nz_mms_id
-        * cz_mms_id
-        * other_system_id
-        :param id_type: Query key. One of the ID types listed above.
-        :param other_id: Query value. ID of the record to be fetched.
-        :return: Record in XML format.
-        """
-        logger.info(f'Trying to fetch record by query with id_type {id_type} and other_id {other_id}.')
-        api_url_query = {id_type: other_id}
-        api_url_query_encoded = parse.urlencode(api_url_query)
-        api_url = self.base_path + '?' + api_url_query_encoded
-        bib_records_response = retrieve(api_url)
-        return bib_records_response
-
-
     def retrieve_ecollection(self, mms_id: str, collection_id: str) -> str:
         """
         For a given mms_id and collection_id, retrieve one e-collection.
