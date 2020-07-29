@@ -49,9 +49,10 @@ class GenericApi:
         :return: Response data in XML format
         """
         logger.info(f"Trying POST for {self.base_path}.")
+        full_path = self.base_path
         if url_parameters:
-            add_parameters(self.base_path, url_parameters)
-        response_content = call_api(self.base_path, 'POST', 200, record_data)
+            full_path = add_parameters(self.base_path, url_parameters)
+        response_content = call_api(full_path, 'POST', 200, record_data)
         return response_content
 
     def delete(self, record_id: str, url_parameters: dict = None) -> str:
@@ -69,9 +70,10 @@ class GenericApi:
         :return: API response
         """
         logger.info(f"Trying DELETE for record {record_id} at {self.base_path}.")
+        full_path = f'{self.base_path}{record_id}'
         if url_parameters:
-            add_parameters(self.base_path, url_parameters)
-        delete_response = call_api(f'{self.base_path}{record_id}', 'DELETE', 204)
+            full_path = add_parameters(full_path, url_parameters)
+        delete_response = call_api(full_path, 'DELETE', 204)
         return delete_response
 
     def retrieve(self, record_id: str, url_parameters: dict = None) -> str:
@@ -86,9 +88,10 @@ class GenericApi:
         :return: Record data of the bib record
         """
         logger.info(f"Trying GET for record {record_id} at {self.base_path}.")
+        full_path = f'{self.base_path}{record_id}'
         if url_parameters:
-            add_parameters(self.base_path, url_parameters)
-        response_content = call_api(f'{self.base_path}{record_id}', 'GET', 200)
+            full_path = add_parameters(full_path, url_parameters)
+        response_content = call_api(full_path, 'GET', 200)
         return response_content
 
     def update(self, record_id: str, record_data: bytes, url_parameters: dict = None) -> str:
@@ -104,9 +107,10 @@ class GenericApi:
         :return: Response data in XML format
         """
         logger.info(f"Trying PUT for record {record_id} at {self.base_path}.")
+        full_path = f'{self.base_path}{record_id}'
         if url_parameters:
-            add_parameters(self.base_path, url_parameters)
-        response_content = call_api(f'{self.base_path}{record_id}', 'PUT', 200, record_data)
+            full_path = add_parameters(full_path, url_parameters)
+        response_content = call_api(full_path, 'PUT', 200, record_data)
         return response_content
 
 
@@ -114,6 +118,7 @@ def add_parameters(url: str, parameters: dict):
     logger.info(f"Additional parameters provided: {parameters}.")
     url_parameters = parse.urlencode(parameters)
     url += f"?{url_parameters}"
+    return url
 
 
 def call_api(url_parameters: str, method: str, status_code: int, record_data: bytes = None) -> str:
