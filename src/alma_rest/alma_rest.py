@@ -134,7 +134,7 @@ def call_api_for_csv_list(
                         db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
                     else:
 
-                        response = CurrentApi.update(new_record_data, record_id)
+                        response = CurrentApi.update(record_id, new_record_data)
 
                         if response:
                             logger.info(f'Manipulation for {alma_id} successful. Adding to put_post_responses.')

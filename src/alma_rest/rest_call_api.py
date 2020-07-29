@@ -91,7 +91,7 @@ class GenericApi:
         response_content = call_api(f'{self.base_path}{record_id}', 'GET', 200)
         return response_content
 
-    def update(self, record_data: bytes, record_id: str, url_parameters: dict = None) -> str:
+    def update(self, record_id: str, record_data: bytes, url_parameters: dict = None) -> str:
         """
         Generic function for PUT calls to the Alma API.
 
