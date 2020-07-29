@@ -30,7 +30,7 @@ class BibsApi(rest_call_api.GenericApi):
 
     def retrieve_bib_by_query(self, url_parameters: dict) -> str:
         """
-        Make a query to the bibs API with url_parameters.
+        Make a query to the bibs API with url_parameters only.
         E. g. {'other_system_id': 'AC08455773'}
         :param url_parameters: Python dictionary of parameters.
         :return: Search result in XML format.
