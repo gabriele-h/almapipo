@@ -5,7 +5,7 @@ See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/o
 
 from logging import getLogger
 
-from . import rest_call_api
+from . import rest_setup
 # noinspection PyUnresolvedReferences
 from . import logfile_setup
 
@@ -13,7 +13,7 @@ from . import logfile_setup
 logger = getLogger(__name__)
 
 
-class UsersApi(rest_call_api.GenericApi):
+class UsersApi(rest_setup.GenericApi):
     """
     Make calls for bibliographic records. Here the record_id is the MMS ID.
     """

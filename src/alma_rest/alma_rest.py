@@ -178,7 +178,7 @@ def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool
 def instantiate_api_class(
         alma_id: str,
         api: str,
-        record_type: str) -> rest_call_api.GenericApi:
+        record_type: str) -> rest_setup.GenericApi:
     """
     Meta-function for all api_calls. Please note that for some API calls there is a fake
     record_type available, such as 'all_items_for_bib'. These will not take additional

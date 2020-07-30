@@ -7,7 +7,7 @@ from logging import getLogger
 from typing import Iterator
 from xml.etree.ElementTree import fromstring, tostring
 
-from . import rest_call_api
+from . import rest_setup
 # noinspection PyUnresolvedReferences
 from . import logfile_setup
 
@@ -21,7 +21,7 @@ def retrieve_libraries() -> str:
     :return: str
     """
     logger.info("Trying to fetch all libraries configured in Alma.")
-    libraries_record = rest_call_api.get_record(f'/conf/libraries/')
+    libraries_record = rest_setup.get_record(f'/conf/libraries/')
     return libraries_record
 
 
@@ -32,7 +32,7 @@ def retrieve_library(library: str) -> str:
     :return: str
     """
     logger.info(f"Trying to fetch one library with code {library}.")
-    library_record = rest_call_api.get_record(f'/conf/libraries/{library}')
+    library_record = rest_setup.get_record(f'/conf/libraries/{library}')
     return library_record
 
 
@@ -62,5 +62,5 @@ def retrieve_locations(library: str) -> str:
     :return: str
     """
     logger.info(f"Trying to fetch all locations for library {library}.")
-    locations_record = rest_call_api.get_record(f'/conf/libraries/{library}/locations')
+    locations_record = rest_setup.get_record(f'/conf/libraries/{library}/locations')
     return locations_record

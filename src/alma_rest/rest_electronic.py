@@ -5,7 +5,7 @@ See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/o
 
 from logging import getLogger
 
-from . import rest_call_api
+from . import rest_setup
 # noinspection PyUnresolvedReferences
 from . import logfile_setup
 
@@ -13,7 +13,7 @@ from . import logfile_setup
 logger = getLogger(__name__)
 
 
-class EcollectionsApi(rest_call_api.GenericApi):
+class EcollectionsApi(rest_setup.GenericApi):
     """
     Make API calls for e-collections.
     """
@@ -28,7 +28,7 @@ class EcollectionsApi(rest_call_api.GenericApi):
         super().__init__(base_path)
 
 
-class EservicesApi(rest_call_api.GenericApi):
+class EservicesApi(rest_setup.GenericApi):
     """
     Make API calls for e-services.
     """
@@ -45,7 +45,7 @@ class EservicesApi(rest_call_api.GenericApi):
         super().__init__(base_path)
 
 
-class PortfoliosApi(rest_call_api.GenericApi):
+class PortfoliosApi(rest_setup.GenericApi):
     """
     Make API calls for e-services.
     """

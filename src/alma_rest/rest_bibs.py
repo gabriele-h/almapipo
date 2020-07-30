@@ -6,7 +6,7 @@ See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/o
 from logging import getLogger
 from urllib import parse
 
-from . import rest_call_api
+from . import rest_setup
 # noinspection PyUnresolvedReferences
 from . import logfile_setup
 
@@ -14,7 +14,7 @@ from . import logfile_setup
 logger = getLogger(__name__)
 
 
-class BibsApi(rest_call_api.GenericApi):
+class BibsApi(rest_setup.GenericApi):
     """
     Make calls for bibliographic records. Here the record_id is the MMS ID.
     """
@@ -91,7 +91,7 @@ class BibsApi(rest_call_api.GenericApi):
         return e_inventory_record
 
 
-class HoldingsApi(rest_call_api.GenericApi):
+class HoldingsApi(rest_setup.GenericApi):
     """
     Make calls for holding records. Here the record_id is the Holding PID.
     """
@@ -119,7 +119,7 @@ class HoldingsApi(rest_call_api.GenericApi):
         return physical_inventory_record
 
 
-class ItemsApi(rest_call_api.GenericApi):
+class ItemsApi(rest_setup.GenericApi):
     """
     Make calls for item records. Here the record_id is the Item PID.
     """
@@ -139,7 +139,7 @@ class ItemsApi(rest_call_api.GenericApi):
         super().__init__(base_path)
 
 
-class PortfoliosApi(rest_call_api.GenericApi):
+class PortfoliosApi(rest_setup.GenericApi):
     """
     Make calls for portfolio records. Here the record_id is the Portfolio PID.
     """
@@ -169,5 +169,5 @@ def scan_in_item_by_barcode(item_barcode: str) -> str:
     logger.info(f'Trying to fetch item by barcode {item_barcode}.')
     api_url_query = {"item_barcode": item_barcode}
     api_url_query_encoded = parse.urlencode(api_url_query)
-    item_record = rest_call_api.call_api(f'/items?{api_url_query_encoded}', 'GET', 200)
+    item_record = rest_setup.call_api(f'/items?{api_url_query_encoded}', 'GET', 200)
     return item_record

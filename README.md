@@ -26,7 +26,7 @@ record will be changed from *new* to *done* in the database table
 `job_status_per_id`. If anything goes wrong, the status will be set to *error*.
 
 **Note:** Currently all API-calls will be made with xml as the format. See 
-how the format is set in the headers within `rest_call_api.py`:
+how the format is set in the headers within `rest_setup.py`:
 ```
 "accept": "application/xml"
 "Content-Type": "application/xml"
@@ -41,7 +41,7 @@ At the time I write this: A lot!
 Currently I am not implementing all the APIs with some kind of grand
 scheme, but as I need them. If you want and are able to contribute, I
 will be happy to receive your pull requests. Or you can try using the
-generic functions included in `rest_call_api.py`. If both is not an option:
+generic functions included in `rest_setup.py`. If both is not an option:
 Get in touch!
 
 ## What Is *Not* Covered in This README
@@ -133,7 +133,7 @@ python3 -m alma_rest.db_create_tables
 
 ## Make a Test Call to the API
 
-Usually you will not need to directly access the module `rest_call_api`.
+Usually you will not need to directly access the module `rest_setup`.
 You might find `test_calls_remaining_today` useful though, as it creates a message
 with the number of remaining API calls. It's perfect for a first call to the API
 as it requires no parameters at all and provides information you will need
@@ -142,8 +142,8 @@ in the future.
 **Note:** The function itself makes an API call and will be counted as one.
 
 ```python
-from alma_rest import rest_call_api
-rest_call_api.test_calls_remaining_today()
+from alma_rest import rest_setup
+rest_setup.test_calls_remaining_today()
 ```
 Output should look something like this:
 ```text
