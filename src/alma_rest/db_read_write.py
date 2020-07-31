@@ -8,7 +8,8 @@ The DB is intended to do the following:
 
 from datetime import datetime
 from logging import getLogger
-from xml.etree.ElementTree import fromstring
+from typing import Iterable
+from xml.etree.ElementTree import fromstring, Element
 
 try:
     from typing import OrderedDict
@@ -108,6 +109,25 @@ def get_value_from_source_csv(
     json_value = value_query.first().csv_line[json_key]
     db_session.close()
     return json_value
+
+
+def get_records_by_timestamp(job_timestamp: datetime) -> Iterable[Element]:
+    """
+    For a given job_timestamp get all fetched_record.alma_record (XML) from the database.
+    :param job_timestamp: Job that created the entry in fetched_records
+    :return: XML of the records
+    """
+    db_session = db_setup.create_db_session()
+
+    record_query = db_session.query(
+        db_setup.FetchedRecords.alma_record
+    ).filter_by(
+        job_timestamp=job_timestamp
+    )
+    db_session.close()
+
+    for result in record_query.all():
+        yield result[0]
 
 
 def get_most_recent_version_from_fetched_records(alma_id: str):
