@@ -61,10 +61,12 @@ def extract_field_contents_from_marc(record: Element, column_headers: Iterable[s
 
     for marc_key in column_headers:
 
+        content = ''
         superfields = record.findall(f'record/*[@tag="{marc_key[0:3]}"]')
 
         if '_' in marc_key:
-            num_repeat = int(marc_key[-1]) - 1
+            num_suffix = int(marc_key.split('_')[1])
+            num_repeat = num_suffix - 1
         else:
             num_repeat = 0
 
@@ -76,23 +78,17 @@ def extract_field_contents_from_marc(record: Element, column_headers: Iterable[s
             try:
                 content = superfields[num_repeat].text
             except IndexError:
-                pass
+                content = ''
         else:
-            if ind1 != '_':
 
-                xpath = f'[@ind1="{ind1}"]/subfield[@code="{sf_code}"]' #[@ind2="{ind2}"]'
+            xpath = f'[@ind1="{ind1}"][@ind2="{ind2}"]/subfield[@code="{sf_code}"]'
 
-                for superfield in superfields:
-
-                    from xml.etree.ElementTree import tostring
-
-                    try:
-                        field = superfield.findall(xpath)[num_repeat]
-                    except IndexError:
-                        logger.info(f'Could not find element with {ind1} and {ind2}.')
-                        pass
-                    else:
-                        content = field.text
+            try:
+                field = superfields[num_repeat].findall(xpath)[0]
+            except IndexError:
+                pass
+            else:
+                content = field.text
 
         marc21_dict[marc_key] = content or ''
 
