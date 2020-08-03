@@ -111,7 +111,10 @@ def create_list_of_marc_fields(record_generator: Iterable[Element]) -> Iterable[
         controlfield_headers, counters = extract_controlfield_keys_from_marc(record, controlfield_headers, counters)
         datafield_headers, counters = extract_datafield_keys_from_marc(record, datafield_headers, counters)
 
-    column_headers = controlfield_headers + datafield_headers
+    controlfield_headers_sorted = sorted(controlfield_headers, key=lambda x: x[0:7])
+    datafield_headers_sorted = sorted(datafield_headers, key=lambda x: x[0:7])
+
+    column_headers = controlfield_headers_sorted + datafield_headers_sorted
 
     return column_headers
 
