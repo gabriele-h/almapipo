@@ -43,7 +43,7 @@ def extract_marc_for_job_timestamp(job_timestamp: datetime) -> Iterable[dict]:
     logger.info(f'Getting bibs retrieved on {job_timestamp} from the database and extracting MARC21 categories.')
     record_generator = db_read_write.get_records_by_timestamp(job_timestamp)
     column_headers = create_list_of_marc_fields(record_generator)
-    logger.info(f'Created column_header {column_headers}.')
+
     for record in db_read_write.get_records_by_timestamp(job_timestamp):
         yield extract_field_contents_from_marc(record, column_headers)
 
@@ -51,6 +51,8 @@ def extract_marc_for_job_timestamp(job_timestamp: datetime) -> Iterable[dict]:
 def extract_field_contents_from_marc(record: Element, column_headers: Iterable[str]) -> dict:
     """
     For a given record extract the information as per column_headers list.
+    The latter may be generated automatically for a list of records
+    with the create_list_of_marc_fields function.
     :param record: MARC21 record as xml.ElementTree.Element
     :param column_headers: List of strings with keys to find elements by
     :return: Dictionary of values retrieved by keys given in column_headers
@@ -192,7 +194,7 @@ def extract_datafield_keys_from_marc(
             try:
                 subfield_code = subfield.attrib['code']
             except KeyError:
-                print('No subfield for datafield?')
+                logger.warning('No subfield code attribute?')
             else:
 
                 datafield_description = datafield_tag
