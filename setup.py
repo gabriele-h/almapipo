@@ -17,6 +17,7 @@ setup(
     scripts=[
         'bin/db_create_tables',
         'bin/input_check',
+        'bin/marc_to_tsv',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

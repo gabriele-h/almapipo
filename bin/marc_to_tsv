@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+
+from argparse import ArgumentParser
+from datetime import datetime
+from logging import getLogger
+from sys import argv
+from typing import Iterable
+
+from alma_rest import xml_extract
+
+# provide info for help when called from commandline
+
+parser = ArgumentParser(
+    description="For a given fetched_records.job_timestamp extract all MARC21 records and export contents to TSV.",
+    epilog="")
+help_job_timestamp = "Format 'YYYY-mm-dd HH:MM:SS.000000+0000', pick for set of records from table fetched_records."
+parser.add_argument('job_timestamp', type=str, help=help_job_timestamp)
+help_tsv_path = "File system path of where you want the tsv saved."
+parser.add_argument('tsv_path', type=str, help=help_tsv_path)
+
+args = parser.parse_args()
+
+# set timestamp from argv
+
+timestamp_format = '%Y-%m-%d %H:%M:%S.%f%z'
+
+try:
+    job_timestamp = datetime.strptime(argv[1], timestamp_format)
+except ValueError:
+    logger.error(f"Date in format {timestamp_format} expected.")
+    exit(1)
+
+
+# extract data
+
+
+def extract_all_keys(all_records: Iterable[dict], concat_subfields: bool = True) -> list:
+    """
+    For a generator of records create a list of all fields for the header of the tsv.
+    :param all_records: Generator of all records
+    :param concat_subfields: Whether or not to have concatenated subfields or split them to separate table cells
+    :return: List of all field-keys within a set of MARC21 records
+    """
+    list_of_keys = []
+
+    for record_dict in all_records:
+        for field_key in record_dict:
+            if field_key[0:2] != '00' and field_key != 'leader':
+                for field_dict in record_dict[field_key]:
+                    ind1 = field_dict['ind1']
+                    ind2 = field_dict['ind2']
+                    if not concat_subfields:
+                        for subfield_key in field_dict:
+                            if subfield_key[0:3] != 'ind':
+                                heading_name = field_key + ind1 + ind2 + subfield_key
+                                if heading_name not in list_of_keys:
+                                    list_of_keys += [heading_name]
+                    else:
+                        heading_name = field_key + ind1 + ind2
+                        if heading_name not in list_of_keys:
+                            list_of_keys += [heading_name]
+            else:
+                if field_key not in list_of_keys:
+                    list_of_keys += [field_key]
+
+    list_sorted = sorted(list_of_keys)
+    # put leader first, which will otherwise sort to last (number before letter)
+    list_sorted.insert(0, list_sorted.pop())
+
+    return list_sorted
+
+
+gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
+tsv_columns = extract_all_keys(gen_record_dicts)
+
+
+# gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
+#
+# with open(tsv_path, 'w') as tsv_file:
+#     writer = DictWriter(tsv_file, fieldnames=tsv_columns, delimiter='\t')
+#     writer.writeheader()
+#     for record in gen_record_dicts:
+#         writer.writerow(record)
