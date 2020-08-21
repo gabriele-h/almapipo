@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+from argparse import ArgumentParser
+from logging import getLogger
+from sys import argv
+
+from alma_rest import input_read
+from alma_rest import logfile_setup
+
+# Logfile
+
+logger = getLogger(__name__)
+logfile_setup.log_to_stdout(logger)
+logfile_setup.log_to_stdout(input_read.logger)
+
+# provide -h information on the script
+
+parser_description = """Checks the first row of data in a csv or tsv file for validity.
+Will print either the first valid line or information on why the file failed to validate."""
+
+parser = ArgumentParser(
+    description=parser_description,
+    epilog="")
+help_path_to_input_file = "Path to a file ending on csv, tsv, CSV or TSV. Values must be delimited by semicolon or tab."
+parser.add_argument('path_to_input_file', type=str, help=help_path_to_input_file)
+
+args = parser.parse_args()
+
+
+# check file validity
+
+
+def set_csv_path_from_argv1() -> str:
+    """
+    Only relevant if read_input is run from commandline.
+    :return: String of the file-path provided as argv1.
+    """
+    try:
+        argv1 = argv[1]
+    except IndexError:
+        logger.error('Please provide csv or tsv file as argument.')
+        exit(1)
+    else:
+        if input_read.check_file_path(argv1):
+            return argv[1]
+        exit(1)
+
+
+csv_path = set_csv_path_from_argv1()
+generator_from_csv = input_read.read_csv_contents(csv_path, True)
+first_row = next(generator_from_csv)
+
+print(f"First valid row of csv-file: {first_row}")

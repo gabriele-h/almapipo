@@ -16,6 +16,7 @@ setup(
     package_dir={'': 'src'},
     scripts=[
         'bin/db_create_tables',
+        'bin/input_check',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

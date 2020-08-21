@@ -25,53 +25,6 @@ logger = getLogger(__name__)
 ALMA_ID_PATTERN = r"^(22|23|53|61|62|81|99)\d{{2,}}{alma_id_suffix}$"
 
 
-def main():
-    """
-    When used from commandline, read_input will only validate
-    the contents of the file provided via argv1 and output the
-    the first valid line or information on why it failed to do so.
-    :return: None
-    """
-    logfile_setup.log_to_stdout(logger)
-
-    print("Use as commandline-tool only to test a given list of IDs for validity.")
-    print("---")
-    csv_path = set_csv_path_from_argv1()
-    generator_from_csv = read_csv_contents(csv_path, True)
-    first_row = next(generator_from_csv)
-    print("---")
-    print(f"First valid row of csv-file: {first_row}")
-
-
-def set_csv_path_from_argv1() -> str:
-    """
-    Only relevant if read_input is run from commandline.
-    :return: String of the file-path provided as argv1.
-    """
-    try:
-        argv1 = sys.argv[1]
-    except IndexError:
-        sys.exit('Please provide csv or tsv file as argument.')
-    else:
-        if check_file_path(argv1):
-            return sys.argv[1]
-        sys.exit('Exiting: Check for file path failed. See log for details.')
-
-
-def check_file_path(file_path: str) -> bool:
-    """
-    Checks file path for existence, readability and whether the file is
-    ending on either .csv or .tsv
-    :param file_path: Absolute or relative path to the csv/tsv file.
-    :return: Boolean to indicate if the provided file exists, is readable and ends on .csv or .tsv.
-    """
-    if path.exists(file_path)\
-            and access(file_path, R_OK)\
-            and file_path[-4:] in ['.csv', '.tsv', '.CSV', '.TSV']:
-        return True
-    logger.error(f"File {file_path} does not exist, is not readable, or does not end on csv, tsv, CSV or TSV.")
-
-
 def read_csv_contents(csv_path: str, validation: bool = True) -> Iterator[str]:
     """
     Feeds the contents of a csv or tsv file into a generator via DictReader.
@@ -83,6 +36,9 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterator[str]:
     :return: Generator of csv/tsv file lines as dictionaries.
     """
     logger.info(f"Reading file {csv_path} into generator.")
+
+    if not check_file_path(csv_path):
+        exit(1)
 
     if csv_path[-4:] in ['.csv', '.CSV']:
         delimit = ';'
@@ -100,6 +56,20 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterator[str]:
                     or not validation:
                 yield row
             logger.warning(f"The following row was discarded: {row}")
+
+
+def check_file_path(file_path: str) -> bool:
+    """
+    Checks file path for existence, readability and whether the file is
+    ending on either .csv or .tsv
+    :param file_path: Absolute or relative path to the csv/tsv file.
+    :return: Boolean to indicate if the provided file exists, is readable and ends on .csv or .tsv.
+    """
+    if path.exists(file_path) \
+            and access(file_path, R_OK) \
+            and file_path[-4:] in ['.csv', '.tsv', '.CSV', '.TSV']:
+        return True
+    logger.error(f"File {file_path} does not exist, is not readable, or does not end on csv, tsv, CSV or TSV.")
 
 
 def is_this_an_alma_id(identifier: str) -> bool:
@@ -129,7 +99,3 @@ def is_this_an_alma_id(identifier: str) -> bool:
 
     logger.warning(f"Identifier is not a valid Alma ID: '{identifier}'")
     return False
-
-
-if __name__ == "__main__":
-    main()
