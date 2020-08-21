@@ -32,11 +32,12 @@ def extract_response_from_fetched_records(alma_id: str) -> ElementTree:
 def extract_marc_for_job_timestamp(job_timestamp: datetime) -> Iterable[dict]:
     """
     For a given job_timestamp, query all records from the database and extract
-    the MARC21 categories to a dictionary. The keys in the dictionary will be
-    a combination of tag, and where applicable ind1, ind2 and subfield code. The leader will
-    have the key "LDR". Repeated fields will be split to multiple columns, where
-    the count of >1 column is appended as a suffix separated by an underscore.
-    The dictionaries are returned within a generator.
+    the MARC21 categories to a dictionary. Please mind that this is a one-way
+    action as not all information (specifically: order of categories and subfields)
+    will be pertained. This function is meant for the kind of analysis where you
+    need to compare the content of two specific fields. All analyses that need to
+    be order-aware should be done via xpath directly in the database. Use the
+    script marc_to_tsv.py to look at the data in Excel.
     :param job_timestamp: Job to extract the data for
     :return: Generator of dictionaries
     """
@@ -52,7 +53,9 @@ def extract_contents_from_marc(record: Element) -> dict:
     """
     For a given record-element extract the information as per column_headers list.
     The latter may be generated automatically for a list of records
-    with the create_list_of_marc_fields function.
+    with the create_list_of_marc_fields function. NOTE: This is a one-way action.
+    Information on order of categories and subfields is lost in the dictionary. The
+    data returned by this function is *not* intended to be converted back to XML!
     :param record: MARC21 record as xml.ElementTree.Element
     :return: Dictionary representation of the record.
     """
