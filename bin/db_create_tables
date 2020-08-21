@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+
+from argparse import ArgumentParser
+from logging import getLogger
+
+from sqlalchemy import create_engine
+
+from alma_rest import db_setup
+from alma_rest import logfile_setup
+
+parser_description = """Create all tables necessary for the package alma_rest and view SQLAlchemy logs on stdout.
+If you run into any issues, check your environment variables and the permissions for the database."""
+
+# provide -h information on the script
+parser = ArgumentParser(
+    description=parser_description,
+    epilog="")
+
+args = parser.parse_args()
+
+# logfile
+logger = getLogger(__name__)
+logfile_setup.log_to_stdout(logger)
+
+# create the tables
+
+connection_params = db_setup.prepare_connection_params_from_env()
+db_engine = create_engine(connection_params, echo=True)
+
+db_setup.Base.metadata.create_all(db_engine)

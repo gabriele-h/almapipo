@@ -1,4 +1,3 @@
-from glob import glob
 from os.path import splitext, basename
 
 from setuptools import setup, find_packages
@@ -15,6 +14,9 @@ setup(
     url="https://github.com/gabriele-h/alma_rest",
     packages=find_packages(where="src"),
     package_dir={'': 'src'},
+    scripts=[
+        'bin/db_create_tables',
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
