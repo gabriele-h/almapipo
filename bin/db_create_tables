@@ -21,6 +21,7 @@ args = parser.parse_args()
 # logfile
 logger = getLogger(__name__)
 logfile_setup.log_to_stdout(logger)
+logfile_setup.log_to_stdout(db_setup.logger)
 
 # create the tables
 
