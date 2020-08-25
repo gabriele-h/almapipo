@@ -13,10 +13,20 @@ from alma_rest import xml_extract
 parser = ArgumentParser(
     description="For a given fetched_records.job_timestamp extract all MARC21 records and export contents to TSV.",
     epilog="")
+
 help_job_timestamp = "Format 'YYYY-mm-dd HH:MM:SS.000000+0000', pick for set of records from table fetched_records."
 parser.add_argument('job_timestamp', type=str, help=help_job_timestamp)
+
 help_tsv_path = "File system path of where you want the tsv saved."
 parser.add_argument('tsv_path', type=str, help=help_tsv_path)
+
+help_tsv_header = "Provide your own list of categories you want to extract as a comma-separated list of strings."
+parser.add_argument('--tsv-header', type=str, help=help_tsv_header)
+
+parser.add_argument('--split-sf', action='store_true', help="One cell per Subfield.")
+
+help_repetition = """If a field is repeated, concat all contents to one cell with delimiter "|"."""
+parser.add_argument('--concat-repetition', action='store_true', help=help_repetition)
 
 args = parser.parse_args()
 
@@ -34,11 +44,11 @@ except ValueError:
 # extract data
 
 
-def extract_all_keys(all_records: Iterable[dict], concat_subfields: bool = True) -> list:
+def extract_all_keys(all_records: Iterable[dict]) -> list:
     """
-    For a generator of records create a list of all fields for the header of the tsv.
+    For a as returned by xml_extract.extract_marc_for_job_timestamp
+    create a list of all fields for the header of the tsv.
     :param all_records: Generator of all records
-    :param concat_subfields: Whether or not to have concatenated subfields or split them to separate table cells
     :return: List of all field-keys within a set of MARC21 records
     """
     list_of_keys = []
@@ -49,7 +59,7 @@ def extract_all_keys(all_records: Iterable[dict], concat_subfields: bool = True)
                 for field_dict in record_dict[field_key]:
                     ind1 = field_dict['ind1']
                     ind2 = field_dict['ind2']
-                    if not concat_subfields:
+                    if args.split_sf:
                         for subfield_key in field_dict:
                             if subfield_key[0:3] != 'ind':
                                 heading_name = field_key + ind1 + ind2 + subfield_key
@@ -71,7 +81,11 @@ def extract_all_keys(all_records: Iterable[dict], concat_subfields: bool = True)
 
 
 gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
-tsv_columns = extract_all_keys(gen_record_dicts)
+
+if args.tsv_header:
+    tsv_columns = args.tsv_header.split(',')
+else:
+    tsv_columns = extract_all_keys(gen_record_dicts)
 
 
 # gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
