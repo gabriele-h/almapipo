@@ -48,7 +48,7 @@ def extract_all_keys(all_records: Iterable[dict]) -> list:
     """
     For a as returned by xml_extract.extract_marc_for_job_timestamp
     create a list of all fields for the header of the tsv.
-    :param all_records: Generator of all records
+    :param all_records: Generator of all records given as dictionaries
     :return: List of all field-keys within a set of MARC21 records
     """
     list_of_keys = []
@@ -57,27 +57,35 @@ def extract_all_keys(all_records: Iterable[dict]) -> list:
         for field_key in record_dict:
             if field_key[0:2] != '00' and field_key != 'leader':
                 for field_dict in record_dict[field_key]:
+
                     ind1 = field_dict['ind1']
                     ind2 = field_dict['ind2']
+
                     if args.split_sf:
                         for subfield_key in field_dict:
                             if subfield_key[0:3] != 'ind':
+
                                 heading_name = field_key + ind1 + ind2 + subfield_key
+
                                 if heading_name not in list_of_keys:
                                     list_of_keys += [heading_name]
+
                     else:
+
                         heading_name = field_key + ind1 + ind2
+
                         if heading_name not in list_of_keys:
                             list_of_keys += [heading_name]
+
             else:
                 if field_key not in list_of_keys:
                     list_of_keys += [field_key]
 
-    list_sorted = sorted(list_of_keys)
-    # put leader first, which will otherwise sort to last (number before letter)
-    list_sorted.insert(0, list_sorted.pop())
+    list_of_keys_sorted = sorted(list_of_keys)
+    # put leader first, which will otherwise sort to last
+    list_of_keys_sorted.insert(0, list_of_keys_sorted.pop())
 
-    return list_sorted
+    return list_of_keys_sorted
 
 
 gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
