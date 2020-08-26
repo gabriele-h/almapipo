@@ -88,13 +88,36 @@ def extract_all_keys(all_records: Iterable[dict]) -> list:
     return list_of_keys_sorted
 
 
-gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
+def extract_values_as_lists(all_records: Iterable[dict], tsv_header: list) -> Iterable[list]:
+    """
+    For an Iterable of record dicts return an Iterable of lists for the values
+    given in tsv_header list.
+    :param all_records: Generator of all records given as dictionaries
+    :param tsv_header: As created by extract_all_keys or given as argv.tsv_header
+    :return: Generator of lists, one list of values per record
+    """
+    for record_dict in all_records:
+        print(record_dict)
+        list_of_values = [record_dict['leader']]
+        for tsv_column in tsv_header:
+            if len(tsv_column) == 3:
+                try:
+                    list_of_values += [' ||| '.join(record_dict[tsv_column])]
+                except KeyError:
+                    list_of_values += ['']
+        yield list_of_values
+
 
 if args.tsv_header:
     tsv_columns = args.tsv_header.split(',')
 else:
+    gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
     tsv_columns = extract_all_keys(gen_record_dicts)
 
+gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
+
+for value in extract_values_as_lists(gen_record_dicts, tsv_columns):
+    print(value)
 
 # gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
 #
