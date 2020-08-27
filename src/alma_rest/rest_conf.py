@@ -21,7 +21,7 @@ def retrieve_libraries() -> str:
     :return: str
     """
     logger.info("Trying to fetch all libraries configured in Alma.")
-    libraries_record = rest_setup.get_record(f'/conf/libraries/')
+    libraries_record = rest_setup.call_api(f'/conf/libraries/', 'GET', 200)
     return libraries_record
 
 
@@ -32,7 +32,7 @@ def retrieve_library(library: str) -> str:
     :return: str
     """
     logger.info(f"Trying to fetch one library with code {library}.")
-    library_record = rest_setup.get_record(f'/conf/libraries/{library}')
+    library_record = rest_setup.call_api(f'/conf/libraries/{library}', 'GET', 200)
     return library_record
 
 
@@ -62,5 +62,5 @@ def retrieve_locations(library: str) -> str:
     :return: str
     """
     logger.info(f"Trying to fetch all locations for library {library}.")
-    locations_record = rest_setup.get_record(f'/conf/libraries/{library}/locations')
+    locations_record = rest_setup.call_api(f'/conf/libraries/{library}/locations', 'GET', 200)
     return locations_record
