@@ -179,7 +179,7 @@ def call_api(url_parameters: str, method: str, status_code: int, record_data: by
                 logger.error(log_string)
             return alma_response_content
 
-        error_string = f"""{method} for record "{url_parameters}" failed. """
+        error_string = f"""{method} for "{alma_url}" failed. """
         error_string += f"""Reason: {alma_response.status_code} - {alma_response.content.decode("utf-8")}"""
         logger.error(error_string)
 
