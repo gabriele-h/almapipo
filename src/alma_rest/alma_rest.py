@@ -9,7 +9,7 @@ This will import the other modules and do the following:
 
 from logging import getLogger
 from datetime import datetime, timezone
-from typing import Callable
+from typing import Callable, Iterable
 
 from . import db_setup
 from . import db_read_write
@@ -30,8 +30,8 @@ logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
 
 
-def call_api_for_csv_list(
-        csv_path: str,
+def call_api_for_list(
+        alma_ids: Iterable[str],
         api: str,
         record_type: str,
         method: str,
@@ -44,7 +44,7 @@ def call_api_for_csv_list(
     * For methods PUT or POST: Save the response to put_post_responses
     * Set status of all API calls in job_status_per_id
     * NOTE: method 'POST' is not implemented yet!
-    :param csv_path: Path of the CSV file containing the Alma IDs
+    :param alma_ids: Iterable of alma_ids, e. g. a list or generator
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of the record to call the API for (e. g. "holdings")
     :param method: As in job_status_per_id, possible values are "DELETE", "GET", "PUT" - POST not implemented yet!
@@ -59,11 +59,8 @@ def call_api_for_csv_list(
         raise NotImplementedError
 
     db_session = db_setup.create_db_session()
-    import_csv_and_ids_to_db_tables(csv_path, method)
 
-    list_of_ids = db_read_write.get_list_of_ids_by_status_and_method('new', method, job_timestamp, db_session)
-
-    for alma_id, in list_of_ids:
+    for alma_id in alma_ids:
 
         CurrentApi = instantiate_api_class(alma_id, api, record_type)
 
@@ -119,7 +116,7 @@ def call_api_for_csv_list(
     db_session.close()
 
 
-def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool = True) -> None:
+def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool = True) -> Iterable[str]:
     """
     Imports a whole csv or tsv file to the table source_csv.
     Imports valid Alma-IDs to table job_status_per_id.
@@ -127,7 +124,7 @@ def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool
     :param csv_path: Path to the CSV file to be imported
     :param method: GET, PUT, POST or DELETE
     :param validation: If set to "False", the first column will not be checked for validity. Defaults to True.
-    :return: None
+    :return: Generator of Alma IDs
     """
     if input_read.check_file_path(csv_path):
         db_session = db_setup.create_db_session()
@@ -136,6 +133,7 @@ def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool
             # noinspection PyTypeChecker
             db_read_write.add_csv_line_to_tables(csv_line, job_timestamp, db_session, method)
             db_session.commit()
+            yield list(csv_line.values())[0]
         db_session.close()
     else:
         logger.error('No valid file path provided.')
