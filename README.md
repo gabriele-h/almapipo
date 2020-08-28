@@ -11,9 +11,9 @@ records needs to be created, deleted, updated, or retrieved for analysis.
 The Alma-IDs of the records are either part of a **set within Alma** or are
 known and saved in a **semicolon or tab delimited file**.
 
-Working with a set will currently not work for all kinds of sets.
+Working with a set will currently work only for some kinds of sets.
 Since some API calls require more than just the record's ID, but also those of
-its ancestors, and not all kinds of sets will have a link to their members,
+its ancestors, and only some of the sets will have a link to their members,
 calls on the sets of e. g. electronic portfolios are
 not supported until the missing link attribute is hopefully fixed by Ex Libris
 (see case 00874282).
