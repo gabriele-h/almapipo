@@ -260,20 +260,16 @@ def add_response_content_to_fetched_records(
     session.add(line_for_table_fetched_records)
 
 
-def add_csv_line_to_tables(
+def add_csv_line_to_source_csv_table(
         csv_line: OrderedDict,
         job_timestamp: datetime,
-        session: Session,
-        method: str) -> None:
+        session: Session) -> None:
     """
     For an ordered Dictionary of values retrieved from a csv/tsv file
-    create an entry in the database that identifies the job
-    responsible for the entry (job_timestamp).
-    Adds one line to source_csv and one to job_status_per_id.
+    Adds one line to source_csv.
     :param csv_line: Ordered dictionary of values from a line of the input file.
     :param job_timestamp: Timestamp to identify the job which created the line.
     :param session: DB session to add the data to.
-    :param method: As in job_status_per_id, possible values are "DELETE", "GET", "POST" and "PUT".
     :return: None
     """
     line_for_table_source_csv = db_setup.SourceCsv(
@@ -281,7 +277,6 @@ def add_csv_line_to_tables(
         csv_line=csv_line
     )
     session.add(line_for_table_source_csv)
-    add_alma_id_to_job_status_per_id(list(csv_line.values())[0], method, job_timestamp, session)
 
 
 def add_alma_id_to_job_status_per_id(

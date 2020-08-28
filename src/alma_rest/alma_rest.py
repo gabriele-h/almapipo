@@ -1,8 +1,7 @@
 """Main point of access
 
 This will import the other modules and do the following:
-* Import a CSV or TSV file to the database tables source_csv and job_status_per_id
-* Call the API with the according method (POST, GET, PUT, DELETE)
+* Call the API on a list of records with the according method (POST, GET, PUT, DELETE)
 * Save the results of successful API calls to database table fetched_records
 * If API calls are not successful, mark the IDs with "error" in job_status_per_id
 """
@@ -17,6 +16,7 @@ from . import input_read
 # noinspection PyUnresolvedReferences
 from . import logfile_setup
 from . import rest_bibs
+from . import rest_conf
 from . import rest_electronic
 from . import rest_users
 from . import rest_setup
@@ -64,10 +64,9 @@ def call_api_for_list(
 
         CurrentApi = instantiate_api_class(alma_id, api, record_type)
 
-        if method != 'GET' and method != 'POST':
-            db_read_write.add_alma_id_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
-
         if method != 'POST':
+
+            db_read_write.add_alma_id_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
 
             record_id = str.split(alma_id, ',')[-1]
             record_data = CurrentApi.retrieve(record_id)
@@ -80,6 +79,7 @@ def call_api_for_list(
                     alma_id, record_data, job_timestamp, db_session
                 )
                 db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
+
                 if method == 'DELETE':
 
                     alma_response = CurrentApi.delete(record_id)
@@ -116,10 +116,9 @@ def call_api_for_list(
     db_session.close()
 
 
-def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool = True) -> Iterable[str]:
+def csv_id_generator_and_add_to_source_csv(csv_path: str, validation: bool = True) -> Iterable[str]:
     """
-    Imports a whole csv or tsv file to the table source_csv.
-    Imports valid Alma-IDs to table job_status_per_id.
+    Imports a whole csv or tsv file to the table source_csv and returns generator of alma_ids as per first column.
     Checks for file existence first.
     :param csv_path: Path to the CSV file to be imported
     :param method: GET, PUT, POST or DELETE
@@ -131,7 +130,7 @@ def import_csv_and_ids_to_db_tables(csv_path: str, method: str, validation: bool
         csv_generator = input_read.read_csv_contents(csv_path, validation)
         for csv_line in csv_generator:
             # noinspection PyTypeChecker
-            db_read_write.add_csv_line_to_tables(csv_line, job_timestamp, db_session, method)
+            db_read_write.add_csv_line_to_source_csv_table(csv_line, job_timestamp, db_session)
             db_session.commit()
             yield list(csv_line.values())[0]
         db_session.close()
