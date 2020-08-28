@@ -128,7 +128,7 @@ alma-ids;title;author
 991234567890123,221234567890123;How to make things up;Yours Truly
 ```
 
-## `alma_rest.db_create_tables`
+## `db_create_tables`
 
 This script needs to be **run only once** when starting to
 use the package, as it creates all necessary tables in the
@@ -137,7 +137,7 @@ database.
 ### Usage example
 
 ```bash
-python3 -m alma_rest.db_create_tables
+db_create_tables
 ```
 
 ## Make a Test Call to the API
@@ -148,7 +148,7 @@ with the number of remaining API calls. It's perfect for a first call to the API
 as it requires no parameters at all and provides information you will need
 in the future.
 
-**Note:** The function itself makes an API call and will be counted as one.
+**Note:** The function itself makes a call to /bibs/test and will be counted as an API call.
 
 ```python
 from alma_rest import rest_setup
@@ -278,21 +278,6 @@ as if it were a header).
 column will be kept for further processing. Providing a correct value
 in env var `ALMA_REST_ID_INSTITUTIONAL_SUFFIX` is crucial here.
 
-## Check File Validity From Commandline
-
-When used from commandline with csv-path as argv1 the script will check file validity.
-It will check if the first column is a valid Alma ID. For further information
-on how the according regular expression came into existence have a look at SvG's very useful
-[Alma record number cheat sheet][1].
-
-[1]: https://knowledge.exlibrisgroup.com/Alma/Community_Knowledge/How_to_-_A_cheat_sheet_for_Alma_record_numbers
-
-### Usage Example Bash
-
-```bash
-python3 -m alma_rest.input_read ../input/testsample.csv
-```
-
 # `alma_rest.db_read_write`
 
 Can be used to do the following:
@@ -332,6 +317,37 @@ alma_id = "991234567890123,221234567890123"
 job_timestamp = datetime(2020, 2, 20, 20, 00, 20, timezone.utc)
 db_read_write.get_value_from_source_csv('alma-ids', alma_id, job_timestamp, 'title')
 ```
+
+# Scripts Added to PATH
+
+The following will only work after activating your venv, which adds the scripts
+to your PATH variable.
+
+## Extract MARC as TSV
+
+This will work only for records that have prior been fetched via GET.
+
+Currently work in progress, more documentation soon.
+
+## Check File Validity From Commandline
+
+When used from commandline with csv-path as argv1 the script will check file validity.
+It will check if the first column is a valid Alma ID. For further information
+on how the according regular expression came into existence have a look at SvG's very useful
+[Alma record number cheat sheet][1].
+
+[1]: https://knowledge.exlibrisgroup.com/Alma/Community_Knowledge/How_to_-_A_cheat_sheet_for_Alma_record_numbers
+
+### Usage Example Bash
+
+```bash
+input_check ../input/testsample.csv
+```
+
+## Create All Necessary DB Tables
+
+See above "Initial Setup" for information on this script. Should be used for initial setup of
+the Postgres database only.
 
 # So you want to query the database
 
