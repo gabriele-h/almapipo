@@ -3,8 +3,9 @@ Query the Alma API for configurations in the system.
 See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/openapi/conf.json
 """
 
+import re
 from logging import getLogger
-from typing import Iterator
+from typing import Iterable
 from xml.etree.ElementTree import fromstring, tostring
 
 from . import rest_setup
@@ -36,7 +37,7 @@ def retrieve_library(library: str) -> str:
     return library_record
 
 
-def retrieve_all_locations_generator() -> Iterator[str]:
+def retrieve_all_locations_generator() -> Iterable[str]:
     """
     Retrieve all locations for all libraries in Alma. Note that this will add the attribute
     "library" to the root element "locations" of all xml strings in the generator.
