@@ -8,14 +8,23 @@ records needs to be created, deleted, updated, or retrieved for analysis.
 
 ## Preparation
 
-The Alma-IDs of the records are known and saved in a **semicolon or tab
-delimited file**. The first column of that file needs to be the Alma-ID
+The Alma-IDs of the records are either part of a **set within Alma** or are
+known and saved in a **semicolon or tab delimited file**.
+
+Working with a set will currently not work for all kinds of sets.
+Since some API calls require more than just the record's ID, but also those of
+its ancestors, and not all kinds of sets will have a link to their members,
+calls on the sets of e. g. electronic portfolios are
+not supported until the missing link attribute is hopefully fixed by Ex Libris
+(see case 00874282).
+
+The first column of the csv/tsv file needs to be the Alma-ID
 or a list of Alma-IDs (see below "Input data").
 
 ## What Does This Package Do?
 
-In a **Postgres database** both the **input** used as well as the
-**status of the api call** are saved on a per-line or per-record basis.
+In a **Postgres database** the **status of the api call** and - where applicable -
+the input data used are saved on a per-line or per-record basis.
 All records will be retrieved prior to deletion, update, or creation. A
 **copy of each record before the action** will be saved to the database.
 **Responses to PUT and POST** requests will be saved too.
@@ -185,16 +194,32 @@ separate row for each call in all of the aforementioned tables. These
 rows can be distinguished by the `job_timestamp` set when the `alma_rest`
 module is used.
 
-### Usage Example Python Console
+### Usage Examples Python Console
 
-First parameter of the function is the path to the csv-file. Then
+First parameter of the function is list of ids to make the calls for. Then
 follow the API that needs to be called and what kind of record it
 should be called for. Final parameter is the method.
 
+#### Using a tsv File as Input
+
 ```python
 from alma_rest import alma_rest
-alma_rest.call_api_for_csv_list('./input/test.tsv', 'bibs', 'holdings', 'GET')
+alma_id_list = alma_rest.csv_id_generator_and_import_source_csv('./test_hols.tsv')
+alma_rest.call_api_for_list(alma_id_list, 'bibs', 'holdings', 'GET')
 ```
+
+#### Using a Set as Input
+
+```python
+from alma_rest import alma_rest
+from alma_rest import rest_conf
+set_id = '123123123123123'
+alma_id_list = rest_conf.retrieve_set_member_alma_ids(set_id)
+alma_rest.call_api_for_list(alma_id_list, 'bibs', 'bibs', 'GET')
+```
+
+**Note:** As mentioned above this will not work for all kinds of sets.
+Use `help(rest_conf.retrieve_set_member_alma_ids)` for more info.
 
 # `alma_rest.xml_extract`
 
@@ -308,18 +333,6 @@ job_timestamp = datetime(2020, 2, 20, 20, 00, 20, timezone.utc)
 db_read_write.get_value_from_source_csv('alma-ids', alma_id, job_timestamp, 'title')
 ```
 
-## Check DB Connectivity From Commandline
-
-When used from commandline without any arguments this script will simply make a check
-whether the database is reachable. This is done via SQLAlchemy and will
-not give any custom feedback. Also it will be included in the logfile.
-
-### Usage Example Bash
-
-```bash
-python3 -m alma_rest.db_read_write
-```
-
 # So you want to query the database
 
 There will be times when you need to have a look at the data that
@@ -350,6 +363,13 @@ Similar queries can be built for tables `sent_records` and
 SELECT xpath('//holding/record/datafield[@tag=245]/subfield', alma_record)
   FROM fetched_records
   WHERE job_timestamp = '2020-02-02 20:02:02.202002+00:00';
+```
+
+If you want to see only entries of records that match a specific xpath,
+add a WHERE clause. For example the following will only list bib records:
+
+```sql
+WHERE cast(xpath('//bib', alma_record) as text[]) != '{}';
 ```
 
 ## Count number of records for `job_timestamp` and `job_action`
