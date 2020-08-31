@@ -33,16 +33,51 @@ def check_data_sent_equals_response(
         session: Session) -> bool:
     """
     For given alma_id and job_timestamp check if the data sent via PUT/POST
-    and the data received in the API's response are the same. If no data is
-    available in one of the two tables (sent_records and put_post_responses)
-    this check will also return False.
+    and the data received in the API's response are the same. Check can only return True
+    if data exists in both relevant tables (sent_records and put_post_responses).
     :param alma_id: Comma separated string of Alma IDs to identify the record
-    :param job_timestamp: Job that created the entry in source_csv
-    :param session: Session to be used for the check.
+    :param job_timestamp: Job that created the entry in the database tables
+    :param session: Session to be used for the check
     :return: True if matches, False if non-existent or does not match.
     """
     sent_id = func.concat(db_setup.SentRecords.alma_id, db_setup.SentRecords.job_timestamp)
     received_id = func.concat(db_setup.PutPostResponses.alma_id, db_setup.PutPostResponses.job_timestamp)
+
+    if check_data_sent_and_response_exist(alma_id, job_timestamp, session):
+
+        sent_received_matching = session.query(
+            db_setup.PutPostResponses
+        ).join(
+            db_setup.SentRecords,
+            sent_id == received_id
+        ).filter(
+            db_setup.SentRecords.alma_record.cast(String) == db_setup.PutPostResponses.alma_record.cast(String)
+        ).filter_by(
+            job_timestamp=job_timestamp
+        ).filter_by(
+            alma_id=alma_id
+        )
+
+        if sent_received_matching.count() > 0:
+            return True
+
+    logger.warning(f'Data in sent_records and put_post_responses for {alma_id} and {job_timestamp} did not match.')
+    return False
+
+
+def check_data_sent_and_response_exist(
+        alma_id: str,
+        job_timestamp: datetime,
+        session: Session) -> bool:
+    """
+    For given alma_id and job_timestamp check if the following exist:
+    * data sent via PUT/POST
+    * data received in the API's response
+    :param alma_id: Comma separated string of Alma IDs to identify the record
+    :param job_timestamp: Job that created the entry in the database tables
+    :param session: Session to be used for the check
+    :return: True if both exist, False if one or both do not exist
+    """
 
     record_sent = session.query(
         db_setup.SentRecords
@@ -60,28 +95,11 @@ def check_data_sent_equals_response(
         alma_id=alma_id
     )
 
-    sent_received_matching = session.query(
-        db_setup.PutPostResponses
-    ).join(
-        db_setup.SentRecords,
-        sent_id == received_id
-    ).filter(
-        db_setup.SentRecords.alma_record.cast(String) == db_setup.PutPostResponses.alma_record.cast(String)
-    ).filter_by(
-        job_timestamp=job_timestamp
-    ).filter_by(
-        alma_id=alma_id
-    )
-
-    if record_sent.count() == 0 or record_received.count() == 0:
-        logger.error(f'No data in either sent_records or put_post_responses for {alma_id} and {job_timestamp}.')
-        return False
-
-    if sent_received_matching.count() > 0:
+    if record_sent.count() > 0 and record_received.count() > 0:
         return True
-    else:
-        logger.warning(f'Data in sent_records and put_post_responses for {alma_id} and {job_timestamp} did not match.')
-        return False
+
+    logger.error(f'No data in sent_records or put_post_responses for {alma_id} and {job_timestamp}.')
+    return False
 
 
 def get_value_from_source_csv(
