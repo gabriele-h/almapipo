@@ -16,11 +16,9 @@ from . import input_read
 # noinspection PyUnresolvedReferences
 from . import logfile_setup
 from . import rest_bibs
-from . import rest_conf
 from . import rest_electronic
 from . import rest_users
 from . import rest_setup
-from . import xml_extract
 
 # Timestamp as inserted in the database
 job_timestamp = datetime.now(timezone.utc)
