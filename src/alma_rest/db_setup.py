@@ -13,7 +13,6 @@ from os import environ
 
 # more sqlalchemy setup below with conditions
 from sqlalchemy import Column, DateTime, Integer, MetaData, String, create_engine
-from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.types import UserDefinedType
 from sqlalchemy.ext.declarative import declarative_base
@@ -73,25 +72,20 @@ def prepare_connection_params_from_env() -> str:
     return connection_params
 
 
-def create_db_session() -> Session:
+def create_db_session(
+        connection_params: str = prepare_connection_params_from_env(),
+        verbosity: bool = does_sqlalchemy_log) -> Session:
     """
-    Create a DB session to manipulate the contents of the DB.
+    Create a DB session according to the information provided in env vars, including SQLAlchemy verbosity.
+    Both connection parameters and verbosity may be overriden by providing them as paramters to the function call.
+    :param connection_params: Parameters to initiate the database connection, defaults to info from env vars
+    :param verbosity: Whether or not to add SQLAlchemy output to the log, defaults to env var ALMA_REST_DB_VERBOSE
     :return: Session for connection to the DB.
     """
-    db_engine = create_db_engine()
+    db_engine = create_engine(connection_params, echo=verbosity)
     DBSession = sessionmaker(bind=db_engine)
     session = DBSession()
     return session
-
-
-def create_db_engine(verbosity: bool = does_sqlalchemy_log) -> Engine:
-    """
-    Create the DB engine according to the information provided in env vars.
-    :return: DB engine.
-    """
-    connection_params = prepare_connection_params_from_env()
-    db_engine = create_engine(connection_params, echo=verbosity)
-    return db_engine
 
 
 class JobStatusPerId(Base):
