@@ -1,1 +1,2 @@
+# install all requirements as per setup.py in editable mode (meaning: without egg or archive)
 -e .
