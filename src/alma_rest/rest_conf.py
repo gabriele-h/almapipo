@@ -78,12 +78,13 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
     must return a comma-separated string of those three IDs!
 
     :param set_id: Set ID as given in Set Details in the Alma UI
-    :return: Generator of three strings: alma_id, api, record_type
+    :return: Generator of alma_id
     """
-    logger.info(f"Trying to extract alma_id, api and record_type for all members of set {set_id}.")
+    logger.info(f"Trying to extract alma_id for all members of set {set_id}.")
 
     regex_prefix = r'^/?\w+/'
     regex_path = r'/\w+/'
+    has_url = False
 
     member_urls_and_ids = retrieve_set_member_link_and_id(set_id)
 
@@ -91,6 +92,7 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
 
         if member_url:
 
+            has_url = True
             member_url_path = member_url.replace(rest_setup.api_base_url, '')
 
             if member_url == member_url_path:
@@ -106,6 +108,9 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
             alma_id = member_id
 
         yield alma_id
+
+    if not has_url:
+        logger.info("""Element member did not have a link attribute. Generator yields member/id instead.""")
 
 
 def retrieve_set_member_link_and_id(set_id: str) -> Iterable[Iterable[str]]:
