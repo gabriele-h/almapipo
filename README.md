@@ -104,7 +104,28 @@ production an all-caps prefix.
 
 ## Input Data
 
-As of now only the first column of the CSV- or TSV-file are relevant for
+### Alma Set
+
+You can make use of a function that extracts the `link` attribute of all
+members in a set. Please note - as mentioned above - that not all sets will
+have the link attribute in their members. Without a link attribute, the function
+`rest_conf.retrieve_set_member_alma_ids` will make use of the `id` element of
+each member. If the path to the member is more complex and includes ancestors,
+making use of such an Alma set (such as electronic portfolios) will not be possible.
+
+#### Usage example
+
+The following function will iterate trough the set by 100 at a time and
+yield the `alma_id` of each record, making it a generator:
+
+```python
+from alma_rest import rest_conf
+alma_ids = rest_conf.retrieve_set_member_alma_ids('1199999999123')
+```
+
+### CSV or TSV file
+
+As of now only the first column of the CSV or TSV file are relevant for
 this package. The first column should include one or more Alma-IDs of the
 record you want to manipulate. There is a function for retrieving content of
 any column in the `db_read_write` module.
@@ -115,7 +136,7 @@ operate on holdings, you will also need the MMS-ID. In such cases the
 by comma without blanks**. The IDs should be listed from **least specific
 to most specific** (e. g. MMS-ID,holding-ID,item-ID).
 
-### Example Data
+#### Example Data
 The example below shows the IDs necessary for querying a holding record in
 the first column. All other columns may contain any data that is necessary
 for understanding when analyzed intellectually or for defining contents of
