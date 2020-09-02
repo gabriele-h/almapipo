@@ -83,7 +83,7 @@ class GenericApi:
         :param url_parameters: Use if you need to add parameters to the URL
         :return: API response
         """
-        logger.info(f"Trying DELETE for record {record_id} at {self.base_path}.")
+        logger.info(f"Trying DELETE for {record_id} at {self.base_path}.")
         full_path = f'{self.base_path}{record_id}'
         if url_parameters:
             full_path = add_parameters(full_path, url_parameters)
@@ -101,7 +101,7 @@ class GenericApi:
         :param url_parameters: Use if you need to add parameters to the URL
         :return: Record data of the bib record
         """
-        logger.info(f"Trying GET for record {record_id} at {self.base_path}.")
+        logger.info(f"Trying GET for {record_id} at {self.base_path}.")
         full_path = f'{self.base_path}{record_id}'
         if url_parameters:
             full_path = add_parameters(full_path, url_parameters)
@@ -120,7 +120,7 @@ class GenericApi:
         :param url_parameters: Use if you need to add parameters to the URL
         :return: Response data in XML format
         """
-        logger.info(f"Trying PUT for record {record_id} at {self.base_path}.")
+        logger.info(f"Trying PUT for {record_id} at {self.base_path}.")
         full_path = f'{self.base_path}{record_id}'
         if url_parameters:
             full_path = add_parameters(full_path, url_parameters)
@@ -167,7 +167,7 @@ def call_api(url_parameters: str, method: str, status_code: int, record_data: by
         if alma_response.status_code == status_code:
             alma_response_content = alma_response.content.decode("utf-8")
             logger.info(
-                f'{method} for record "{url_parameters}" completed.'
+                f'{method} for "{url_parameters}" completed.'
             )
             if '<errorList>' in alma_response_content:
                 log_string = f"""The response contained an error, even though it had status code {status_code}. """
