@@ -74,7 +74,10 @@ See https://docs.python.org/3/library/venv.html for further info.
 ## Install All From `requirements.txt`
 
 The requirements are actually defined within `setup.py` and `requirements.txt`
-has just one entry referring to that.
+has just one entry referring to that. Installing alma_rest via pip will install the
+requirements as defined in `setup.py` automatically.
+
+**The following is only necessary if you got the code directly via Github:**
 
 ```bash
 pip install -r requirements.txt
