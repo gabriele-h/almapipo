@@ -19,8 +19,8 @@ class TestDoesStringEqualAlmaID:
 
     @pytest.fixture
     def set_env_id_suffix(self):
-        old_suffix = environ.get('ALMA_REST_ID_INSTITUTIONAL_SUFFIX', '')
-        environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX'] = '1234'
+        old_suffix = environ.get('ALMA_REST_ID_INSTITUTIONAL_SUFFIX', '234')
+        environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX'] = '234'
         yield
         environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX'] = old_suffix
 
