@@ -16,6 +16,7 @@ from . import input_read
 # noinspection PyUnresolvedReferences
 from . import logfile_setup
 from . import rest_bibs
+from . import rest_conf
 from . import rest_electronic
 from . import rest_users
 from . import rest_setup
@@ -26,6 +27,38 @@ job_timestamp = datetime.now(timezone.utc)
 # Logfile
 logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
+
+
+def call_api_for_set(
+        set_id: str,
+        api: str,
+        record_type: str,
+        method: str,
+        manipulate_record: Callable[[str, str], bytes] = None) -> None:
+    """
+    Retrieve the alma_ids of all members in a set and make API calls on them.
+    Will add one line to job_status_per_id for the set itself in addition to all member API calls.
+    See call_api_for_list for more information on how the API is called for the members.
+    :param set_id: In the Alma UI go to "Set Details" and look for "Set ID"
+    :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
+    :param record_type: Type of the record to call the API for (e. g. "holdings")
+    :param method: As in job_status_per_id, possible values are "DELETE", "GET", "PUT" - POST not implemented yet!
+    :param manipulate_record: Function with arguments alma_id and data retrieved via GET that returns record_data
+    :return: None
+    """
+    db_session = db_setup.create_db_session()
+    db_read_write.add_alma_id_to_job_status_per_id('GET', set_id, job_timestamp, db_session)
+    alma_id_list = rest_conf.retrieve_set_member_alma_ids(set_id)
+
+    try:
+        call_api_for_list(alma_id_list, api, record_type, method, manipulate_record)
+    except TypeError:
+        db_read_write.update_job_status('error', set_id, 'GET', job_timestamp, db_session)
+        logger.error(f"""An error occured while retrieving the set's members. Is the set {set_id} empty?""")
+    else:
+        db_read_write.update_job_status('done', set_id, job_timestamp, db_session)
+
+    db_session.close()
 
 
 def call_api_for_list(

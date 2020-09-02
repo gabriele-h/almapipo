@@ -192,12 +192,9 @@ If it does look like that, you can find the same message in the logfile.
 
 Main part making use of most of the other modules.
 
-## Actions on whole CSV lists
+## Actions on lists of Alma-IDs
 
-There are four functions for create, delete, retrieve, and update to
-operate on whole CSV lists. These will
-add CSV Lines to `source_csv` and `job_status_per_id` (see below)
-and issue an Alma API request per alma-id. If successful,
+There is one function to issue an Alma API request per alma-id. If successful,
 job_status in `job_status_per_id` will be set from "new" to "done",
 otherwise "error". For all calls other than GET a second request per
 alma-id is done for the action specified, so there will be two
@@ -217,7 +214,7 @@ need to be analyzed intellectually anyways.
 **Note:** If you call the api for a record multiple times there will be a
 separate row for each call in all of the aforementioned tables. These
 rows can be distinguished by the `job_timestamp` set when the `alma_rest`
-module is used.
+module is imported.
 
 ### Usage Examples Python Console
 
@@ -227,6 +224,12 @@ should be called for. Final parameter is the method.
 
 #### Using a tsv File as Input
 
+The following will import the CSV lines to the table `source_csv` and
+create a generator of alma_ids. If the generator is empty, you might want to
+add the additional parameter `validation` to `False`, which skips the check
+whether the first column contained a valid `alma_id`. The value is not set
+in the example below as it defaults to True.
+
 ```python
 from alma_rest import alma_rest
 alma_id_list = alma_rest.csv_id_generator_and_import_source_csv('./test_hols.tsv')
@@ -235,12 +238,19 @@ alma_rest.call_api_for_list(alma_id_list, 'bibs', 'holdings', 'GET')
 
 #### Using a Set as Input
 
+The function `call_api_for_set` will add a line to `job_status_per_id` for
+the given `set_id`. If the function `rest_conf.retrieve_set_member_alma_ids`
+does not return the expected Iterable, the status within
+`job_status_per_id` will be updated to `error`. This will
+happen if the set is empty or does not exist. Otherwise the status for the
+`set_id` will be set to `done`.
+
+Please note that `call_api_for_set` makes use of `call_api_for_list`.
+
 ```python
 from alma_rest import alma_rest
-from alma_rest import rest_conf
 set_id = '123123123123123'
-alma_id_list = rest_conf.retrieve_set_member_alma_ids(set_id)
-alma_rest.call_api_for_list(alma_id_list, 'bibs', 'bibs', 'GET')
+alma_rest.call_api_for_set(set_id, 'bibs', 'bibs', 'GET')
 ```
 
 **Note:** As mentioned above this will not work for all kinds of sets.
