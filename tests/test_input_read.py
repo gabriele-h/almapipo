@@ -13,9 +13,6 @@ class TestDoesStringEqualAlmaID:
         '61363367390001234', '62363367380001234', '53375846240001234',
         '81445078000001234'
     }
-    not_an_alma_id = '811234'
-    string_empty = ""
-    not_a_string = 1234567
 
     @pytest.fixture
     def set_env_id_suffix(self):
@@ -27,14 +24,14 @@ class TestDoesStringEqualAlmaID:
     def test_alma_ids_only(self, set_env_id_suffix):
         assert all(input_read.is_this_an_alma_id(id_) for id_ in self.set_of_alma_ids)
 
-    def test_containing_other(self):
-        assert not input_read.is_this_an_alma_id(self.not_an_alma_id)
+    def test_minimum_length(self):
+        assert not input_read.is_this_an_alma_id("811234")
 
     def test_empty(self):
-        assert not input_read.is_this_an_alma_id(self.string_empty)
+        assert not input_read.is_this_an_alma_id("")
 
     def test_number_not_string(self):
-        assert not input_read.is_this_an_alma_id(self.not_a_string)
+        assert not input_read.is_this_an_alma_id(8156789234)
 
     def test_set_not_string_either(self):
         assert not input_read.is_this_an_alma_id(self.set_of_alma_ids)
