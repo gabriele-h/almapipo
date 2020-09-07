@@ -3,7 +3,8 @@
 from argparse import ArgumentParser
 from logging import getLogger
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.ext.declarative import declarative_base
 
 from alma_rest import db_setup
 from alma_rest import logfile_setup
@@ -17,6 +18,10 @@ parser = ArgumentParser(
     epilog="")
 
 args = parser.parse_args()
+
+# Basic shortenings for SQLAlchemy
+metadata = MetaData()
+Base = declarative_base()
 
 # logfile
 logger = getLogger(__name__)
