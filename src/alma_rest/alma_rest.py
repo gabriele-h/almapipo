@@ -58,6 +58,7 @@ def call_api_for_set(
     else:
         db_read_write.update_job_status('done', set_id, 'GET', job_timestamp, db_session)
 
+    db_session.commit()
     db_session.close()
 
 
