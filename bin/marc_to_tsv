@@ -23,9 +23,10 @@ parser.add_argument('tsv_path', type=str, help=help_tsv_path)
 help_tsv_header = "Provide your own list of categories you want to extract as a comma-separated list of strings."
 parser.add_argument('--tsv-header', type=str, help=help_tsv_header)
 
-parser.add_argument('--split-sf', action='store_true', help="One cell per Subfield.")
+help_split_sf = """When set, each subfield gets its own cell. Otherwise concatenates them with " $$" as delimiter."""
+parser.add_argument('--split-sf', action='store_true', help=help_split_sf)
 
-help_repetition = """If a field is repeated, concat all contents to one cell with delimiter "|"."""
+help_repetition = """Concat all contents of a marc tag to one cell with delimiter " ||| " for repeated tags."""
 parser.add_argument('--concat-repetition', action='store_true', help=help_repetition)
 
 args = parser.parse_args()
@@ -54,8 +55,9 @@ def extract_all_keys(all_records: Iterable[dict]) -> list:
     list_of_keys = []
 
     for record_dict in all_records:
+
         for field_key in record_dict:
-            if field_key[0:2] != '00' and field_key != 'leader':
+            if field_key[0:2] != '00' and field_key != 'leader' and not args.concat_repetition:
                 for field_dict in record_dict[field_key]:
 
                     ind1 = field_dict['ind1']
@@ -97,12 +99,34 @@ def extract_values_as_lists(all_records: Iterable[dict], tsv_header: list) -> It
     :return: Generator of lists, one list of values per record
     """
     for record_dict in all_records:
-        print(record_dict)
-        list_of_values = [record_dict['leader']]
+
+        if 'leader' in tsv_header:
+            list_of_values = [record_dict['leader']]
+        else:
+            list_of_values = []
+
         for tsv_column in tsv_header:
             if len(tsv_column) == 3:
                 try:
                     list_of_values += [' ||| '.join(record_dict[tsv_column])]
+                except TypeError:
+                    try:
+                        categories = []
+
+                        for repetition in record_dict[tsv_column]:
+                            category = []
+
+                            for subfield in repetition:
+                                if subfield not in ['ind1', 'ind2']:
+                                    subfields = ','.join(repetition[subfield])
+                                    category += [f"""$${subfield}{subfields}"""]
+
+                            categories += [' '.join(category)]
+
+                        list_of_values += [' ||| '.join(categories)]
+
+                    except KeyError:
+                        list_of_values += ['']
                 except KeyError:
                     list_of_values += ['']
         yield list_of_values
@@ -116,13 +140,7 @@ else:
 
 gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
 
-for value in extract_values_as_lists(gen_record_dicts, tsv_columns):
-    print(value)
-
-# gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
-#
-# with open(tsv_path, 'w') as tsv_file:
-#     writer = DictWriter(tsv_file, fieldnames=tsv_columns, delimiter='\t')
-#     writer.writeheader()
-#     for record in gen_record_dicts:
-#         writer.writerow(record)
+with open(args.tsv_path, 'w') as tsv_file:
+    tsv_file.write('\t'.join(tsv_columns))
+    for record_contents in extract_values_as_lists(gen_record_dicts, tsv_columns):
+        tsv_file.write('\n'+'\t'.join(record_contents))
