@@ -54,9 +54,9 @@ def call_api_for_set(
         call_api_for_list(alma_id_list, api, record_type, method, manipulate_record)
     except TypeError:
         db_read_write.update_job_status('error', set_id, 'GET', job_timestamp, db_session)
-        logger.error(f"""An error occured while retrieving the set's members. Is the set {set_id} empty?""")
+        logger.error(f"""An error occurred while retrieving the set's members. Is the set {set_id} empty?""")
     else:
-        db_read_write.update_job_status('done', set_id, job_timestamp, db_session)
+        db_read_write.update_job_status('done', set_id, 'GET', job_timestamp, db_session)
 
     db_session.close()
 
