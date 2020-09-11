@@ -67,11 +67,9 @@ def extract_contents_from_marc(record: Element) -> dict:
         append_multiple_to_dict(marc21_dict, tag, text)
 
     for datafield in record.findall('datafield'):
-        tag, ind1, ind2 = datafield.attrib['tag'], datafield.attrib['ind1'], datafield.attrib['ind2']
-        datafield_dict = {'ind1': ind1, 'ind2': ind2}
-        subfields = extract_subfields_from_datafield(datafield)
-        datafield_dict.update(subfields)
-        append_multiple_to_dict(marc21_dict, tag, datafield_dict)
+        tag_with_inds = f"""{datafield.attrib['tag']}{datafield.attrib['ind1']}{datafield.attrib['ind2']}"""
+        datafield_dict = extract_subfields_from_datafield(datafield)
+        append_multiple_to_dict(marc21_dict, tag_with_inds, datafield_dict)
 
     return marc21_dict
 
