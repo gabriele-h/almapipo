@@ -55,7 +55,8 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterator[str]:
             if all(is_this_an_alma_id(string) for string in str.split(first_column_value, ',')) \
                     or not validation:
                 yield row
-            logger.warning(f"The following row was discarded: {row}")
+            else:
+                logger.warning(f"The following row was discarded: {row}")
 
 
 def check_file_path(file_path: str) -> bool:
