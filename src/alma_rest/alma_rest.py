@@ -69,7 +69,7 @@ def call_api_for_list(
         method: str,
         manipulate_record: Callable[[str, str], bytes] = None) -> None:
     """
-    For a list of Alma-IDs given in a CSV file, this function does the following:
+    For a list of Alma-IDs given in a list, this function does the following:
     * Add csv list to job_status_per_id and source_csv for the given method
     * Call GET for the Alma-IDs and store it in fetched_records
     * For method PUT: Manipulate the retrieved record with the manipulation_function
@@ -111,6 +111,8 @@ def call_api_for_list(
                     alma_id, record_data, job_timestamp, db_session
                 )
                 db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
+
+                db_session.commit()
 
                 if method == 'DELETE':
 
