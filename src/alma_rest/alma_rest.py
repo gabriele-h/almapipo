@@ -116,6 +116,8 @@ def call_api_for_list(
 
                 if method == 'DELETE':
 
+                    db_read_write.add_alma_id_to_job_status_per_id(alma_id, method, job_timestamp, db_session)
+
                     alma_response = CurrentApi.delete(record_id)
 
                     if alma_response is None:
@@ -124,6 +126,7 @@ def call_api_for_list(
                         db_read_write.update_job_status('done', alma_id, method, job_timestamp, db_session)
 
                 elif method == 'PUT':
+                    db_read_write.add_alma_id_to_job_status_per_id(alma_id, method, job_timestamp, db_session)
 
                     new_record_data = manipulate_record(alma_id, record_data)
 
