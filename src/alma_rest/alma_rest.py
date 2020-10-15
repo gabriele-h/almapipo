@@ -143,9 +143,9 @@ def call_api_for_list(
                             db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
                             db_read_write.update_job_status('done', alma_id, method, job_timestamp, db_session)
                             db_read_write.check_data_sent_equals_response(alma_id, job_timestamp, db_session)
-
-                        logger.error(f'Did not receive a response for {alma_id}?')
-                        db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
+                        else:
+                            logger.error(f'Did not receive a response for {alma_id}?')
+                            db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
 
         db_session.commit()
 
