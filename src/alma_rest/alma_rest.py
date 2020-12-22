@@ -158,7 +158,6 @@ def csv_id_generator_and_add_to_source_csv(csv_path: str, validation: bool = Tru
     Imports a whole csv or tsv file to the table source_csv and returns generator of alma_ids as per first column.
     Checks for file existence first.
     :param csv_path: Path to the CSV file to be imported
-    :param method: GET, PUT, POST or DELETE
     :param validation: If set to "False", the first column will not be checked for validity. Defaults to True.
     :return: Generator of Alma IDs
     """
