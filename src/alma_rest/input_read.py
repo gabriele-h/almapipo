@@ -17,8 +17,6 @@ from logging import getLogger
 from os import access, environ, path, R_OK
 from typing import Iterator
 
-from . import logfile_setup
-
 # Logfile
 logger = getLogger(__name__)
 

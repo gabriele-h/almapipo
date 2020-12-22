@@ -21,7 +21,6 @@ from sqlalchemy import func, String
 from sqlalchemy.orm import Session
 
 from . import db_setup
-from . import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)

@@ -13,8 +13,6 @@ from typing import Callable, Iterable
 from . import db_setup
 from . import db_read_write
 from . import input_read
-# noinspection PyUnresolvedReferences
-from . import logfile_setup
 from . import rest_bibs
 from . import rest_conf
 from . import rest_electronic

@@ -16,8 +16,6 @@ from os import environ
 from requests import Session, Response
 from urllib import parse
 
-# noinspection PyUnresolvedReferences
-from . import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)

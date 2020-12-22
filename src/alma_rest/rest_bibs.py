@@ -7,8 +7,6 @@ from logging import getLogger
 from urllib import parse
 
 from . import rest_setup
-# noinspection PyUnresolvedReferences
-from . import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)

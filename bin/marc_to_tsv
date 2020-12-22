@@ -5,10 +5,13 @@ from datetime import datetime
 from logging import getLogger
 from sys import argv
 from typing import Iterable
+import warnings
 
+from alma_rest import logfile_setup
 from alma_rest import xml_extract
 
 logger = getLogger(__name__)
+logfile_setup.log_to_stdout(logger)
 
 # provide info for help when called from commandline
 
@@ -40,7 +43,7 @@ timestamp_format = '%Y-%m-%d %H:%M:%S.%f%z'
 try:
     job_timestamp = datetime.strptime(argv[1], timestamp_format)
 except ValueError:
-    logger.error(f"Date in format {timestamp_format} expected.")
+    warnings.warn(f"Date in format {timestamp_format} expected.")
     exit(1)
 
 

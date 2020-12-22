@@ -10,8 +10,6 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
 from . import db_read_write
-# noinspection PyUnresolvedReferences
-from . import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)

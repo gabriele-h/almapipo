@@ -9,8 +9,6 @@ from typing import Iterable
 from xml.etree.ElementTree import fromstring, tostring
 
 from . import rest_setup
-# noinspection PyUnresolvedReferences
-from . import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)

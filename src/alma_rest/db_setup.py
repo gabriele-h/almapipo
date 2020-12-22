@@ -7,7 +7,7 @@ Does the following two:
 DB needs to support native XML data type, so only PostgreSQL is supported.
 """
 
-import logging
+from logging import getLogger
 import xml.etree.ElementTree as etree
 from os import environ
 
@@ -18,11 +18,8 @@ from sqlalchemy.types import UserDefinedType
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import JSON
 
-# noinspection PyUnresolvedReferences
-from . import logfile_setup
-
 # Logfile
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 # DB Setup
 does_sqlalchemy_log = bool(int(environ["ALMA_REST_DB_VERBOSE"]))

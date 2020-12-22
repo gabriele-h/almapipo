@@ -6,8 +6,6 @@ See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/o
 from logging import getLogger
 
 from . import rest_setup
-# noinspection PyUnresolvedReferences
-from . import logfile_setup
 
 # Logfile
 logger = getLogger(__name__)
