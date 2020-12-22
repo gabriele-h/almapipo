@@ -120,56 +120,55 @@ def call_api_for_record(
 
     CurrentApi = instantiate_api_class(alma_id, api, record_type)
 
-    if method != 'POST':
+    db_read_write.add_alma_id_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
 
-        db_read_write.add_alma_id_to_job_status_per_id(alma_id, 'GET', job_timestamp, db_session)
+    record_id = str.split(alma_id, ',')[-1]
+    record_data = CurrentApi.retrieve(record_id)
 
-        record_id = str.split(alma_id, ',')[-1]
-        record_data = CurrentApi.retrieve(record_id)
+    if not record_data:
+        logger.error(f'Could not fetch record {alma_id}.')
+        db_read_write.update_job_status('error', alma_id, 'GET', job_timestamp, db_session)
+    else:
+        db_read_write.add_response_content_to_fetched_records(
+            alma_id, record_data, job_timestamp, db_session
+        )
+        db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
 
-        if not record_data:
-            logger.error(f'Could not fetch record {alma_id}.')
-            db_read_write.update_job_status('error', alma_id, 'GET', job_timestamp, db_session)
-        else:
-            db_read_write.add_response_content_to_fetched_records(
-                alma_id, record_data, job_timestamp, db_session
-            )
-            db_read_write.update_job_status('done', alma_id, 'GET', job_timestamp, db_session)
+        db_session.commit()
 
-            db_session.commit()
+        if method == 'DELETE':
 
-            if method == 'DELETE':
+            db_read_write.add_alma_id_to_job_status_per_id(alma_id, method, job_timestamp, db_session)
 
-                db_read_write.add_alma_id_to_job_status_per_id(alma_id, method, job_timestamp, db_session)
+            alma_response = CurrentApi.delete(record_id)
 
-                alma_response = CurrentApi.delete(record_id)
+            if alma_response is None:
+                db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
+            else:
+                db_read_write.update_job_status('done', alma_id, method, job_timestamp, db_session)
 
-                if alma_response is None:
-                    db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
-                else:
+        elif method == 'PUT':
+
+            db_read_write.add_alma_id_to_job_status_per_id(alma_id, method, job_timestamp, db_session)
+
+            new_record_data = manipulate_record(alma_id, record_data)
+
+            if not new_record_data:
+                logger.error(f'Could not manipulate data of record {alma_id}.')
+                db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
+            else:
+
+                response = CurrentApi.update(record_id, new_record_data)
+
+                if response:
+                    logger.info(f'Manipulation for {alma_id} successful. Adding to put_post_responses.')
+                    db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
+                    db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
                     db_read_write.update_job_status('done', alma_id, method, job_timestamp, db_session)
-
-            elif method == 'PUT':
-                db_read_write.add_alma_id_to_job_status_per_id(alma_id, method, job_timestamp, db_session)
-
-                new_record_data = manipulate_record(alma_id, record_data)
-
-                if not new_record_data:
-                    logger.error(f'Could not manipulate data of record {alma_id}.')
-                    db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
+                    db_read_write.check_data_sent_equals_response(alma_id, job_timestamp, db_session)
                 else:
-
-                    response = CurrentApi.update(record_id, new_record_data)
-
-                    if response:
-                        logger.info(f'Manipulation for {alma_id} successful. Adding to put_post_responses.')
-                        db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
-                        db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
-                        db_read_write.update_job_status('done', alma_id, method, job_timestamp, db_session)
-                        db_read_write.check_data_sent_equals_response(alma_id, job_timestamp, db_session)
-                    else:
-                        logger.error(f'Did not receive a response for {alma_id}?')
-                        db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
+                    logger.error(f'Did not receive a response for {alma_id}?')
+                    db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
 
     db_session.commit()
 
