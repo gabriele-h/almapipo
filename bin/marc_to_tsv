@@ -8,6 +8,8 @@ from typing import Iterable
 
 from alma_rest import xml_extract
 
+logger = getLogger(__name__)
+
 # provide info for help when called from commandline
 
 parser = ArgumentParser(
