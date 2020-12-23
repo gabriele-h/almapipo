@@ -17,7 +17,7 @@ logger = getLogger(__name__)
 
 def extract_response_from_fetched_records(alma_id: str) -> ElementTree:
     """
-    From the table fetched_records extract the whole response for the record.
+    From the table fetched_records extract the whole response for the record. Only most recent version supported.
     :param alma_id: Comma separated string of Alma IDs to identify the record.
     :return: ElementTree of the record.
     """
