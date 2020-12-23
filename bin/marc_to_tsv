@@ -4,11 +4,11 @@ from argparse import ArgumentParser
 from datetime import datetime
 from logging import getLogger
 from sys import argv
-from typing import Iterable
 import warnings
 
 from alma_rest import logfile_setup
 from alma_rest import xml_extract
+from marc_tools.marcxml_to_lists import extract_all_keys, extract_values_as_lists
 
 logger = getLogger(__name__)
 logfile_setup.log_to_stdout(logger)
@@ -36,116 +36,35 @@ parser.add_argument('--concat-repetition', action='store_true', help=help_repeti
 
 args = parser.parse_args()
 
+
 # set timestamp from argv
 
 timestamp_format = '%Y-%m-%d %H:%M:%S.%f%z'
 
 try:
+
     job_timestamp = datetime.strptime(argv[1], timestamp_format)
+
 except ValueError:
+
     warnings.warn(f"Date in format {timestamp_format} expected.")
     exit(1)
 
-
-# extract data
-
-
-def extract_all_keys(all_records: Iterable[dict]) -> list:
-    """
-    For a as returned by xml_extract.extract_marc_for_job_timestamp
-    create a list of all fields for the header of the tsv.
-    :param all_records: Generator of all records given as dictionaries
-    :return: List of all field-keys within a set of MARC21 records
-    """
-    list_of_keys = []
-
-    for record_dict in all_records:
-
-        for field_key in record_dict:
-            if field_key[0:2] != '00' and field_key != 'leader' and not args.concat_repetition:
-                for field_dict in record_dict[field_key]:
-
-                    ind1 = field_dict['ind1']
-                    ind2 = field_dict['ind2']
-
-                    if args.split_sf:
-                        for subfield_key in field_dict:
-                            if subfield_key[0:3] != 'ind':
-
-                                heading_name = field_key + ind1 + ind2 + subfield_key
-
-                                if heading_name not in list_of_keys:
-                                    list_of_keys += [heading_name]
-
-                    else:
-
-                        heading_name = field_key + ind1 + ind2
-
-                        if heading_name not in list_of_keys:
-                            list_of_keys += [heading_name]
-
-            else:
-                if field_key not in list_of_keys:
-                    list_of_keys += [field_key]
-
-    list_of_keys_sorted = sorted(list_of_keys)
-    # put leader first, which will otherwise sort to last
-    list_of_keys_sorted.insert(0, list_of_keys_sorted.pop())
-
-    return list_of_keys_sorted
-
-
-def extract_values_as_lists(all_records: Iterable[dict], tsv_header: list) -> Iterable[list]:
-    """
-    For an Iterable of record dicts return an Iterable of lists for the values
-    given in tsv_header list.
-    :param all_records: Generator of all records given as dictionaries
-    :param tsv_header: As created by extract_all_keys or given as argv.tsv_header
-    :return: Generator of lists, one list of values per record
-    """
-    for record_dict in all_records:
-
-        if 'leader' in tsv_header:
-            list_of_values = [record_dict['leader']]
-        else:
-            list_of_values = []
-
-        for tsv_column in tsv_header:
-            if len(tsv_column) == 3:
-                try:
-                    list_of_values += [' ||| '.join(record_dict[tsv_column])]
-                except TypeError:
-                    try:
-                        categories = []
-
-                        for repetition in record_dict[tsv_column]:
-                            category = []
-
-                            for subfield in repetition:
-                                if subfield not in ['ind1', 'ind2']:
-                                    subfields = ','.join(repetition[subfield])
-                                    category += [f"""$${subfield}{subfields}"""]
-
-                            categories += [' '.join(category)]
-
-                        list_of_values += [' ||| '.join(categories)]
-
-                    except KeyError:
-                        list_of_values += ['']
-                except KeyError:
-                    list_of_values += ['']
-        yield list_of_values
-
-
-if args.tsv_header:
-    tsv_columns = args.tsv_header.split(',')
 else:
+
+    # extract data
+
+    if args.tsv_header:
+        tsv_columns = args.tsv_header.split(',')
+    else:
+        gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
+        tsv_columns = extract_all_keys(gen_record_dicts, args.concat_repetition, args.split_sf)
+
     gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
-    tsv_columns = extract_all_keys(gen_record_dicts)
 
-gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
+    with open(args.tsv_path, 'w') as tsv_file:
 
-with open(args.tsv_path, 'w') as tsv_file:
-    tsv_file.write('\t'.join(tsv_columns))
-    for record_contents in extract_values_as_lists(gen_record_dicts, tsv_columns):
-        tsv_file.write('\n'+'\t'.join(record_contents))
+        tsv_file.write('\t'.join(tsv_columns))
+
+        for record_contents in extract_values_as_lists(gen_record_dicts, tsv_columns):
+            tsv_file.write('\n'+'\t'.join(record_contents))
