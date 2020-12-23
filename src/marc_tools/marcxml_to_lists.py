@@ -8,51 +8,49 @@ The other function extracts a list of contents for the given MARC21 records as a
 from typing import Iterable
 
 
-def extract_all_keys(all_records: Iterable[dict], concat_repetition: bool = False, split_sf: bool = False) -> list:
+def extract_all_keys_sorted(all_records: Iterable[dict]) -> list:
     """
-    For a as returned by xml_extract.extract_marc_for_job_timestamp
-    create a list of all fields for the header of the tsv.
+    Makes use of extract_all_keys, then sorts the keys, putting "leader" first.
     :param all_records: Generator of all records given as dictionaries
-    :param concat_repetition: If true, concatenates all subfields of a kind of category to one cell
-    :param split_sf: If true, each subfield gets its own column, if false, concatenated with "$$<code>" prefix
-    :return: List of all field-keys within a set of MARC21 records
+    :return: Sorted list of all field-keys within a set of MARC21 records
     """
-    list_of_keys = []
-
-    for record_dict in all_records:
-
-        for field_key in record_dict:
-            if field_key[0:2] != '00' and field_key != 'leader' and not concat_repetition:
-                for field_dict in record_dict[field_key]:
-
-                    ind1 = field_dict['ind1']
-                    ind2 = field_dict['ind2']
-
-                    if args.split_sf:
-                        for subfield_key in field_dict:
-                            if subfield_key[0:3] != 'ind':
-
-                                heading_name = field_key + ind1 + ind2 + subfield_key
-
-                                if heading_name not in list_of_keys:
-                                    list_of_keys += [heading_name]
-
-                    else:
-
-                        heading_name = field_key + ind1 + ind2
-
-                        if heading_name not in list_of_keys:
-                            list_of_keys += [heading_name]
-
-            else:
-                if field_key not in list_of_keys:
-                    list_of_keys += [field_key]
+    list_of_keys = extract_all_keys(all_records)
 
     list_of_keys_sorted = sorted(list_of_keys)
     # put leader first, which will otherwise sort to last
     list_of_keys_sorted.insert(0, list_of_keys_sorted.pop())
 
     return list_of_keys_sorted
+
+
+def extract_all_keys(all_records: Iterable[dict]) -> list:
+    """
+    For a as returned by xml_extract.extract_marc_for_job_timestamp
+    create a list of all fields for the header of the tsv.
+    :param all_records: Generator of all records given as dictionaries
+    :return: Unsorted list of all field-keys within a set of MARC21 records
+    """
+    list_of_keys = []
+
+    for record_dict in all_records:
+
+        for field_key in record_dict:
+            if field_key[0:2] != '00' and field_key != 'leader':
+                for field_dict in record_dict[field_key]:
+
+                    ind1 = field_dict['ind1']
+                    ind2 = field_dict['ind2']
+
+                    heading_name = field_key + ind1 + ind2
+
+                    if heading_name not in list_of_keys:
+                        list_of_keys += [heading_name]
+
+            else:
+                if field_key not in list_of_keys:
+                    list_of_keys += [field_key]
+
+    return list_of_keys
 
 
 def extract_values_as_lists(all_records: Iterable[dict], tsv_header: list) -> Iterable[list]:
