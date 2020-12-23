@@ -5,7 +5,7 @@ handling of the record.
 
 from datetime import datetime
 from logging import getLogger
-from typing import Iterable, Tuple
+from typing import Iterable
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
@@ -72,22 +72,21 @@ def extract_contents_from_marc(record: Element) -> dict:
     return marc21_dict
 
 
-def extract_subfields_from_datafield(datafield: Element) -> dict:
+def extract_subfields_as_string(datafield: Element) -> str:
     """
-    For a given datafield element extract a dictionary of
-    its subfields, where the key is the attribute "code" and
-    the value the subfield's text.
+    For a given datafield element extract a string of
+    its subfields, each is prepended with '$$' and the subfield's code
+    (e. g. $$ager' for subfield a with content 'ger')
     :param datafield:
     :return: Dictionary with subfield-code as key and subfield-text as value.
     """
-    dict_of_subfields = {}
+    def gen_subfield(datafield):
+        for subfield in datafield.findall('subfield'):
+            code = subfield.attrib['code']
+            text = subfield.text
+            yield '$$' + code + text
 
-    for subfield in datafield.findall('subfield'):
-        code = subfield.attrib['code']
-        text = subfield.text
-        append_multiple_to_dict(dict_of_subfields, code, text)
-
-    return dict_of_subfields
+    return ''.join(list(gen_subfield(datafield)))
 
 
 def append_multiple_to_dict(dictionary: dict, key: str, value) -> dict:

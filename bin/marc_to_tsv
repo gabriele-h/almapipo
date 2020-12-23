@@ -6,8 +6,7 @@ from logging import getLogger
 from sys import argv
 import warnings
 
-from alma_rest import logfile_setup
-from alma_rest import xml_extract
+from alma_rest import db_read_write, logfile_setup, xml_extract
 from marc_tools import marcxml_to_lists
 
 logger = getLogger(__name__)
@@ -51,14 +50,14 @@ else:
     if args.tsv_header:
         tsv_columns = args.tsv_header.split(',')
     else:
-        gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
-        tsv_columns = marcxml_to_lists.extract_all_keys(gen_record_dicts)
+        gen_record_elements = db_read_write.get_records_by_timestamp(job_timestamp)
+        tsv_columns = marcxml_to_lists.extract_keys_for_records(gen_record_elements)
 
-    gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
+    gen_record_elements = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
 
     with open(args.tsv_path, 'w') as tsv_file:
 
         tsv_file.write('\t'.join(tsv_columns))
 
-        for record_contents in marcxml_to_lists.extract_values_as_lists(gen_record_dicts, tsv_columns):
+        for record_contents in marcxml_to_lists.extract_values_as_lists(gen_record_elements, tsv_columns):
             tsv_file.write('\n'+'\t'.join(record_contents))
