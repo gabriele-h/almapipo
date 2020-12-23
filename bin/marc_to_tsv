@@ -8,7 +8,7 @@ import warnings
 
 from alma_rest import logfile_setup
 from alma_rest import xml_extract
-from marc_tools.marcxml_to_lists import extract_all_keys, extract_values_as_lists
+from marc_tools import marcxml_to_lists
 
 logger = getLogger(__name__)
 logfile_setup.log_to_stdout(logger)
@@ -27,12 +27,6 @@ parser.add_argument('tsv_path', type=str, help=help_tsv_path)
 
 help_tsv_header = "Provide your own list of categories you want to extract as a comma-separated list of strings."
 parser.add_argument('--tsv-header', type=str, help=help_tsv_header)
-
-help_split_sf = """When set, each subfield gets its own cell. Otherwise concatenates them with " $$" as delimiter."""
-parser.add_argument('--split-sf', action='store_true', help=help_split_sf)
-
-help_repetition = """Concat all contents of a marc tag to one cell with delimiter " ||| " for repeated tags."""
-parser.add_argument('--concat-repetition', action='store_true', help=help_repetition)
 
 args = parser.parse_args()
 
@@ -58,7 +52,7 @@ else:
         tsv_columns = args.tsv_header.split(',')
     else:
         gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
-        tsv_columns = extract_all_keys(gen_record_dicts, args.concat_repetition, args.split_sf)
+        tsv_columns = marcxml_to_lists.extract_all_keys(gen_record_dicts)
 
     gen_record_dicts = xml_extract.extract_marc_for_job_timestamp(job_timestamp)
 
@@ -66,5 +60,5 @@ else:
 
         tsv_file.write('\t'.join(tsv_columns))
 
-        for record_contents in extract_values_as_lists(gen_record_dicts, tsv_columns):
+        for record_contents in marcxml_to_lists.extract_values_as_lists(gen_record_dicts, tsv_columns):
             tsv_file.write('\n'+'\t'.join(record_contents))
