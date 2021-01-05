@@ -145,7 +145,6 @@ class PortfoliosApi(rest_setup.GenericApi):
         """
         Initialize API calls for holding records connected to a bibliographic record.
         :param mms_id: MMS ID of the bibliographic record the portfolio is connected to.
-        :param portfolio_id: ID of the portfolio record.
         """
         self.mms_id = mms_id
 

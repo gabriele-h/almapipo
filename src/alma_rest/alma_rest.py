@@ -206,7 +206,7 @@ def instantiate_api_class(
     :param alma_id: String with concatenated Alma IDs from least to most specific (mms-id, hol-id, item-id)
     :param api: API to call, first path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of the record, usually last path-argument with hardcoded string (e. g. "holdings")
-    :return: API response as a string.
+    :return: Instance of an Api Object with correct path
     """
     split_alma_id = str.split(alma_id, ',')
 
