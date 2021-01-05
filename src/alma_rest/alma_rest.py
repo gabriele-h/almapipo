@@ -233,6 +233,8 @@ def instantiate_api_class(
     elif api == 'users':
         if record_type == 'users':
             return rest_users.UsersApi()
+        else:
+            raise NotImplementedError
 
     logger.error('The API you are trying to call is not implemented yet.')
     raise NotImplementedError
