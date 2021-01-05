@@ -15,7 +15,7 @@ import sys
 from csv import DictReader
 from logging import getLogger
 from os import access, environ, path, R_OK
-from typing import Iterator
+from typing import Iterable
 
 # Logfile
 logger = getLogger(__name__)
@@ -23,15 +23,15 @@ logger = getLogger(__name__)
 ALMA_ID_PATTERN = r"^(22|23|53|61|62|81|99)\d{{2,}}{alma_id_suffix}$"
 
 
-def read_csv_contents(csv_path: str, validation: bool = True) -> Iterator[str]:
+def read_csv_contents(csv_path: str, validation: bool = True) -> Iterable[dict]:
     """
     Feeds the contents of a csv or tsv file into a generator via DictReader.
     If the first column does not match an Alma ID, the whole row
     will be discarded. This validation can be overridden with the
     second param of the function set to False.
-    :param csv_path: Relative or absolute path to a csv or tsv file.
-    :param validation: If set to "False", the first column will not be checked for validity.
-    :return: Generator of csv/tsv file lines as dictionaries.
+    :param csv_path: Relative or absolute path to a csv or tsv file
+    :param validation: If set to "False", the first column will not be checked for validity
+    :return: Generator of csv/tsv file lines as dictionaries
     """
     logger.info(f"Reading file {csv_path} into generator.")
 

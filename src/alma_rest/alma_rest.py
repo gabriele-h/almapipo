@@ -185,7 +185,6 @@ def csv_id_generator_and_add_to_source_csv(csv_path: str, validation: bool = Tru
         db_session = db_setup.create_db_session()
         csv_generator = input_read.read_csv_contents(csv_path, validation)
         for csv_line in csv_generator:
-            # noinspection PyTypeChecker
             db_read_write.add_csv_line_to_source_csv_table(csv_line, job_timestamp, db_session)
             db_session.commit()
             yield list(csv_line.values())[0]
