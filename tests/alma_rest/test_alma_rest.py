@@ -6,6 +6,11 @@ from alma_rest import alma_rest, rest_bibs, rest_electronic, rest_users
 
 
 class TestInstantiateApiClass:
+    """
+    Tests for alma_rest.alma_rest.instantiate_api_class
+    Tests for specific kinds of APIs will be listed in their own inner classes, e. g. TestInstantiateApiClassBibs
+    Tests for NotImplementedErros are indicated by the string "nonexistent"
+    """
 
     def test_instantiate_api_class_faulty(self):
         with pytest.raises(NotImplementedError):
