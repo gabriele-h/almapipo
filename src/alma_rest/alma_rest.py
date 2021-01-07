@@ -13,7 +13,6 @@ from typing import Callable, Iterable
 
 from . import db_setup
 from . import db_read_write
-from . import input_read
 from . import rest_bibs
 from . import rest_conf
 from . import rest_electronic
@@ -171,27 +170,6 @@ def call_api_for_record(
                     db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
 
     db_session.commit()
-
-
-def csv_id_generator_and_add_to_source_csv(csv_path: str, validation: bool = True) -> Iterable[str]:
-    """
-    Imports a whole csv or tsv file to the table source_csv and returns generator of alma_ids as per first column.
-    Checks for file existence first.
-    :param csv_path: Path to the CSV file to be imported
-    :param validation: If set to "False", the first column will not be checked for validity. Defaults to True.
-    :return: Generator of Alma IDs
-    """
-    if input_read.check_file_path(csv_path):
-        db_session = db_setup.create_db_session()
-        csv_generator = input_read.read_csv_contents(csv_path, validation)
-        for csv_line in csv_generator:
-            db_read_write.add_csv_line_to_source_csv_table(csv_line, job_timestamp, db_session)
-            db_session.commit()
-            yield list(csv_line.values())[0]
-        db_session.close()
-    else:
-        logger.error('No valid file path provided.')
-        raise ValueError
 
 
 def instantiate_api_class(

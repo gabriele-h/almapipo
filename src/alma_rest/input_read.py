@@ -11,7 +11,6 @@ manipulations.
 """
 
 import re
-import sys
 from csv import DictReader
 from logging import getLogger
 from os import access, environ, path, R_OK
@@ -36,7 +35,8 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterable[dict]:
     logger.info(f"Reading file {csv_path} into generator.")
 
     if not check_file_path(csv_path):
-        exit(1)
+        logger.error('No valid file path provided.')
+        raise ValueError
 
     if csv_path[-4:] in ['.csv', '.CSV']:
         delimit = ';'
@@ -44,7 +44,7 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterable[dict]:
         delimit = '\t'
     else:
         logger.error(f"Extension of the given file not expected (csv for semicolon, tsv for tabs).")
-        sys.exit(1)
+        raise ValueError
 
     with open(csv_path, newline="") as csv_file:
         csv_reader = DictReader(csv_file, delimiter=delimit)
