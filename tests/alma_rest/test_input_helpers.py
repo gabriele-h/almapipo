@@ -57,12 +57,12 @@ class TestCsvAlmaIdGenerator:
 
     def test_func_yields_all_entries(self, prevent_check_file_path, csv_with_contents):
         g = input_helpers.csv_almaid_generator('/path/to/csv')
-        result = list(g)   # process everything
-        assert len(result) == 2
+        result = list(g)
+        assert result == ['9981093873901234', '9981093873911234']
 
     def test_process_empty_csv(self, prevent_check_file_path, csv_without_contents):
         g = input_helpers.csv_almaid_generator('/path/to/csv')
-        result = list(g)   # process everything
+        result = list(g)
         assert not result
 
 
