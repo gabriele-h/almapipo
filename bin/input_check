@@ -4,8 +4,7 @@ from argparse import ArgumentParser
 from logging import getLogger
 from sys import argv
 
-from alma_rest import input_read
-from alma_rest import logfile_setup
+from alma_rest import input_read, logfile_setup
 
 # Logfile
 
@@ -25,9 +24,6 @@ help_path_to_input_file = "Path to a file ending on csv, tsv, CSV or TSV. Values
 parser.add_argument('path_to_input_file', type=str, help=help_path_to_input_file)
 
 args = parser.parse_args()
-
-
-# check file validity
 
 
 def set_csv_path_from_argv1() -> str:

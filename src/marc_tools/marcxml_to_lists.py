@@ -20,9 +20,11 @@ def extract_all_keys_sorted(all_records: Iterable[dict]) -> list:
     :param all_records: Generator of all records given as dictionaries
     :return: Sorted list of all field-keys within a set of MARC21 records
     """
+
     list_of_keys = extract_keys_for_records(all_records)
 
     list_of_keys_sorted = sorted(list_of_keys)
+
     # put leader first, which will otherwise sort to last
     list_of_keys_sorted.insert(0, list_of_keys_sorted.pop())
 
@@ -101,11 +103,16 @@ def extract_values_as_lists(all_records: Iterable[Element], tsv_header: list) ->
                 xpath = f'controlfield[@tag="{tag}"]'
 
                 if len(field_element.findall(xpath)) > 1:
+
                     indices = [i for i, x in enumerate(tsv_header) if x == tsv_header[i]]
                     num_occurence = indices.index(i)
+
                     list_of_values += [field_element.findall(xpath)[num_occurence].text]
+
                 elif len(field_element.findall(xpath)) == 1:
+
                     list_of_values += [field_element.find(xpath).text]
+
                 else:
                     list_of_values += ['']
 
@@ -117,18 +124,23 @@ def extract_values_as_lists(all_records: Iterable[Element], tsv_header: list) ->
                 xpath = f'datafield[@tag="{tag}"][@ind1="{ind1}"][@ind2="{ind2}"]'
 
                 if len(field_element.findall(xpath)) > 1:
+
                     indices = [i for i, x in enumerate(tsv_header) if x == tsv_header[i]]
                     num_occurence = indices.index(i)
                     subfields = xml_extract.extract_subfields_as_string(field_element.findall(xpath)[num_occurence])
+
                     list_of_values += [subfields]
+
                 elif len(field_element.findall(xpath)) == 1:
+
                     subfields = xml_extract.extract_subfields_as_string(field_element.find(xpath))
+
                     list_of_values += [subfields]
+
                 else:
                     list_of_values += ['']
 
             else:
-
                 logger.error('Key does not match expected format. Either "leader" or length of 3 or 5 expected.')
                 continue
 

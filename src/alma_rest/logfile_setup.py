@@ -9,6 +9,7 @@ log_formatter = logging.Formatter(log_format_string)
 
 logfile_dir_path = Path(environ['ALMA_REST_LOGFILE_DIR'])
 logfile_path = logfile_dir_path / 'alma_rest.log'
+
 logging.basicConfig(
     format=log_format_string,
     filename=logfile_path,

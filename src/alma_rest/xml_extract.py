@@ -35,7 +35,7 @@ def extract_marc_for_job_timestamp(job_timestamp: datetime) -> Iterable[dict]:
     will be pertained. This function is meant for the kind of analysis where you
     need to compare the content of two specific fields. All analyses that need to
     be order-aware should be done via xpath directly in the database. Use the
-    script marc_to_tsv.py to look at the data in Excel.
+    script fetched_records_to_tsv.py to look at the data in Excel.
     :param job_timestamp: Job to extract the data for
     :return: Generator of dictionaries
     """

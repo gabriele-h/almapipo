@@ -41,16 +41,22 @@ def retrieve_all_locations_generator() -> Iterable[str]:
     "library" to the root element "locations" of all xml strings in the generator.
     :return: Generator of strings containing get_locations() return values plus attribute "library"
     """
+
     logger.info(f"Trying to fetch all locations for all libraries configured in Alma.")
+
     libraries_record = retrieve_libraries()
     libraries_xml = fromstring(libraries_record)
+
     for library in libraries_xml.findall('library/code'):
+
         library_code = library.text
         locations = retrieve_locations(library_code)
         locations_xml = fromstring(locations)
+
         if locations_xml:
             locations_xml.set('library', library_code)
             yield tostring(locations_xml, encoding='unicode')
+
         logger.warning(f'Library {library_code} has no locations.')
 
 
@@ -60,8 +66,11 @@ def retrieve_locations(library: str) -> str:
     :param library:
     :return: str
     """
+
     logger.info(f"Trying to fetch all locations for library {library}.")
+
     locations_record = rest_setup.call_api(f'/conf/libraries/{library}/locations', 'GET', 200)
+
     return locations_record
 
 
@@ -78,6 +87,7 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
     :param set_id: Set ID as given in Set Details in the Alma UI
     :return: Generator of alma_id
     """
+
     logger.info(f"Trying to extract alma_id for all members of set {set_id}.")
 
     regex_prefix = r'^/?\w+/'
@@ -117,7 +127,9 @@ def retrieve_set_member_link_and_id(set_id: str) -> Iterable[Iterable[str]]:
     :param set_id: Set ID as given in Set Details in the Alma UI
     :return: Generator of a list of two values: member/@link and member/id/text()
     """
+
     logger.info(f"Trying to fetch URLs for all members of {set_id}.")
+
     num_members = retrieve_set_total_record_count(set_id)
 
     api_url_path = f'/conf/sets/{set_id}/members'
@@ -147,8 +159,11 @@ def retrieve_set_total_record_count(set_id: str) -> int:
     :param set_id: Set ID as given in Set Details in the Alma UI
     :return: Number of members as int (total_record_count)
     """
+
     logger.info(f"Trying to fetch number of members for set {set_id}.")
+
     members_in_set = rest_setup.call_api(f'/conf/sets/{set_id}/members?limit=1', 'GET', 200)
     response_xml = fromstring(members_in_set)
     num_members = response_xml.attrib['total_record_count']
+
     return int(num_members)

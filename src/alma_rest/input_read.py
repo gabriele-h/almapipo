@@ -11,6 +11,7 @@ manipulations.
 """
 
 import re
+import warnings
 from csv import DictReader
 from logging import getLogger
 from os import access, environ, path, R_OK
@@ -47,9 +48,13 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterable[dict]:
         raise ValueError
 
     with open(csv_path, newline="") as csv_file:
+
         csv_reader = DictReader(csv_file, delimiter=delimit)
+
         for row in csv_reader:
+
             first_column_value = list(row.values())[0]
+
             if all(is_this_an_alma_id(string) for string in str.split(first_column_value, ',')) \
                     or not validation:
                 yield row
@@ -64,10 +69,12 @@ def check_file_path(file_path: str) -> bool:
     :param file_path: Absolute or relative path to the csv/tsv file.
     :return: Boolean to indicate if the provided file exists, is readable and ends on .csv or .tsv.
     """
+
     if path.exists(file_path) \
             and access(file_path, R_OK) \
             and file_path[-4:] in ['.csv', '.tsv', '.CSV', '.TSV']:
         return True
+
     logger.error(f"File {file_path} does not exist, is not readable, or does not end on csv, tsv, CSV or TSV.")
 
 
@@ -78,6 +85,7 @@ def is_this_an_alma_id(identifier: str) -> bool:
     :param identifier: String to be verified as an Alma-ID.
     :return: Boolean indicating the status of the verification.
     """
+
     if type(identifier) != str:
         logger.warning("Please provide ID as a string.")
         return False
@@ -87,14 +95,19 @@ def is_this_an_alma_id(identifier: str) -> bool:
         return False
 
     try:
+
         alma_id_suffix = environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX']
+
     except KeyError:
-        logger.error("Env var 'ALMA_REST_ID_INSTITUTIONAL_SUFFIX' not set.")
-        exit(1)
 
-    pattern = ALMA_ID_PATTERN.format(alma_id_suffix=alma_id_suffix)
-    if re.fullmatch(pattern, identifier):
-        return True
+        warnings.warn("Env var 'ALMA_REST_ID_INSTITUTIONAL_SUFFIX' not set.")
 
-    logger.warning(f"Identifier is not a valid Alma ID: '{identifier}'")
-    return False
+    else:
+
+        pattern = ALMA_ID_PATTERN.format(alma_id_suffix=alma_id_suffix)
+
+        if re.fullmatch(pattern, identifier):
+            return True
+
+        logger.warning(f"Identifier is not a valid Alma ID: '{identifier}'")
+        return False

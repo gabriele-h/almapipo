@@ -27,9 +27,11 @@ def add_element_to_root(
     :param element_attributes: Attributes of the element to be added
     :return: ElementTree of the manipulated xml
     """
+
     manipulated_xml = deepcopy(xml)
     element = create_element(element_tag, element_text, element_attributes)
     manipulated_xml.append(element)
+
     return manipulated_xml
 
 
@@ -50,10 +52,13 @@ def add_element_to_child(
     :param element_attributes: Attributes of the element to be added
     :return: ElementTree of the manipulated xml
     """
+
     manipulated_xml = deepcopy(xml)
     element = create_element(element_tag, element_text, element_attributes)
+
     for child in manipulated_xml.findall(child):
         child.append(element)
+
     return manipulated_xml
 
 
@@ -80,21 +85,32 @@ def update_element(
     :param new_element_attributes: Attributes of the new element
     :return: ElementTree of the manipulated xml
     """
+
     manipulated_xml = deepcopy(xml)
     list_of_elements = check_element_existence(manipulated_xml, element_tag, old_element_text, old_element_attributes)
+
     for element in list_of_elements:
+
         if new_element_text:
+
             element.text = new_element_text
+
             log_string = f"""Element {element_tag} had text {old_element_text}. """
             log_string += f"""New text is {new_element_text}."""
             logger.info(log_string)
+
         elif new_element_attributes:
+
             element.attrib = new_element_attributes
+
             log_string = f"""Element {element_tag} had attributes {old_element_attributes}. """
             log_string += f"""New attributes are {new_element_attributes}."""
             logger.info(log_string)
+
         else:
+
             logger.warning("Could not modify any element.")
+
     return manipulated_xml
 
 
@@ -108,9 +124,12 @@ def remove_element_by_path(xml: ElementTree, element_tag: str) -> ElementTree:
     :param element_tag: Type of tag to be removed from the XML
     :return: ElementTree of the manipulated xml
     """
+
     manipulated_xml = deepcopy(xml)
+
     for element in manipulated_xml.findall(element_tag):
         manipulated_xml.remove(element)
+
     return manipulated_xml
 
 
@@ -129,19 +148,29 @@ def check_element_existence(
     :param element_attributes: Attributes of the element to be searched for
     :return: List of matching Elements
     """
+
     list_of_elements = []
+
     for element in xml.findall(element_tag):
+
         if element_text and element.text == element_text:
+
             if element_attributes and element.attrib == element_attributes:
                 list_of_elements.append(element)
             elif not element_attributes:
                 list_of_elements.append(element)
+
         elif not element_text and element_attributes and element.attrib == element_attributes:
+
             list_of_elements.append(element)
+
         elif not element_attributes and not element_text:
+
             list_of_elements.append(element)
+
     if not list_of_elements:
         logger.info(f'No matching element found with {element_tag}, {element_text} and {element_attributes}.')
+
     return list_of_elements
 
 
@@ -155,10 +184,13 @@ def create_element(
     :param element_text: Text of the element to be added
     :param element_attributes: Attributes of the element to be added
     """
+
     if element_attributes:
         element = Element(element_tag, element_attributes)
     else:
         element = Element(element_tag)
+
     if element_text:
         element.text = element_text
+
     return element

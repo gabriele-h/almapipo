@@ -31,6 +31,9 @@ class UsersApi(rest_setup.GenericApi):
         :param user_id: Any unique ID of the user
         :return: Record in XML format as a string
         """
+
         logger.info(f'Trying to fetch all fees for user_id {user_id}.')
+
         all_fees = self.retrieve(f'{user_id}/fees')
+
         return all_fees

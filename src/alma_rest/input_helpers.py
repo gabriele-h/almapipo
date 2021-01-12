@@ -19,7 +19,9 @@ def csv_almaid_generator(csv_path: str, validation: bool = False) -> Iterable[st
     :param validation: If set to "False", the first column will not be checked for validity. Defaults to False.
     :return: Generator of Alma IDs
     """
+
     csv_generator = input_read.read_csv_contents(csv_path, validation)
+
     for csv_line in csv_generator:
         yield list(csv_line.values())[0]
 
@@ -33,9 +35,13 @@ def add_csv_to_source_csv_table(csv_path: str, job_timestamp: str, validation: b
     :param validation: If set to "False", the first column will not be checked for validity. Defaults to False.
     :return: Generator of Alma IDs
     """
+
     db_session = db_setup.create_db_session()
+
     csv_generator = input_read.read_csv_contents(csv_path, validation)
+
     for csv_line in csv_generator:
         db_read_write.add_csv_line_to_source_csv_table(csv_line, job_timestamp, db_session)
+
     db_session.commit()
     db_session.close()

@@ -65,11 +65,16 @@ class GenericApi:
         :param url_parameters: Use if you need to add parameters to the URL
         :return: Response data in XML format
         """
+
         logger.info(f"Trying POST for {self.base_path}.")
+
         full_path = self.base_path
+
         if url_parameters:
             full_path = add_parameters(self.base_path, url_parameters)
+
         response_content = call_api(full_path, 'POST', 200, record_data)
+
         return response_content
 
     def delete(self, record_id: str, url_parameters: dict = None) -> str:
@@ -86,11 +91,16 @@ class GenericApi:
         :param url_parameters: Use if you need to add parameters to the URL
         :return: API response
         """
+
         logger.info(f"Trying DELETE for {record_id} at {self.base_path}.")
+
         full_path = f'{self.base_path}{record_id}'
+
         if url_parameters:
             full_path = add_parameters(full_path, url_parameters)
+
         delete_response = call_api(full_path, 'DELETE', 204)
+
         return delete_response
 
     def retrieve(self, record_id: str, url_parameters: dict = None) -> str:
@@ -104,11 +114,16 @@ class GenericApi:
         :param url_parameters: Use if you need to add parameters to the URL
         :return: Record data of the bib record
         """
+
         logger.info(f"Trying GET for {record_id} at {self.base_path}.")
+
         full_path = f'{self.base_path}{record_id}'
+
         if url_parameters:
             full_path = add_parameters(full_path, url_parameters)
+
         response_content = call_api(full_path, 'GET', 200)
+
         return response_content
 
     def update(self, record_id: str, record_data: bytes, url_parameters: dict = None) -> str:
@@ -123,11 +138,16 @@ class GenericApi:
         :param url_parameters: Use if you need to add parameters to the URL
         :return: Response data in XML format
         """
+
         logger.info(f"Trying PUT for {record_id} at {self.base_path}.")
+
         full_path = f'{self.base_path}{record_id}'
+
         if url_parameters:
             full_path = add_parameters(full_path, url_parameters)
+
         response_content = call_api(full_path, 'PUT', 200, record_data)
+
         return response_content
 
 
@@ -138,9 +158,12 @@ def add_parameters(url: str, parameters: dict) -> str:
     :param parameters: dictionary of the parameters.
     :return:
     """
+
     logger.info(f"Additional parameters provided: {parameters}.")
+
     url_parameters = parse.urlencode(parameters)
     full_url = f"{url}?{url_parameters}"
+
     return full_url
 
 
@@ -163,23 +186,30 @@ def call_api(url_parameters: str, method: str, status_code: int, record_data: by
     :param record_data: Necessary input for POST and PUT, defaults to None.
     :return: The API response's content in XML format as a string.
     """
+
     with create_alma_api_session('xml') as session:
+
         alma_url = api_base_url+url_parameters
         alma_response = switch_api_method(alma_url, method, session, record_data)
 
         if alma_response.status_code == status_code:
+
             alma_response_content = alma_response.content.decode("utf-8")
-            logger.info(
-                f'{method} for "{url_parameters}" completed.'
-            )
+
+            logger.info(f'{method} for "{url_parameters}" completed.')
+
             if '<errorList>' in alma_response_content:
+
                 log_string = f"""The response contained an error, even though it had status code {status_code}. """
                 log_string += f"""Reason: {alma_response.status_code} - {alma_response.content}"""
                 logger.warning(log_string)
+
             elif not alma_response_content.startswith('<?xml') and status_code != 204:
+
                 log_string = f"""The response retrieved does not seem to be valid xml - startswith('<?xml') -- """
                 log_string += {alma_response_content}
                 logger.error(log_string)
+
             return alma_response_content
 
         error_string = f"""{method} for "{alma_url}" failed. """
@@ -196,6 +226,7 @@ def switch_api_method(alma_url: str, method: str, session: Session, record_data:
     :param record_data: Necessary input for POST and PUT, defaults to None.
     :return:
     """
+
     if method == 'DELETE':
         return session.delete(alma_url)
     elif method == 'GET':
@@ -204,6 +235,7 @@ def switch_api_method(alma_url: str, method: str, session: Session, record_data:
         return session.post(alma_url, data=record_data)
     elif method == 'PUT':
         return session.put(alma_url, data=record_data)
+
     logger.error('No valid REST method supplied.')
     raise ValueError
 
@@ -213,11 +245,14 @@ def create_alma_api_session(session_format) -> Session:
     :param session_format: Format in which records are sent and retrieved.
     :return: Session object for connections to Alma
     """
+
     session = Session()
+
     session.headers.update({
         "accept": "application/" + session_format,
         "Content-Type": "application/" + session_format,
         "authorization": f"apikey {api_key}",
         "User-Agent": "alma_rest/0.0.1"
     })
+
     return session

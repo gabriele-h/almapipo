@@ -39,8 +39,9 @@ def check_data_sent_equals_response(
     :param session: Session to be used for the check
     :return: True if matches, False if non-existent or does not match.
     """
+
     sent_id = func.concat(db_setup.SentRecords.alma_id, db_setup.SentRecords.job_timestamp)
-    received_id = func.concat(db_setup.PutPostResponses.alma_id, db_setup.PutPostResponses.job_timestamp)
+    response_id = func.concat(db_setup.PutPostResponses.alma_id, db_setup.PutPostResponses.job_timestamp)
 
     if check_data_sent_and_response_exist(alma_id, job_timestamp, session):
 
@@ -48,7 +49,7 @@ def check_data_sent_equals_response(
             db_setup.PutPostResponses
         ).join(
             db_setup.SentRecords,
-            sent_id == received_id
+            sent_id == response_id
         ).filter(
             db_setup.SentRecords.alma_record.cast(String) == db_setup.PutPostResponses.alma_record.cast(String)
         ).filter_by(
@@ -115,7 +116,9 @@ def get_value_from_source_csv(
     :param json_key: Heading of the column that has the desired information
     :return: Value from source_csv json for json_key
     """
+
     db_session = db_setup.create_db_session()
+
     value_query = db_session.query(
         db_setup.SourceCsv
     ).filter(
@@ -123,8 +126,11 @@ def get_value_from_source_csv(
     ).filter_by(
         job_timestamp=job_timestamp
     )
+
     json_value = value_query.first().csv_line[json_key]
+
     db_session.close()
+
     return json_value
 
 
@@ -134,6 +140,7 @@ def get_records_by_timestamp(job_timestamp: datetime) -> Iterable[Element]:
     :param job_timestamp: Job that created the entry in fetched_records
     :return: XML of the records
     """
+
     db_session = db_setup.create_db_session()
 
     record_query = db_session.query(
@@ -141,6 +148,7 @@ def get_records_by_timestamp(job_timestamp: datetime) -> Iterable[Element]:
     ).filter_by(
         job_timestamp=job_timestamp
     )
+
     db_session.close()
 
     for result in record_query.all():
@@ -154,7 +162,9 @@ def get_most_recent_version_from_fetched_records(alma_id: str):
     :param alma_id: Comma separated string of Alma IDs to identify the record.
     :return: SQLAlchemy query object of the record.
     """
+
     db_session = db_setup.create_db_session()
+
     record_query = db_session.query(
         db_setup.FetchedRecords
     ).filter_by(
@@ -162,7 +172,9 @@ def get_most_recent_version_from_fetched_records(alma_id: str):
     ).order_by(
         db_setup.FetchedRecords.job_timestamp.desc()
     ).limit(1)
+
     db_session.close()
+
     return record_query.first()
 
 
@@ -180,6 +192,7 @@ def update_job_status(status: str,
     :param session: Session to be used for the manipulation.
     :return: None
     """
+
     list_of_matched_rows = session.query(
         db_setup.JobStatusPerId
     ).filter_by(
@@ -189,6 +202,7 @@ def update_job_status(status: str,
     ).filter_by(
         job_action=method
     )
+
     list_of_matched_rows[0].job_status = status
 
 
@@ -202,6 +216,7 @@ def get_list_of_ids_by_status_and_method(status: str, method: str, job_timestamp
     :param job_timestamp: Timestamp to identify the job responsible for the ID.
     :return: List of IDs.
     """
+
     list_of_ids = session.query(
         db_setup.JobStatusPerId.alma_id
     ).filter_by(
@@ -211,6 +226,7 @@ def get_list_of_ids_by_status_and_method(status: str, method: str, job_timestamp
     ).filter_by(
         job_action=method
     )
+
     return list_of_ids
 
 
@@ -225,12 +241,15 @@ def add_put_post_response(alma_id: str, record_data: str, job_timestamp: datetim
     :param session: DB session to add the lines to.
     :return: None
     """
+
     record_data_xml = fromstring(record_data)
+
     line_for_table_put_post_responses = db_setup.PutPostResponses(
         alma_id=alma_id,
         alma_record=record_data_xml,
         job_timestamp=job_timestamp,
     )
+
     session.add(line_for_table_put_post_responses)
 
 
@@ -245,12 +264,15 @@ def add_sent_record(alma_id: str, record_data: bytes, job_timestamp: datetime, s
     :param session: DB session to add the lines to.
     :return: None
     """
+
     record_data_xml = fromstring(record_data)
+
     line_for_table_sent_records = db_setup.SentRecords(
         alma_id=alma_id,
         alma_record=record_data_xml,
         job_timestamp=job_timestamp,
     )
+
     session.add(line_for_table_sent_records)
 
 
@@ -269,11 +291,13 @@ def add_response_content_to_fetched_records(
     :param session: DB session to add the lines to.
     :return: None
     """
+
     line_for_table_fetched_records = db_setup.FetchedRecords(
         alma_id=alma_id,
         alma_record=record_data,
         job_timestamp=job_timestamp,
     )
+
     session.add(line_for_table_fetched_records)
 
 
@@ -289,10 +313,12 @@ def add_csv_line_to_source_csv_table(
     :param session: DB session to add the data to.
     :return: None
     """
+
     line_for_table_source_csv = db_setup.SourceCsv(
         job_timestamp=job_timestamp,
         csv_line=csv_line
     )
+
     session.add(line_for_table_source_csv)
 
 
@@ -309,12 +335,14 @@ def add_alma_id_to_job_status_per_id(
     :param session: DB session to add the data to.
     :return: None
     """
+
     line_for_table_job_status_per_id = db_setup.JobStatusPerId(
         job_timestamp=job_timestamp,
         alma_id=alma_id,
         job_status='new',
         job_action=method
     )
+
     session.add(line_for_table_job_status_per_id)
 
 
@@ -327,9 +355,11 @@ def log_success_rate(method: str, job_timestamp: datetime, db_session: Session) 
     :param db_session: DB session to make use of.
     :return: None
     """
+
     ids_done = get_list_of_ids_by_status_and_method('done', method, job_timestamp, db_session)
     ids_error = get_list_of_ids_by_status_and_method('error', method, job_timestamp, db_session)
     ids_new = get_list_of_ids_by_status_and_method('new', method, job_timestamp, db_session)
+
     logger.info(f"{method} was done for {ids_done.count()} record(s).")
     logger.info(f"{method} had errors for {ids_error.count()} record(s).")
     logger.info(f"{method} was not handled for {ids_new.count()} record(s).")

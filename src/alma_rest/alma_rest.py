@@ -3,7 +3,10 @@
 This will import the other modules and do the following:
 * Call the API on a list of records with the according method (POST, GET, PUT, DELETE)
 * Save the results of successful API calls to database table fetched_records
-* If API calls are not successful, mark the IDs with "error" in job_status_per_id
+* In job_status_per_id keep track of the API-call's success:
+    * Unhandled calls keep status "new"
+    * Successful calls change to "done"
+    * If there is an error to "error"
 """
 
 from logging import getLogger
@@ -11,13 +14,8 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from typing import Callable, Iterable
 
-from . import db_setup
-from . import db_read_write
-from . import rest_bibs
-from . import rest_conf
-from . import rest_electronic
-from . import rest_users
-from . import rest_setup
+from . import db_setup, db_read_write
+from . import rest_bibs, rest_conf, rest_electronic, rest_setup, rest_users
 
 # Timestamp as inserted in the database
 job_timestamp = datetime.now(timezone.utc)
@@ -48,13 +46,12 @@ def call_api_for_set(
     db_read_write.add_alma_id_to_job_status_per_id('GET', set_id, job_timestamp, db_session)
     alma_id_list = rest_conf.retrieve_set_member_alma_ids(set_id)
 
-    try:
-        call_api_for_list(alma_id_list, api, record_type, method, manipulate_record)
-    except TypeError:
+    if type(alma_id_list) is None:
         db_read_write.update_job_status('error', set_id, 'GET', job_timestamp, db_session)
         logger.error(f"""An error occurred while retrieving the set's members. Is the set {set_id} empty?""")
-    else:
-        db_read_write.update_job_status('done', set_id, 'GET', job_timestamp, db_session)
+
+    call_api_for_list(alma_id_list, api, record_type, method, manipulate_record)
+    db_read_write.update_job_status('done', set_id, 'GET', job_timestamp, db_session)
 
     db_session.commit()
     db_session.close()
@@ -153,20 +150,27 @@ def call_api_for_record(
             new_record_data = manipulate_record(alma_id, record_data)
 
             if not new_record_data:
+
                 logger.error(f'Could not manipulate data of record {alma_id}.')
                 db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
+
             else:
 
                 response = CurrentApi.update(record_id, new_record_data)
 
                 if response:
+
                     logger.info(f'Manipulation for {alma_id} successful. Adding to put_post_responses.')
+
                     db_read_write.add_put_post_response(alma_id, response, job_timestamp, db_session)
                     db_read_write.add_sent_record(alma_id, new_record_data, job_timestamp, db_session)
                     db_read_write.update_job_status('done', alma_id, method, job_timestamp, db_session)
                     db_read_write.check_data_sent_equals_response(alma_id, job_timestamp, db_session)
+
                 else:
+
                     logger.error(f'Did not receive a response for {alma_id}?')
+
                     db_read_write.update_job_status('error', alma_id, method, job_timestamp, db_session)
 
     db_session.commit()
@@ -188,6 +192,7 @@ def instantiate_api_class(
     split_alma_id = str.split(alma_id, ',')
 
     if api == 'bibs':
+
         if record_type == 'bibs':
             return rest_bibs.BibsApi()
         elif record_type == 'holdings':
@@ -198,7 +203,9 @@ def instantiate_api_class(
             return rest_bibs.PortfoliosApi(split_alma_id[0])
         else:
             raise NotImplementedError
+
     elif api == 'electronic':
+
         if record_type == 'e-collections':
             return rest_electronic.EcollectionsApi()
         elif record_type == 'e-services':
@@ -207,11 +214,13 @@ def instantiate_api_class(
             return rest_electronic.PortfoliosApi(split_alma_id[0], split_alma_id[1])
         else:
             raise NotImplementedError
+
     elif api == 'users':
+
         if record_type == 'users':
             return rest_users.UsersApi()
         else:
             raise NotImplementedError
 
-    logger.error('The API you are trying to call is not implemented yet.')
+    logger.error('The API you are trying to call is not implemented yet or does not exist.')
     raise NotImplementedError

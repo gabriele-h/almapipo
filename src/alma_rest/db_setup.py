@@ -61,11 +61,14 @@ def prepare_connection_params_from_env() -> str:
     Set up the engine for connections to the PostgreSQL database.
     :return: String with connection params as provided via env vars.
     """
+
     database = environ["ALMA_REST_DB"]
     db_user = environ["ALMA_REST_DB_USER"]
     db_pw = environ["ALMA_REST_DB_PW"]
     db_url = environ["ALMA_REST_DB_URL"]
+
     connection_params = f'postgresql://{db_user}:{db_pw}@{db_url}/{database}'
+
     return connection_params
 
 
@@ -79,9 +82,11 @@ def create_db_session(
     :param verbosity: Whether or not to add SQLAlchemy output to the log, defaults to env var ALMA_REST_DB_VERBOSE
     :return: Session for connection to the DB.
     """
+
     db_engine = create_engine(connection_params, echo=verbosity)
     DBSession = sessionmaker(bind=db_engine)
     session = DBSession()
+
     return session
 
 
