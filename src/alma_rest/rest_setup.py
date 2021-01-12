@@ -30,12 +30,17 @@ def test_calls_remaining_today():
     for the day.
     :return: Number of calls left according to daily API Request Threshold
     """
+
     with create_alma_api_session('xml') as session:
+
         alma_response = switch_api_method(f'{api_base_url}/bibs/test', 'GET', session)
         alma_response_headers = alma_response.headers
-        info_string = f"""API calls left for today: {alma_response_headers['X-Exl-Api-Remaining']}"""
-        print(info_string)
+        calls_remaining = alma_response_headers['X-Exl-Api-Remaining']
+
+        info_string = f"""API calls left for today: {calls_remaining}"""
         logger.info(info_string)
+
+        return calls_remaining
 
 
 class GenericApi:

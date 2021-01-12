@@ -171,17 +171,18 @@ Usually you will not need to directly access the module `rest_setup`.
 You might find `test_calls_remaining_today` useful though, as it creates a message
 with the number of remaining API calls. It's perfect for a first call to the API
 as it requires no parameters at all and provides information you will need
-in the future.
+in the future. It returns the number of left calls and logs them to the log file.
 
 **Note:** The function itself makes a call to /bibs/test and will be counted as an API call.
 
 ```python
 from alma_rest import rest_setup
-rest_setup.test_calls_remaining_today()
+num_calls = rest_setup.test_calls_remaining_today()
+print(num_calls)
 ```
 Output should look something like this:
 ```text
-API calls left for today: 54123
+54123
 ```
 If it does not and there is no python error message, check the logfile.
 There might be something missing and/or wrong in your configuration.

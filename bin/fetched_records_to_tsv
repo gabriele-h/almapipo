@@ -30,8 +30,6 @@ parser.add_argument('--tsv-header', type=str, help=help_tsv_header)
 args = parser.parse_args()
 
 
-# set timestamp from argv
-
 timestamp_format = '%Y-%m-%d %H:%M:%S.%f%z'
 
 try:
@@ -48,8 +46,11 @@ else:
     # extract data
 
     if args.tsv_header:
+
         tsv_columns = args.tsv_header.split(',')
+
     else:
+
         gen_record_elements = db_read_write.get_records_by_timestamp(job_timestamp)
         tsv_columns = marcxml_to_lists.extract_keys_for_records(gen_record_elements)
 
