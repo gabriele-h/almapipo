@@ -19,7 +19,8 @@ logging.basicConfig(
 
 def log_to_stdout(logger_name: logging.getLogger) -> None:
     """
-    For scripts called from commandline, provide ability to log directly to standard out.
+    For scripts called from commandline, provide ability to log directly to
+    standard out.
     :param logger_name: Logger of the invoking script.
     :return: None
     """

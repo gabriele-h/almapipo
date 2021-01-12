@@ -14,14 +14,16 @@ logfile_setup.log_to_stdout(input_read.logger)
 
 # provide -h information on the script
 
-parser_description = """Checks the first row of data in a csv or tsv file for validity.
-Will print either the first valid line or information on why the file failed to validate."""
+parser_description = """Checks first data row in csv or tsv file for validity.
+Will print either the first valid line 
+or information on why the file failed to validate."""
 
 parser = ArgumentParser(
     description=parser_description,
     epilog="")
-help_path_to_input_file = "Path to a file ending on csv, tsv, CSV or TSV. Values must be delimited by semicolon or tab."
-parser.add_argument('path_to_input_file', type=str, help=help_path_to_input_file)
+help_input_file = "Path to a file ending on csv, tsv, CSV or TSV." \
+                          " Values must be delimited by semicolon or tab."
+parser.add_argument('input_file', type=str, help=help_input_file)
 
 args = parser.parse_args()
 

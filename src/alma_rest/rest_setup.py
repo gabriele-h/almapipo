@@ -33,7 +33,9 @@ def test_calls_remaining_today():
 
     with create_alma_api_session('xml') as session:
 
-        alma_response = switch_api_method(f'{api_base_url}/bibs/test', 'GET', session)
+        alma_response = switch_api_method(
+            f'{api_base_url}/bibs/test', 'GET', session
+        )
         alma_response_headers = alma_response.headers
         calls_remaining = alma_response_headers['X-Exl-Api-Remaining']
 
@@ -126,7 +128,11 @@ class GenericApi:
 
         return response_content
 
-    def update(self, record_id: str, record_data: bytes, url_parameters: dict = None) -> str:
+    def update(
+            self,
+            record_id: str,
+            record_data: bytes,
+            url_parameters: dict = None) -> str:
         """
         Generic function for PUT calls to the Alma API.
 
@@ -167,7 +173,11 @@ def add_parameters(url: str, parameters: dict) -> str:
     return full_url
 
 
-def call_api(url_parameters: str, method: str, status_code: int, record_data: bytes = None) -> str:
+def call_api(
+        url_parameters: str,
+        method: str,
+        status_code: int,
+        record_data: bytes = None) -> str:
     """
     Generic function for all API calls.
 
@@ -180,17 +190,19 @@ def call_api(url_parameters: str, method: str, status_code: int, record_data: by
     case the response will be saved to the database (if it exists),
     and the error will be added to the logfile as an ERROR.
 
-    :param url_parameters: Necessary path and arguments for the API call.
+    :param url_parameters: Necessary path and arguments for the API call
     :param method: DELETE, GET, POST or PUT
-    :param status_code: Status code of a successful API call for the given method.
-    :param record_data: Necessary input for POST and PUT, defaults to None.
-    :return: The API response's content in XML format as a string.
+    :param status_code: Status code of a successful API call for given method
+    :param record_data: Necessary input for POST and PUT, defaults to None
+    :return: The API response's content in XML format as a string
     """
 
     with create_alma_api_session('xml') as session:
 
         alma_url = api_base_url+url_parameters
-        alma_response = switch_api_method(alma_url, method, session, record_data)
+        alma_response = switch_api_method(
+            alma_url, method, session, record_data
+        )
 
         if alma_response.status_code == status_code:
 
@@ -200,30 +212,36 @@ def call_api(url_parameters: str, method: str, status_code: int, record_data: by
 
             if '<errorList>' in alma_response_content:
 
-                log_string = f"""The response contained an error, even though it had status code {status_code}. """
-                log_string += f"""Reason: {alma_response.status_code} - {alma_response.content}"""
-                logger.warning(log_string)
+                logger.warning(f"The response contained an error, even though "
+                               f"it had status code {status_code}. Reason: "
+                               f"{alma_response.status_code} - "
+                               f"{alma_response.content}")
 
-            elif not alma_response_content.startswith('<?xml') and status_code != 204:
+            elif not alma_response_content.startswith('<?xml') \
+                    and status_code != 204:
 
-                log_string = f"""The response retrieved does not seem to be valid xml - startswith('<?xml') -- """
-                log_string += {alma_response_content}
-                logger.error(log_string)
+                logger.error(f"The response retrieved does not seem to be "
+                             f"valid xml - startswith('<?xml') -- "
+                             f"{alma_response_content}")
 
             return alma_response_content
 
-        error_string = f"""{method} for "{alma_url}" failed. """
-        error_string += f"""Reason: {alma_response.status_code} - {alma_response.content.decode("utf-8")}"""
-        logger.error(error_string)
+        logger.error(f'{method} for "{alma_url}" failed. Reason: '
+                     f'{alma_response.status_code} - '
+                     f'{alma_response.content.decode("utf-8")}')
 
 
-def switch_api_method(alma_url: str, method: str, session: Session, record_data: str = None) -> Response:
+def switch_api_method(
+        alma_url: str,
+        method: str,
+        session: Session,
+        record_data: str = None) -> Response:
     """
     Make API calls according to the kind of method provided.
-    :param alma_url: Combination of base-url and parameters necessary (path, arguments).
+    :param alma_url: Combination of base-url and parameters necessary
     :param method: DELETE, GET, POST or PUT
-    :param session: Alma API session.
-    :param record_data: Necessary input for POST and PUT, defaults to None.
+    :param session: Alma API session
+    :param record_data: Necessary input for POST and PUT, defaults to None
     :return:
     """
 

@@ -8,8 +8,9 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from alma_rest import db_setup, logfile_setup
 
-parser_description = """Create all tables necessary for the package alma_rest and view SQLAlchemy logs on stdout.
-If you run into any issues, check your environment variables and the permissions for the database."""
+parser_description = """Create all tables necessary for the package alma_rest
+and view SQLAlchemy logs on stdout. If you run into any issues, check your
+environment variables and the permissions for the database."""
 
 # provide -h information on the script
 parser = ArgumentParser(

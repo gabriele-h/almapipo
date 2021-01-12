@@ -31,18 +31,22 @@ def retrieve_library(library: str) -> str:
     :return: str
     """
     logger.info(f"Trying to fetch one library with code {library}.")
-    library_record = rest_setup.call_api(f'/conf/libraries/{library}', 'GET', 200)
+    library_record = rest_setup.call_api(
+        f'/conf/libraries/{library}', 'GET', 200
+    )
     return library_record
 
 
 def retrieve_all_locations_generator() -> Iterable[str]:
     """
-    Retrieve all locations for all libraries in Alma. Note that this will add the attribute
-    "library" to the root element "locations" of all xml strings in the generator.
-    :return: Generator of strings containing get_locations() return values plus attribute "library"
+    Retrieve all locations for all libraries in Alma. Note that this will add
+    the attribute "library" to the root element "locations" of all xml strings
+    in the generator.
+    :return: Generator of strings from get_locations() plus attribute "library"
     """
 
-    logger.info(f"Trying to fetch all locations for all libraries configured in Alma.")
+    logger.info(f"Trying to fetch all locations for all libraries configured "
+                f"in Alma.")
 
     libraries_record = retrieve_libraries()
     libraries_xml = fromstring(libraries_record)
@@ -69,20 +73,25 @@ def retrieve_locations(library: str) -> str:
 
     logger.info(f"Trying to fetch all locations for library {library}.")
 
-    locations_record = rest_setup.call_api(f'/conf/libraries/{library}/locations', 'GET', 200)
+    locations_record = rest_setup.call_api(
+        f'/conf/libraries/{library}/locations', 'GET', 200
+    )
 
     return locations_record
 
 
 def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
     """
-    For a given set retrieve the alma_id for all members from their link attribute. If the link is
-    not available, this function will return member/id, but be aware, that this is not always sufficient!
+    For a given set retrieve the alma_id for all members from their link
+    attribute. If the link is not available, this function will return
+    member/id, but be aware, that this is not always sufficient!
 
-    Since not all kinds of sets have the information of an api link for their members, this function will not
-    work for example for sets of electronic portfolios. Test this function on your set before you
-    use it further. If you want to make calls like /bibs/{mms-id}/holdings/{hol-id}/items/{item-id}, this function
-    must return a comma-separated string of those three IDs!
+    Since not all kinds of sets have the information of an api link for their
+    members, this function will not work for example for sets of electronic
+    portfolios. Test this function on your set before you use it further.
+    If you want to make calls like
+    /bibs/{mms-id}/holdings/{hol-id}/items/{item-id},
+    this function must return a comma-separated string of those three IDs!
 
     :param set_id: Set ID as given in Set Details in the Alma UI
     :return: Generator of alma_id
@@ -90,7 +99,7 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
 
     logger.info(f"Trying to extract alma_id for all members of set {set_id}.")
 
-    regex_prefix = r'^/?\w+/'
+    re_prefix = r'^/?\w+/'
     regex_path = r'/\w+/'
     has_url = False
 
@@ -104,28 +113,29 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
             member_url_path = member_url.replace(rest_setup.api_base_url, '')
 
             if member_url == member_url_path:
-                logger.error(
-                    f"""Could not remove base_url as per env var from the member's URL. Please check env vars.""")
+                logger.error(f"Could not remove base_url as per env var from "
+                             f"the member's URL. Please check env vars.")
                 raise ValueError
 
-            member_url_path_wo_prefix = re.sub(regex_prefix, '', member_url_path)
+            member_url_path_wo_prefix = re.sub(re_prefix, '', member_url_path)
             alma_id = re.sub(regex_path, ',', member_url_path_wo_prefix)
 
         else:
-            # Usually the alma_id we need consists of more than one ID, so this is just a fallback
+            # Usually we need more than one ID, this is just a fallback
             alma_id = member_id
 
         yield alma_id
 
     if not has_url:
-        logger.info("""Element member did not have a link attribute. Generator yields member/id instead.""")
+        logger.info("Element member did not have a link attribute. Generator "
+                    "yields member/id instead.")
 
 
 def retrieve_set_member_link_and_id(set_id: str) -> Iterable[Iterable[str]]:
     """
     For a given set retrieve the URLs and IDs for all members.
     :param set_id: Set ID as given in Set Details in the Alma UI
-    :return: Generator of a list of two values: member/@link and member/id/text()
+    :return: Generator of list of two values: member/@link and member/id/text()
     """
 
     logger.info(f"Trying to fetch URLs for all members of {set_id}.")
@@ -162,7 +172,9 @@ def retrieve_set_total_record_count(set_id: str) -> int:
 
     logger.info(f"Trying to fetch number of members for set {set_id}.")
 
-    members_in_set = rest_setup.call_api(f'/conf/sets/{set_id}/members?limit=1', 'GET', 200)
+    members_in_set = rest_setup.call_api(
+        f'/conf/sets/{set_id}/members?limit=1', 'GET', 200
+    )
     response_xml = fromstring(members_in_set)
     num_members = response_xml.attrib['total_record_count']
 

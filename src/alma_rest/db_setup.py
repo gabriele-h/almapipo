@@ -12,7 +12,8 @@ import xml.etree.ElementTree as etree
 from os import environ
 
 # more sqlalchemy setup below with conditions
-from sqlalchemy import Column, DateTime, Integer, MetaData, String, create_engine
+from sqlalchemy import create_engine
+from sqlalchemy import Column, DateTime, Integer, MetaData, String
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.types import UserDefinedType
 from sqlalchemy.ext.declarative import declarative_base
@@ -76,10 +77,13 @@ def create_db_session(
         connection_params: str = prepare_connection_params_from_env(),
         verbosity: bool = does_sqlalchemy_log) -> Session:
     """
-    Create a DB session according to the information provided in env vars, including SQLAlchemy verbosity.
-    Both connection parameters and verbosity may be overriden by providing them as paramters to the function call.
-    :param connection_params: Parameters to initiate the database connection, defaults to info from env vars
-    :param verbosity: Whether or not to add SQLAlchemy output to the log, defaults to env var ALMA_REST_DB_VERBOSE
+    Create a DB session according to the information provided in env vars,
+    including SQLAlchemy verbosity. Both connection parameters and verbosity
+    may be overriden by providing them as paramters to the function call.
+    :param connection_params: Parameters to initiate the database connection,
+        defaults to info from env vars
+    :param verbosity: Whether or not to add SQLAlchemy output to the log,
+        defaults to content of env var ALMA_REST_DB_VERBOSE
     :return: Session for connection to the DB.
     """
 

@@ -1,5 +1,6 @@
 """
-Does some generic XML modifications like "remove element" or "replace element content".
+Does some generic XML modifications like "remove element" or
+"replace element content".
 """
 
 from copy import deepcopy
@@ -20,7 +21,7 @@ def add_element_to_root(
     """
     For an xml given as an ElementTree, add the given Element.
     The Element will be added as a direct descendant of the root element.
-    The original xml fed to the function will be left untouched by this operation.
+    The original xml will be left untouched by this operation.
     :param xml: ElementTree of the xml to be manipulated
     :param element_tag: Type of tag of the element to be added
     :param element_text: Text of the element to be added
@@ -37,16 +38,16 @@ def add_element_to_root(
 
 def add_element_to_child(
         xml: ElementTree,
-        child: str,
+        child_path: str,
         element_tag: str,
         element_text: str = None,
         element_attributes: dict = None) -> ElementTree:
     """
-    For an xml given as an ElementTree, add the given Element to a specific child tag.
-    The Element will be added to all children matching the description given for child.
-    The original xml fed to the function will be left untouched by this operation.
+    For an xml given as ElementTree, add Element to all children matching
+    the path given as child.
+    The original xml will be left untouched by this operation.
     :param xml: ElementTree of the xml to be manipulated
-    :param child: Path to the child as per Element.findall() - e. g. tag type
+    :param child_path: Path to the child as per Element.findall()
     :param element_tag: Type of tag of the element to be added
     :param element_text: Text of the element to be added
     :param element_attributes: Attributes of the element to be added
@@ -56,8 +57,8 @@ def add_element_to_child(
     manipulated_xml = deepcopy(xml)
     element = create_element(element_tag, element_text, element_attributes)
 
-    for child in manipulated_xml.findall(child):
-        child.append(element)
+    for matching_child in manipulated_xml.findall(child_path):
+        matching_child.append(element)
 
     return manipulated_xml
 
@@ -76,7 +77,7 @@ def update_element(
     there will be no match and with that no manipulation.
     If you want to update attributes only without touching the element's text,
     provide the text as None for both old_element_text and new_element_text.
-    The original xml fed to the function will be left untouched by this operation.
+    The original xml will be left untouched by this operation.
     :param xml: ElementTree of the xml to be manipulated
     :param element_tag: Type of tag of the element to be replaced
     :param old_element_text: Text of the element to be replaced
@@ -87,7 +88,9 @@ def update_element(
     """
 
     manipulated_xml = deepcopy(xml)
-    list_of_elements = check_element_existence(manipulated_xml, element_tag, old_element_text, old_element_attributes)
+    list_of_elements = check_element_existence(
+        manipulated_xml, element_tag, old_element_text, old_element_attributes
+    )
 
     for element in list_of_elements:
 
@@ -95,17 +98,16 @@ def update_element(
 
             element.text = new_element_text
 
-            log_string = f"""Element {element_tag} had text {old_element_text}. """
-            log_string += f"""New text is {new_element_text}."""
-            logger.info(log_string)
+            logger.info(f"Element {element_tag} had text {old_element_text}. "
+                        f"New text is {new_element_text}.")
 
         elif new_element_attributes:
 
             element.attrib = new_element_attributes
 
-            log_string = f"""Element {element_tag} had attributes {old_element_attributes}. """
-            log_string += f"""New attributes are {new_element_attributes}."""
-            logger.info(log_string)
+            logger.info(f"Element {element_tag} had attributes "
+                        f"{old_element_attributes}. New attributes are "
+                        f"{new_element_attributes}.")
 
         else:
 
@@ -116,10 +118,9 @@ def update_element(
 
 def remove_element_by_path(xml: ElementTree, element_tag: str) -> ElementTree:
     """
-    From an xml given as an ElementTree, remove all elements with the given path.
-    This operation is based on Element.findall(), so besides providing a tag type
-    you can identify the element to remove by path.
-    The original xml fed to the function will be left untouched by this operation.
+    From an xml given as ElementTree, remove all elements with the given path.
+    This operation is based on Element.findall().
+    The original xml will be left untouched by this operation.
     :param xml: ElementTree of the xml to be manipulated
     :param element_tag: Type of tag to be removed from the XML
     :return: ElementTree of the manipulated xml
@@ -160,7 +161,9 @@ def check_element_existence(
             elif not element_attributes:
                 list_of_elements.append(element)
 
-        elif not element_text and element_attributes and element.attrib == element_attributes:
+        elif not element_text \
+                and element_attributes \
+                and element.attrib == element_attributes:
 
             list_of_elements.append(element)
 
@@ -169,7 +172,8 @@ def check_element_existence(
             list_of_elements.append(element)
 
     if not list_of_elements:
-        logger.info(f'No matching element found with {element_tag}, {element_text} and {element_attributes}.')
+        logger.info(f'No matching element found with {element_tag}, '
+                    f'{element_text} and {element_attributes}.')
 
     return list_of_elements
 

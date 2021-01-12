@@ -23,14 +23,16 @@ logger = getLogger(__name__)
 ALMA_ID_PATTERN = r"^(22|23|53|61|62|81|99)\d{{2,}}{alma_id_suffix}$"
 
 
-def read_csv_contents(csv_path: str, validation: bool = True) -> Iterable[dict]:
+def read_csv_contents(
+        csv_path: str,
+        validation: bool = False) -> Iterable[dict]:
     """
     Feeds the contents of a csv or tsv file into a generator via DictReader.
     If the first column does not match an Alma ID, the whole row
     will be discarded. This validation can be overridden with the
     second param of the function set to False.
     :param csv_path: Relative or absolute path to a csv or tsv file
-    :param validation: If set to "False", the first column will not be checked for validity
+    :param validation: Check ID structure of first column, defaults to False
     :return: Generator of csv/tsv file lines as dictionaries
     """
     logger.info(f"Reading file {csv_path} into generator.")
@@ -44,7 +46,8 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterable[dict]:
     elif csv_path[-4:] in ['.tsv', '.TSV']:
         delimit = '\t'
     else:
-        logger.error(f"Extension of the given file not expected (csv for semicolon, tsv for tabs).")
+        logger.error(f"Extension of the given file not expected (csv for"
+                     f" semicolon, tsv for tabs).")
         raise ValueError
 
     with open(csv_path, newline="") as csv_file:
@@ -55,8 +58,9 @@ def read_csv_contents(csv_path: str, validation: bool = True) -> Iterable[dict]:
 
             first_column_value = list(row.values())[0]
 
-            if all(is_this_an_alma_id(string) for string in str.split(first_column_value, ',')) \
-                    or not validation:
+            if all(is_this_an_alma_id(string)
+                   for string in str.split(first_column_value, ',')) \
+                   or not validation:
                 yield row
             else:
                 logger.warning(f"The following row was discarded: {row}")
@@ -66,8 +70,8 @@ def check_file_path(file_path: str) -> bool:
     """
     Checks file path for existence, readability and whether the file is
     ending on either .csv or .tsv
-    :param file_path: Absolute or relative path to the csv/tsv file.
-    :return: Boolean to indicate if the provided file exists, is readable and ends on .csv or .tsv.
+    :param file_path: Absolute or relative path to the csv/tsv file
+    :return: Boolean for file exists, is readable and ends on .csv or .tsv
     """
 
     if path.exists(file_path) \
@@ -75,7 +79,8 @@ def check_file_path(file_path: str) -> bool:
             and file_path[-4:] in ['.csv', '.tsv', '.CSV', '.TSV']:
         return True
 
-    logger.error(f"File {file_path} does not exist, is not readable, or does not end on csv, tsv, CSV or TSV.")
+    logger.error(f"File {file_path} does not exist, is not readable, or does"
+                 f"not end on csv, tsv, CSV or TSV.")
 
 
 def is_this_an_alma_id(identifier: str) -> bool:
