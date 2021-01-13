@@ -67,8 +67,12 @@ class TestExtractAll:
     marcxml_bib_element_1 = fromstring(marcxml_bib_string_1)
     marcxml_bib_element_2 = fromstring(marcxml_bib_string_2)
 
-    all_keys_bib_1 = marcxml_to_lists.extract_keys_for_single_record(marcxml_bib_element_1)
-    all_keys_bib_2 = marcxml_to_lists.extract_keys_for_single_record(marcxml_bib_element_2)
+    all_keys_bib_1 = marcxml_to_lists.extract_keys_for_single_record(
+        marcxml_bib_element_1
+    )
+    all_keys_bib_2 = marcxml_to_lists.extract_keys_for_single_record(
+        marcxml_bib_element_2
+    )
     all_keys_bib_both = marcxml_to_lists.extract_keys_for_records(
         [marcxml_bib_element_1, marcxml_bib_element_2]
     )
@@ -87,8 +91,9 @@ class TestExtractAll:
 
     def test_bib_1_extracted_keys(self):
         assert list(self.all_keys_bib_1) == [
-                'leader', '001', '007', '009', '015  ', '020  ', '035  ', '035  ', '1001 ', '24510', '68904', '68905'
-            ]
+            'leader', '001', '007', '009', '015  ', '020  ', '035  ',
+            '035  ', '1001 ', '24510', '68904', '68905'
+        ]
 
     def test_bib_2_extracted_keys(self):
         assert list(self.all_keys_bib_2) == [
@@ -97,21 +102,27 @@ class TestExtractAll:
 
     def test_bib_both_extracted_keys(self):
         assert self.all_keys_bib_both == [
-            'leader', '001', '007', '009', '015  ', '020  ', '035  ', '035  ', '1001 ', '24510', '68904', '68905',
+            'leader', '001', '007', '009', '015  ', '020  ', '035  ',
+            '035  ', '1001 ', '24510', '68904', '68905',
             '040  '
         ]
 
     def test_extract_keys_and_sort(self):
         assert self.all_keys_bib_both_sorted == [
-            'leader', '001', '007', '009', '015  ', '020  ', '035  ', '035  ', '040  ', '1001 ', '24510', '68904',
+            'leader', '001', '007', '009', '015  ', '020  ', '035  ',
+            '035  ', '040  ', '1001 ', '24510', '68904',
             '68905'
         ]
 
     def test_extract_values_leader_and_001(self):
-        assert list(self.values_leader_and_001_bib_1) == [['0101nam a2200373 c 4500', '1234567890']]
+        assert list(self.values_leader_and_001_bib_1) == [
+            ['0101nam a2200373 c 4500', '1234567890']
+        ]
 
     def test_extract_repated(self):
-        assert list(self.values_035_bib_1) == [['$$a(AB-ABC)prefix01234567', '$$aprefix012345']]
+        assert list(self.values_035_bib_1) == [
+            ['$$a(AB-ABC)prefix01234567', '$$aprefix012345']
+        ]
 
     def test_empty_if_not_given(self):
         assert list(self.values_040_bib_1) == [['']]

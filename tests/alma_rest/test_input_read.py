@@ -22,7 +22,8 @@ class TestDoesStringEqualAlmaID:
         environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX'] = old_suffix
 
     def test_alma_ids_only(self, set_env_id_suffix):
-        assert all(input_read.is_this_an_alma_id(id_) for id_ in self.set_of_alma_ids)
+        assert all(input_read.is_this_an_alma_id(id_)
+                   for id_ in self.set_of_alma_ids)
 
     def test_minimum_length(self):
         assert not input_read.is_this_an_alma_id("811234")

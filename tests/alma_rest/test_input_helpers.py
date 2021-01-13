@@ -21,7 +21,8 @@ def csv_with_contents(monkeypatch):
         {'MMS-ID': '9981093873911234', 'Consortium-ID': 'XY0002'}
     ]
 
-    monkeypatch.setattr('alma_rest.input_read.read_csv_contents', lambda *_: contents)
+    monkeypatch.setattr('alma_rest.input_read.'
+                        'read_csv_contents', lambda *_: contents)
 
 
 @pytest.fixture
@@ -31,13 +32,15 @@ def csv_without_contents(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def mock_db_session(monkeypatch):
-    monkeypatch.setattr('alma_rest.db_setup.create_db_session', lambda: mock.MagicMock())
+    monkeypatch.setattr('alma_rest.db_setup.'
+                        'create_db_session', lambda: mock.MagicMock())
 
 
 @pytest.fixture
 def db_writer(monkeypatch):
     writer = mock.MagicMock()
-    monkeypatch.setattr('alma_rest.db_read_write.add_csv_line_to_source_csv_table', writer)
+    monkeypatch.setattr('alma_rest.db_read_write.'
+                        'add_csv_line_to_source_csv_table', writer)
     return writer
 
 
@@ -55,12 +58,16 @@ class TestCsvAlmaIdGenerator:
         g = input_helpers.csv_almaid_generator('/path/to/csv')
         assert list(g) == []
 
-    def test_func_yields_all_entries(self, prevent_check_file_path, csv_with_contents):
+    def test_func_yields_all_entries(
+            self, prevent_check_file_path, csv_with_contents
+    ):
         g = input_helpers.csv_almaid_generator('/path/to/csv')
         result = list(g)
         assert result == ['9981093873901234', '9981093873911234']
 
-    def test_process_empty_csv(self, prevent_check_file_path, csv_without_contents):
+    def test_process_empty_csv(
+            self, prevent_check_file_path, csv_without_contents
+    ):
         g = input_helpers.csv_almaid_generator('/path/to/csv')
         result = list(g)
         assert not result
@@ -71,10 +78,18 @@ class TestAddCsvToSourceCsvTable:
     Tests for alma_rest.input_helpers.add_csv_to_source_csv_table
     """
 
-    def test_all_entries_added_to_db(self, prevent_check_file_path, csv_with_contents, db_writer):
-        input_helpers.add_csv_to_source_csv_table('/path/to/csv', '1970-01-01 00:00:00+00:00')
+    def test_all_entries_added_to_db(
+            self, prevent_check_file_path, csv_with_contents, db_writer
+    ):
+        input_helpers.add_csv_to_source_csv_table(
+            '/path/to/csv', '1970-01-01 00:00:00+00:00'
+        )
         assert db_writer.call_count == 2
 
-    def test_no_entries_added_to_db(self, prevent_check_file_path, csv_without_contents, db_writer):
-        input_helpers.add_csv_to_source_csv_table('/path/to/csv', '1970-01-01 00:00:00+00:00')
+    def test_no_entries_added_to_db(
+            self, prevent_check_file_path, csv_without_contents, db_writer
+    ):
+        input_helpers.add_csv_to_source_csv_table(
+            '/path/to/csv', '1970-01-01 00:00:00+00:00'
+        )
         assert db_writer.call_count == 0
