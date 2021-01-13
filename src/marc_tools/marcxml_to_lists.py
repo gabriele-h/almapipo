@@ -81,8 +81,9 @@ def extract_keys_for_single_record(record: Element) -> tuple:
 
         elif field_element.tag == 'datafield':
 
-            key = field_element.get('tag') + field_element.get('ind1') + \
-                  field_element.get('ind2')
+            key = field_element.get('tag') \
+                  + field_element.get('ind1') \
+                  + field_element.get('ind2')
 
         else:
             logger.warning(f"XML contains unexpected element "

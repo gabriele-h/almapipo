@@ -199,7 +199,7 @@ def call_api(
 
     with create_alma_api_session('xml') as session:
 
-        alma_url = api_base_url+url_parameters
+        alma_url = api_base_url + url_parameters
         alma_response = switch_api_method(
             alma_url, method, session, record_data
         )
