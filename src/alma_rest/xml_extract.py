@@ -72,14 +72,14 @@ def extract_contents_from_marc(record: Element) -> dict:
     for controlfield in record.findall("controlfield"):
         tag = controlfield.attrib["tag"]
         text = controlfield.text
-        append_multiple_to_dict(marc21_dict, tag, text)
+        _append_multiple_to_dict(marc21_dict, tag, text)
 
     for datafield in record.findall("datafield"):
         tag_with_inds = datafield.attrib["tag"] \
                         + datafield.attrib["ind1"] \
                         + datafield.attrib["ind2"]
         datafield_dict = extract_subfields_as_string(datafield)
-        append_multiple_to_dict(marc21_dict, tag_with_inds, datafield_dict)
+        _append_multiple_to_dict(marc21_dict, tag_with_inds, datafield_dict)
 
     return marc21_dict
 
@@ -101,7 +101,7 @@ def extract_subfields_as_string(datafield: Element) -> str:
     return "".join(list(gen_subfield()))
 
 
-def append_multiple_to_dict(dictionary: dict, key: str, value) -> dict:
+def _append_multiple_to_dict(dictionary: dict, key: str, value) -> dict:
     """
     For a given dictionary see if the key already exists and if
     it does, append the value to the list of values.
