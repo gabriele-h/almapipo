@@ -38,13 +38,13 @@ def read_csv_contents(
     logger.info(f"Reading file {csv_path} into generator.")
 
     if not check_file_path(csv_path):
-        logger.error('No valid file path provided.')
+        logger.error("No valid file path provided.")
         raise ValueError
 
-    if csv_path[-4:] in ['.csv', '.CSV']:
-        delimit = ';'
-    elif csv_path[-4:] in ['.tsv', '.TSV']:
-        delimit = '\t'
+    if csv_path[-4:] in [".csv", ".CSV"]:
+        delimit = ";"
+    elif csv_path[-4:] in [".tsv", ".TSV"]:
+        delimit = "\t"
     else:
         logger.error(f"Extension of the given file not expected (csv for"
                      f" semicolon, tsv for tabs).")
@@ -59,7 +59,7 @@ def read_csv_contents(
             first_column_value = list(row.values())[0]
 
             if all(is_this_an_alma_id(string)
-                   for string in str.split(first_column_value, ',')) \
+                   for string in str.split(first_column_value, ",")) \
                    or not validation:
                 yield row
             else:
@@ -76,7 +76,7 @@ def check_file_path(file_path: str) -> bool:
 
     if path.exists(file_path) \
             and access(file_path, R_OK) \
-            and file_path[-4:] in ['.csv', '.tsv', '.CSV', '.TSV']:
+            and file_path[-4:] in [".csv", ".tsv", ".CSV", ".TSV"]:
         return True
 
     logger.error(f"File {file_path} does not exist, is not readable, or does"
@@ -101,7 +101,7 @@ def is_this_an_alma_id(identifier: str) -> bool:
 
     try:
 
-        alma_id_suffix = environ['ALMA_REST_ID_INSTITUTIONAL_SUFFIX']
+        alma_id_suffix = environ["ALMA_REST_ID_INSTITUTIONAL_SUFFIX"]
 
     except KeyError:
 

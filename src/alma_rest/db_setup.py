@@ -35,7 +35,7 @@ Base = declarative_base()
 # noinspection PyUnusedLocal,PyMethodMayBeStatic
 class XMLType(UserDefinedType):
     def get_col_spec(self):
-        return 'XML'
+        return "XML"
 
     def bind_processor(self, dialect):
         def process(value):
@@ -68,7 +68,7 @@ def prepare_connection_params_from_env() -> str:
     db_pw = environ["ALMA_REST_DB_PW"]
     db_url = environ["ALMA_REST_DB_URL"]
 
-    connection_params = f'postgresql://{db_user}:{db_pw}@{db_url}/{database}'
+    connection_params = f"postgresql://{db_user}:{db_pw}@{db_url}/{database}"
 
     return connection_params
 
@@ -95,7 +95,7 @@ def create_db_session(
 
 
 class JobStatusPerId(Base):
-    __tablename__ = 'job_status_per_id'
+    __tablename__ = "job_status_per_id"
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime(timezone=True))
@@ -105,7 +105,7 @@ class JobStatusPerId(Base):
 
 
 class SourceCsv(Base):
-    __tablename__ = 'source_csv'
+    __tablename__ = "source_csv"
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime(timezone=True))
@@ -113,7 +113,7 @@ class SourceCsv(Base):
 
 
 class FetchedRecords(Base):
-    __tablename__ = 'fetched_records'
+    __tablename__ = "fetched_records"
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime(timezone=True))
@@ -122,7 +122,7 @@ class FetchedRecords(Base):
 
 
 class SentRecords(Base):
-    __tablename__ = 'sent_records'
+    __tablename__ = "sent_records"
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime(timezone=True))
@@ -131,7 +131,7 @@ class SentRecords(Base):
 
 
 class PutPostResponses(Base):
-    __tablename__ = 'put_post_responses'
+    __tablename__ = "put_post_responses"
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime(timezone=True))

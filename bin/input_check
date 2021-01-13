@@ -23,7 +23,7 @@ parser = ArgumentParser(
     epilog="")
 help_input_file = "Path to a file ending on csv, tsv, CSV or TSV." \
                           " Values must be delimited by semicolon or tab."
-parser.add_argument('input_file', type=str, help=help_input_file)
+parser.add_argument("input_file", type=str, help=help_input_file)
 
 args = parser.parse_args()
 
@@ -36,7 +36,7 @@ def set_csv_path_from_argv1() -> str:
     try:
         argv1 = argv[1]
     except IndexError:
-        logger.error('Please provide csv or tsv file as argument.')
+        logger.error("Please provide csv or tsv file as argument.")
         exit(1)
     else:
         if input_read.check_file_path(argv1):

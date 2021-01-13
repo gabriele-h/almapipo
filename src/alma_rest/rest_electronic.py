@@ -19,9 +19,9 @@ class EcollectionsApi(rest_setup.GenericApi):
         """
         Initialize API for e-collections.
         """
-        base_path = '/electronic/e-collections/'
+        base_path = "/electronic/e-collections/"
 
-        logger.info(f'Instantiating {type(self).__name__}.')
+        logger.info(f"Instantiating {type(self).__name__}.")
 
         super().__init__(base_path)
 
@@ -36,10 +36,10 @@ class EservicesApi(rest_setup.GenericApi):
         """
         self.collection_id = collection_id
 
-        base_path = f'/electronic/e-collections/{self.collection_id}/'
+        base_path = f"/electronic/e-collections/{self.collection_id}/"
 
-        logger.info(f'Instantiating {type(self).__name__} with collection_id '
-                    f'{self.collection_id}.')
+        logger.info(f"Instantiating {type(self).__name__} with collection_id "
+                    f"{self.collection_id}.")
 
         super().__init__(base_path)
 
@@ -56,11 +56,11 @@ class PortfoliosApi(rest_setup.GenericApi):
         self.collection_id = collection_id
         self.service_id = service_id
 
-        base_path = f'/electronic/e-collections/{self.collection_id}' \
-                    f'/e-services/{self.service_id}/'
+        base_path = f"/electronic/e-collections/{self.collection_id}" \
+                    f"/e-services/{self.service_id}/"
 
-        logger.info(f'Instantiating {type(self).__name__} with '
-                    f'collection_id {self.collection_id} and service_id '
-                    f'{self.service_id}.')
+        logger.info(f"Instantiating {type(self).__name__} with "
+                    f"collection_id {self.collection_id} and service_id "
+                    f"{self.service_id}.")
 
         super().__init__(base_path)

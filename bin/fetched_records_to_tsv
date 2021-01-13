@@ -21,19 +21,19 @@ parser = ArgumentParser(
 
 help_job_timestamp = "Format 'YYYY-mm-dd HH:MM:SS.000000+0000', pick for set" \
                      "of records from table fetched_records."
-parser.add_argument('job_timestamp', type=str, help=help_job_timestamp)
+parser.add_argument("job_timestamp", type=str, help=help_job_timestamp)
 
 help_tsv_path = "File system path of where you want the tsv saved."
-parser.add_argument('tsv_path', type=str, help=help_tsv_path)
+parser.add_argument("tsv_path", type=str, help=help_tsv_path)
 
 help_tsv_header = "Provide your own list of categories you want to extract" \
                   " as a comma-separated list of strings."
-parser.add_argument('--tsv-header', type=str, help=help_tsv_header)
+parser.add_argument("--tsv-header", type=str, help=help_tsv_header)
 
 args = parser.parse_args()
 
 
-timestamp_format = '%Y-%m-%d %H:%M:%S.%f%z'
+timestamp_format = "%Y-%m-%d %H:%M:%S.%f%z"
 
 try:
 
@@ -50,7 +50,7 @@ else:
 
     if args.tsv_header:
 
-        tsv_columns = args.tsv_header.split(',')
+        tsv_columns = args.tsv_header.split(",")
 
     else:
 
@@ -65,13 +65,13 @@ else:
         job_timestamp
     )
 
-    with open(args.tsv_path, 'w') as tsv_file:
+    with open(args.tsv_path, "w") as tsv_file:
 
-        tsv_file.write('\t'.join(tsv_columns))
+        tsv_file.write("\t".join(tsv_columns))
 
         records_list = marcxml_to_lists.extract_values_as_lists(
             gen_record_elements, tsv_columns
         )
 
         for record_contents in records_list:
-            tsv_file.write('\n'+'\t'.join(record_contents))
+            tsv_file.write("\n"+"\t".join(record_contents))

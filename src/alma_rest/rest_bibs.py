@@ -20,9 +20,9 @@ class BibsApi(rest_setup.GenericApi):
         """
         Initialize API calls for bibliographic records.
         """
-        base_path = '/bibs/'
+        base_path = "/bibs/"
 
-        logger.info(f'Instantiating {type(self).__name__}.')
+        logger.info(f"Instantiating {type(self).__name__}.")
 
         super().__init__(base_path)
 
@@ -33,10 +33,10 @@ class BibsApi(rest_setup.GenericApi):
         :param url_parameters: Python dictionary of parameters.
         :return: Search result in XML format.
         """
-        logger.info(f'Trying to fetch bibs records with parameters '
-                    f'{url_parameters}.')
+        logger.info(f"Trying to fetch bibs records with parameters "
+                    f"{url_parameters}.")
 
-        search_result = self.retrieve('', url_parameters)
+        search_result = self.retrieve("", url_parameters)
 
         return search_result
 
@@ -46,10 +46,10 @@ class BibsApi(rest_setup.GenericApi):
         :param mms_id: Unique ID of BIB record the holdings are connected to
         :return: Record in XML format
         """
-        logger.info(f'Trying to fetch all holdings information for bib record '
-                    f'{mms_id}.')
+        logger.info(f"Trying to fetch all holdings information for bib record "
+                    f"{mms_id}.")
 
-        record = self.retrieve(f'{mms_id}/holdings')
+        record = self.retrieve(f"{mms_id}/holdings")
 
         return record
 
@@ -59,11 +59,11 @@ class BibsApi(rest_setup.GenericApi):
         :param mms_id: Unique ID of BIB record the items are connected to
         :return: Record in XML format
         """
-        logger.info(f'Trying to fetch all holdings and items information for '
-                    f'bib record {mms_id}.')
+        logger.info(f"Trying to fetch all holdings and items information for "
+                    f"bib record {mms_id}.")
 
         physical_inventory_record = self.retrieve(
-            f'{mms_id}/holdings/ALL/items'
+            f"{mms_id}/holdings/ALL/items"
         )
 
         return physical_inventory_record
@@ -74,9 +74,9 @@ class BibsApi(rest_setup.GenericApi):
         :param mms_id: Unique ID of BIB record the portfolios are connected to
         :return: Record in XML format
         """
-        logger.info(f'Trying to fetch all portfolios for bib record {mms_id}.')
+        logger.info(f"Trying to fetch all portfolios for bib record {mms_id}.")
 
-        e_inventory_record = self.retrieve(f'{mms_id}/portfolios/')
+        e_inventory_record = self.retrieve(f"{mms_id}/portfolios/")
 
         return e_inventory_record
 
@@ -86,10 +86,10 @@ class BibsApi(rest_setup.GenericApi):
         :param mms_id: Unique ID of BIB record e-collections are connected to
         :return: Record in XML format
         """
-        logger.info(f'Trying to fetch all e-collections for '
-                    f'bib record {mms_id}.')
+        logger.info(f"Trying to fetch all e-collections for "
+                    f"bib record {mms_id}.")
 
-        e_inventory_record = self.retrieve(f'{mms_id}/e-collections/')
+        e_inventory_record = self.retrieve(f"{mms_id}/e-collections/")
 
         return e_inventory_record
 
@@ -100,11 +100,11 @@ class BibsApi(rest_setup.GenericApi):
         :param collection_id: Unique ID of the e-collection
         :return: Record in XML format
         """
-        logger.info(f'Trying to fetch all e-collections for mms_id {mms_id} '
-                    f'and collection_id {collection_id}.')
+        logger.info(f"Trying to fetch all e-collections for mms_id {mms_id} "
+                    f"and collection_id {collection_id}.")
 
         e_inventory_record = self.retrieve(
-            f'{mms_id}/e-collections/{collection_id}'
+            f"{mms_id}/e-collections/{collection_id}"
         )
 
         return e_inventory_record
@@ -121,10 +121,10 @@ class HoldingsApi(rest_setup.GenericApi):
         """
         self.mms_id = mms_id
 
-        base_path = f'/bibs/{self.mms_id}/holdings/'
+        base_path = f"/bibs/{self.mms_id}/holdings/"
 
-        logger.info(f'Instantiating {type(self).__name__} with mms_id '
-                    f'{self.mms_id}.')
+        logger.info(f"Instantiating {type(self).__name__} with mms_id "
+                    f"{self.mms_id}.")
 
         super().__init__(base_path)
 
@@ -134,10 +134,10 @@ class HoldingsApi(rest_setup.GenericApi):
         :param hol_id: ID of the HOL record the ITMs are connected to.
         :return: Record in XML format.
         """
-        logger.info(f'Trying to fetch all items information for hol_id '
-                    f'{hol_id}.')
+        logger.info(f"Trying to fetch all items information for hol_id "
+                    f"{hol_id}.")
 
-        physical_inventory_record = self.retrieve(f'{hol_id}/items')
+        physical_inventory_record = self.retrieve(f"{hol_id}/items")
 
         return physical_inventory_record
 
@@ -155,10 +155,10 @@ class ItemsApi(rest_setup.GenericApi):
         self.mms_id = mms_id
         self.hol_id = hol_id
 
-        base_path = f'/bibs/{self.mms_id}/holdings/{self.hol_id}/items/'
+        base_path = f"/bibs/{self.mms_id}/holdings/{self.hol_id}/items/"
 
-        logger.info(f'Instantiating {type(self).__name__} with mms_id '
-                    f'{self.mms_id} and hol_id {self.hol_id}.')
+        logger.info(f"Instantiating {type(self).__name__} with mms_id "
+                    f"{self.mms_id} and hol_id {self.hol_id}.")
 
         super().__init__(base_path)
 
@@ -174,7 +174,7 @@ class PortfoliosApi(rest_setup.GenericApi):
         """
         self.mms_id = mms_id
 
-        base_path = f'/bibs/{self.mms_id}/portfolios/'
+        base_path = f"/bibs/{self.mms_id}/portfolios/"
 
         logger.info(f"Instantiating {type(self).__name__} with mms_id "
                     f"{self.mms_id}.")
@@ -191,12 +191,12 @@ def scan_in_item_by_barcode(item_barcode: str) -> str:
     :return: Record in XML format.
     """
 
-    logger.info(f'Trying to fetch item by barcode {item_barcode}.')
+    logger.info(f"Trying to fetch item by barcode {item_barcode}.")
 
     api_url_query = {"item_barcode": item_barcode}
     api_url_query_encoded = parse.urlencode(api_url_query)
     item_record = rest_setup.call_api(
-        f'/items?{api_url_query_encoded}', 'GET', 200
+        f"/items?{api_url_query_encoded}", "GET", 200
     )
 
     return item_record

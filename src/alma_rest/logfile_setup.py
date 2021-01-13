@@ -4,11 +4,11 @@ import logging
 from os import environ
 from pathlib import Path
 
-log_format_string = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+log_format_string = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 log_formatter = logging.Formatter(log_format_string)
 
-logfile_dir_path = Path(environ['ALMA_REST_LOGFILE_DIR'])
-logfile_path = logfile_dir_path / 'alma_rest.log'
+logfile_dir_path = Path(environ["ALMA_REST_LOGFILE_DIR"])
+logfile_path = logfile_dir_path / "alma_rest.log"
 
 logging.basicConfig(
     format=log_format_string,

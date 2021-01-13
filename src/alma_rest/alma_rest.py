@@ -44,20 +44,20 @@ def call_api_for_set(
     """
     db_session = db_setup.create_db_session()
     db_read_write.add_alma_id_to_job_status_per_id(
-        'GET', set_id, job_timestamp, db_session
+        "GET", set_id, job_timestamp, db_session
     )
     alma_id_list = rest_conf.retrieve_set_member_alma_ids(set_id)
 
     if type(alma_id_list) is None:
         db_read_write.update_job_status(
-            'error', set_id, 'GET', job_timestamp, db_session
+            "error", set_id, "GET", job_timestamp, db_session
         )
         logger.error(f"An error occurred while retrieving the set's members."
                      f" Is the set {set_id} empty?")
 
     call_api_for_list(alma_id_list, api, record_type, method, manipulate_xml)
     db_read_write.update_job_status(
-        'done', set_id, 'GET', job_timestamp, db_session
+        "done", set_id, "GET", job_timestamp, db_session
     )
 
     db_session.commit()
@@ -119,38 +119,38 @@ def call_api_for_record(
     :return:
     """
 
-    if method not in ['DELETE', 'GET', 'PUT', 'POST']:
-        logger.error(f'Provided method {method} not known.')
+    if method not in ["DELETE", "GET", "PUT", "POST"]:
+        logger.error(f"Provided method {method} not known.")
         raise ValueError
 
-    if method == 'POST':
+    if method == "POST":
         raise NotImplementedError
 
     CurrentApi = instantiate_api_class(alma_id, api, record_type)
 
     db_read_write.add_alma_id_to_job_status_per_id(
-        alma_id, 'GET', job_timestamp, db_session
+        alma_id, "GET", job_timestamp, db_session
     )
 
-    record_id = str.split(alma_id, ',')[-1]
+    record_id = str.split(alma_id, ",")[-1]
     record_data = CurrentApi.retrieve(record_id)
 
     if not record_data:
-        logger.error(f'Could not fetch record {alma_id}.')
+        logger.error(f"Could not fetch record {alma_id}.")
         db_read_write.update_job_status(
-            'error', alma_id, 'GET', job_timestamp, db_session
+            "error", alma_id, "GET", job_timestamp, db_session
         )
     else:
         db_read_write.add_response_content_to_fetched_records(
             alma_id, record_data, job_timestamp, db_session
         )
         db_read_write.update_job_status(
-            'done', alma_id, 'GET', job_timestamp, db_session
+            "done", alma_id, "GET", job_timestamp, db_session
         )
 
         db_session.commit()
 
-        if method == 'DELETE':
+        if method == "DELETE":
 
             db_read_write.add_alma_id_to_job_status_per_id(
                 alma_id, method, job_timestamp, db_session
@@ -160,14 +160,14 @@ def call_api_for_record(
 
             if alma_response is None:
                 db_read_write.update_job_status(
-                    'error', alma_id, method, job_timestamp, db_session
+                    "error", alma_id, method, job_timestamp, db_session
                 )
             else:
                 db_read_write.update_job_status(
-                    'done', alma_id, method, job_timestamp, db_session
+                    "done", alma_id, method, job_timestamp, db_session
                 )
 
-        elif method == 'PUT':
+        elif method == "PUT":
 
             db_read_write.add_alma_id_to_job_status_per_id(
                 alma_id, method, job_timestamp, db_session
@@ -177,9 +177,9 @@ def call_api_for_record(
 
             if not new_record_data:
 
-                logger.error(f'Could not manipulate data of record {alma_id}.')
+                logger.error(f"Could not manipulate data of record {alma_id}.")
                 db_read_write.update_job_status(
-                    'error', alma_id, method, job_timestamp, db_session
+                    "error", alma_id, method, job_timestamp, db_session
                 )
 
             else:
@@ -188,8 +188,8 @@ def call_api_for_record(
 
                 if response:
 
-                    logger.info(f'Manipulation for {alma_id} successful.'
-                                f' Adding to put_post_responses.')
+                    logger.info(f"Manipulation for {alma_id} successful."
+                                f" Adding to put_post_responses.")
 
                     db_read_write.add_put_post_response(
                         alma_id, response, job_timestamp, db_session
@@ -198,7 +198,7 @@ def call_api_for_record(
                         alma_id, new_record_data, job_timestamp, db_session
                     )
                     db_read_write.update_job_status(
-                        'done', alma_id, method, job_timestamp, db_session
+                        "done", alma_id, method, job_timestamp, db_session
                     )
                     db_read_write.check_data_sent_equals_response(
                         alma_id, job_timestamp, db_session
@@ -206,10 +206,10 @@ def call_api_for_record(
 
                 else:
 
-                    logger.error(f'Did not receive a response for {alma_id}?')
+                    logger.error(f"Did not receive a response for {alma_id}?")
 
                     db_read_write.update_job_status(
-                        'error', alma_id, method, job_timestamp, db_session
+                        "error", alma_id, method, job_timestamp, db_session
                     )
 
     db_session.commit()
@@ -226,41 +226,41 @@ def instantiate_api_class(
     :param record_type: Type of record to call the API for (e. g. "holdings")
     :return: Instance of an Api Object with correct path
     """
-    split_alma_id = str.split(alma_id, ',')
+    split_alma_id = str.split(alma_id, ",")
 
-    if api == 'bibs':
+    if api == "bibs":
 
-        if record_type == 'bibs':
+        if record_type == "bibs":
             return rest_bibs.BibsApi()
-        elif record_type == 'holdings':
+        elif record_type == "holdings":
             return rest_bibs.HoldingsApi(split_alma_id[0])
-        elif record_type == 'items':
+        elif record_type == "items":
             return rest_bibs.ItemsApi(split_alma_id[0], split_alma_id[1])
-        elif record_type == 'portfolios':
+        elif record_type == "portfolios":
             return rest_bibs.PortfoliosApi(split_alma_id[0])
         else:
             raise NotImplementedError
 
-    elif api == 'electronic':
+    elif api == "electronic":
 
-        if record_type == 'e-collections':
+        if record_type == "e-collections":
             return rest_electronic.EcollectionsApi()
-        elif record_type == 'e-services':
+        elif record_type == "e-services":
             return rest_electronic.EservicesApi(split_alma_id[0])
-        elif record_type == 'portfolios':
+        elif record_type == "portfolios":
             return rest_electronic.PortfoliosApi(
                 split_alma_id[0], split_alma_id[1]
             )
         else:
             raise NotImplementedError
 
-    elif api == 'users':
+    elif api == "users":
 
-        if record_type == 'users':
+        if record_type == "users":
             return rest_users.UsersApi()
         else:
             raise NotImplementedError
 
-    logger.error('The API you are trying to call is not implemented yet'
-                 ' or does not exist.')
+    logger.error("The API you are trying to call is not implemented yet"
+                 " or does not exist.")
     raise NotImplementedError

@@ -68,8 +68,8 @@ def check_data_sent_equals_response(
         if sent_received_matching.count() > 0:
             return True
 
-    logger.warning(f'Data in sent_records and put_post_responses for {alma_id}'
-                   f' and {job_timestamp} did not match.')
+    logger.warning(f"Data in sent_records and put_post_responses for {alma_id}"
+                   f" and {job_timestamp} did not match.")
     return False
 
 
@@ -106,8 +106,8 @@ def check_data_sent_and_response_exist(
     if record_sent.count() > 0 and record_received.count() > 0:
         return True
 
-    logger.error(f'No data in sent_records or put_post_responses for {alma_id}'
-                 f' and {job_timestamp}.')
+    logger.error(f"No data in sent_records or put_post_responses for {alma_id}"
+                 f" and {job_timestamp}.")
     return False
 
 
@@ -361,7 +361,7 @@ def add_alma_id_to_job_status_per_id(
     line_for_table_job_status_per_id = db_setup.JobStatusPerId(
         job_timestamp=job_timestamp,
         alma_id=alma_id,
-        job_status='new',
+        job_status="new",
         job_action=method
     )
 
@@ -383,13 +383,13 @@ def log_success_rate(
     """
 
     ids_done = get_list_of_ids_by_status_and_method(
-        'done', method, job_timestamp, db_session
+        "done", method, job_timestamp, db_session
     )
     ids_error = get_list_of_ids_by_status_and_method(
-        'error', method, job_timestamp, db_session
+        "error", method, job_timestamp, db_session
     )
     ids_new = get_list_of_ids_by_status_and_method(
-        'new', method, job_timestamp, db_session
+        "new", method, job_timestamp, db_session
     )
 
     logger.info(f"{method} was done for {ids_done.count()} record(s).")

@@ -19,9 +19,9 @@ class UsersApi(rest_setup.GenericApi):
         """
         Initialize API calls for bibliographic records.
         """
-        base_path = '/users/'
+        base_path = "/users/"
 
-        logger.info(f'Instantiating {type(self).__name__}.')
+        logger.info(f"Instantiating {type(self).__name__}.")
 
         super().__init__(base_path)
 
@@ -32,8 +32,8 @@ class UsersApi(rest_setup.GenericApi):
         :return: Record in XML format as a string
         """
 
-        logger.info(f'Trying to fetch all fees for user_id {user_id}.')
+        logger.info(f"Trying to fetch all fees for user_id {user_id}.")
 
-        all_fees = self.retrieve(f'{user_id}/fees')
+        all_fees = self.retrieve(f"{user_id}/fees")
 
         return all_fees

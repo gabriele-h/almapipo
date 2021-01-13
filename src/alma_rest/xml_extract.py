@@ -22,8 +22,8 @@ def extract_response_from_fetched_records(alma_id: str) -> ElementTree:
     :param alma_id: Comma separated string of Alma IDs to identify the record.
     :return: ElementTree of the record.
     """
-    logger.info(f'Extracting most recent response for alma_id {alma_id} from '
-                f'table fetched_records.')
+    logger.info(f"Extracting most recent response for alma_id {alma_id} from "
+                f"table fetched_records.")
     response_query = db_read_write.get_most_recent_fetched_xml(alma_id)
     response = response_query.alma_record
     return response
@@ -44,14 +44,14 @@ def extract_marc_for_job_timestamp(job_timestamp: datetime) -> Iterable[dict]:
     :param job_timestamp: Job to extract the data for
     :return: Generator of dictionaries
     """
-    logger.info(f'Getting bibs retrieved on {job_timestamp} from table'
-                f'fetched_records.')
+    logger.info(f"Getting bibs retrieved on {job_timestamp} from table"
+                f"fetched_records.")
     db_record_generator = db_read_write.get_fetched_xml_by_timestamp(
         job_timestamp
     )
 
     for db_record in db_record_generator:
-        marc_dict = extract_contents_from_marc(db_record.find('record'))
+        marc_dict = extract_contents_from_marc(db_record.find("record"))
         yield marc_dict
 
 
@@ -67,17 +67,17 @@ def extract_contents_from_marc(record: Element) -> dict:
     :param record: MARC21 record as xml.ElementTree.Element
     :return: Dictionary representation of the record.
     """
-    marc21_dict = {'leader': record.find('leader').text}
+    marc21_dict = {"leader": record.find("leader").text}
 
-    for controlfield in record.findall('controlfield'):
-        tag = controlfield.attrib['tag']
+    for controlfield in record.findall("controlfield"):
+        tag = controlfield.attrib["tag"]
         text = controlfield.text
         append_multiple_to_dict(marc21_dict, tag, text)
 
-    for datafield in record.findall('datafield'):
-        tag_with_inds = datafield.attrib['tag'] \
-                        + datafield.attrib['ind1'] \
-                        + datafield.attrib['ind2']
+    for datafield in record.findall("datafield"):
+        tag_with_inds = datafield.attrib["tag"] \
+                        + datafield.attrib["ind1"] \
+                        + datafield.attrib["ind2"]
         datafield_dict = extract_subfields_as_string(datafield)
         append_multiple_to_dict(marc21_dict, tag_with_inds, datafield_dict)
 
@@ -88,17 +88,17 @@ def extract_subfields_as_string(datafield: Element) -> str:
     """
     For a given datafield element extract a string of
     its subfields, each is prepended with '$$' and the subfield's code
-    (e. g. $$ager' for subfield a with content 'ger')
+    (e. g. '$$ager' for subfield a with content 'ger')
     :param datafield:
     :return: Dictionary with subfield-code as key and subfield-text as value.
     """
     def gen_subfield():
-        for subfield in datafield.findall('subfield'):
-            code = subfield.attrib['code']
+        for subfield in datafield.findall("subfield"):
+            code = subfield.attrib["code"]
             text = subfield.text
-            yield '$$' + code + text
+            yield "$$" + code + text
 
-    return ''.join(list(gen_subfield()))
+    return "".join(list(gen_subfield()))
 
 
 def append_multiple_to_dict(dictionary: dict, key: str, value) -> dict:

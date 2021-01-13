@@ -20,8 +20,8 @@ from urllib import parse
 # Logfile
 logger = getLogger(__name__)
 
-api_key = environ['ALMA_REST_API_KEY']
-api_base_url = environ['ALMA_REST_API_BASE_URL']
+api_key = environ["ALMA_REST_API_KEY"]
+api_base_url = environ["ALMA_REST_API_BASE_URL"]
 
 
 def test_calls_remaining_today():
@@ -31,13 +31,13 @@ def test_calls_remaining_today():
     :return: Number of calls left according to daily API Request Threshold
     """
 
-    with create_alma_api_session('xml') as session:
+    with create_alma_api_session("xml") as session:
 
         alma_response = switch_api_method(
-            f'{api_base_url}/bibs/test', 'GET', session
+            f"{api_base_url}/bibs/test", "GET", session
         )
         alma_response_headers = alma_response.headers
-        calls_remaining = alma_response_headers['X-Exl-Api-Remaining']
+        calls_remaining = alma_response_headers["X-Exl-Api-Remaining"]
 
         info_string = f"""API calls left for today: {calls_remaining}"""
         logger.info(info_string)
@@ -75,7 +75,7 @@ class GenericApi:
         if url_parameters:
             full_path = add_parameters(self.base_path, url_parameters)
 
-        response_content = call_api(full_path, 'POST', 200, record_data)
+        response_content = call_api(full_path, "POST", 200, record_data)
 
         return response_content
 
@@ -96,12 +96,12 @@ class GenericApi:
 
         logger.info(f"Trying DELETE for {record_id} at {self.base_path}.")
 
-        full_path = f'{self.base_path}{record_id}'
+        full_path = f"{self.base_path}{record_id}"
 
         if url_parameters:
             full_path = add_parameters(full_path, url_parameters)
 
-        delete_response = call_api(full_path, 'DELETE', 204)
+        delete_response = call_api(full_path, "DELETE", 204)
 
         return delete_response
 
@@ -119,12 +119,12 @@ class GenericApi:
 
         logger.info(f"Trying GET for {record_id} at {self.base_path}.")
 
-        full_path = f'{self.base_path}{record_id}'
+        full_path = f"{self.base_path}{record_id}"
 
         if url_parameters:
             full_path = add_parameters(full_path, url_parameters)
 
-        response_content = call_api(full_path, 'GET', 200)
+        response_content = call_api(full_path, "GET", 200)
 
         return response_content
 
@@ -147,12 +147,12 @@ class GenericApi:
 
         logger.info(f"Trying PUT for {record_id} at {self.base_path}.")
 
-        full_path = f'{self.base_path}{record_id}'
+        full_path = f"{self.base_path}{record_id}"
 
         if url_parameters:
             full_path = add_parameters(full_path, url_parameters)
 
-        response_content = call_api(full_path, 'PUT', 200, record_data)
+        response_content = call_api(full_path, "PUT", 200, record_data)
 
         return response_content
 
@@ -197,7 +197,7 @@ def call_api(
     :return: The API response's content in XML format as a string
     """
 
-    with create_alma_api_session('xml') as session:
+    with create_alma_api_session("xml") as session:
 
         alma_url = api_base_url + url_parameters
         alma_response = switch_api_method(
@@ -208,16 +208,16 @@ def call_api(
 
             alma_response_content = alma_response.content.decode("utf-8")
 
-            logger.info(f'{method} for "{url_parameters}" completed.')
+            logger.info(f"{method} for '{url_parameters}' completed.")
 
-            if '<errorList>' in alma_response_content:
+            if "<errorList>" in alma_response_content:
 
                 logger.warning(f"The response contained an error, even though "
                                f"it had status code {status_code}. Reason: "
                                f"{alma_response.status_code} - "
                                f"{alma_response.content}")
 
-            elif not alma_response_content.startswith('<?xml') \
+            elif not alma_response_content.startswith("<?xml") \
                     and status_code != 204:
 
                 logger.error(f"The response retrieved does not seem to be "
@@ -226,9 +226,9 @@ def call_api(
 
             return alma_response_content
 
-        logger.error(f'{method} for "{alma_url}" failed. Reason: '
-                     f'{alma_response.status_code} - '
-                     f'{alma_response.content.decode("utf-8")}')
+        logger.error(f"{method} for '{alma_url}' failed. Reason: "
+                     f"{alma_response.status_code} - "
+                     f"{alma_response.content.decode('utf-8')}")
 
 
 def switch_api_method(
@@ -245,16 +245,16 @@ def switch_api_method(
     :return:
     """
 
-    if method == 'DELETE':
+    if method == "DELETE":
         return session.delete(alma_url)
-    elif method == 'GET':
+    elif method == "GET":
         return session.get(alma_url)
-    elif method == 'POST':
+    elif method == "POST":
         return session.post(alma_url, data=record_data)
-    elif method == 'PUT':
+    elif method == "PUT":
         return session.put(alma_url, data=record_data)
 
-    logger.error('No valid REST method supplied.')
+    logger.error("No valid REST method supplied.")
     raise ValueError
 
 

@@ -70,20 +70,20 @@ def extract_keys_for_single_record(record: Element) -> tuple:
     :return: generator of field_keys
     """
 
-    if record.find('leader') is not None:
-        yield 'leader'
+    if record.find("leader") is not None:
+        yield "leader"
 
-    for field_element in record.findall('.//*[@tag]'):
+    for field_element in record.findall(".//*[@tag]"):
 
-        if field_element.tag == 'controlfield':
+        if field_element.tag == "controlfield":
 
-            key = field_element.get('tag')
+            key = field_element.get("tag")
 
-        elif field_element.tag == 'datafield':
+        elif field_element.tag == "datafield":
 
-            key = field_element.get('tag') \
-                  + field_element.get('ind1') \
-                  + field_element.get('ind2')
+            key = field_element.get("tag") \
+                  + field_element.get("ind1") \
+                  + field_element.get("ind2")
 
         else:
             logger.warning(f"XML contains unexpected element "
@@ -111,9 +111,9 @@ def extract_values_as_lists(
 
             tag = tsv_header[i][0:3]
 
-            if tsv_header[i] == 'leader':
+            if tsv_header[i] == "leader":
 
-                list_of_values += [field_element.find('leader').text]
+                list_of_values += [field_element.find("leader").text]
 
             elif len(tsv_header[i]) == 3:
 
@@ -133,7 +133,7 @@ def extract_values_as_lists(
                     list_of_values += [field_element.find(xpath).text]
 
                 else:
-                    list_of_values += ['']
+                    list_of_values += [""]
 
             elif len(tsv_header[i]) == 5:
 
@@ -163,11 +163,11 @@ def extract_values_as_lists(
                     list_of_values += [subfields]
 
                 else:
-                    list_of_values += ['']
+                    list_of_values += [""]
 
             else:
-                logger.error('Key does not match expected format. Either '
-                             '"leader" or length of 3 or 5 expected.')
+                logger.error("Key does not match expected format. Either "
+                             "'leader' or length of 3 or 5 expected.")
                 continue
 
         yield list_of_values

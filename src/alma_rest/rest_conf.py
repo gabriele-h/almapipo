@@ -20,7 +20,7 @@ def retrieve_libraries() -> str:
     :return: str
     """
     logger.info("Trying to fetch all libraries configured in Alma.")
-    libraries_record = rest_setup.call_api(f'/conf/libraries/', 'GET', 200)
+    libraries_record = rest_setup.call_api(f"/conf/libraries/", "GET", 200)
     return libraries_record
 
 
@@ -32,7 +32,7 @@ def retrieve_library(library: str) -> str:
     """
     logger.info(f"Trying to fetch one library with code {library}.")
     library_record = rest_setup.call_api(
-        f'/conf/libraries/{library}', 'GET', 200
+        f"/conf/libraries/{library}", "GET", 200
     )
     return library_record
 
@@ -51,17 +51,17 @@ def retrieve_all_locations_generator() -> Iterable[str]:
     libraries_record = retrieve_libraries()
     libraries_xml = fromstring(libraries_record)
 
-    for library in libraries_xml.findall('library/code'):
+    for library in libraries_xml.findall("library/code"):
 
         library_code = library.text
         locations = retrieve_locations(library_code)
         locations_xml = fromstring(locations)
 
         if locations_xml:
-            locations_xml.set('library', library_code)
-            yield tostring(locations_xml, encoding='unicode')
+            locations_xml.set("library", library_code)
+            yield tostring(locations_xml, encoding="unicode")
 
-        logger.warning(f'Library {library_code} has no locations.')
+        logger.warning(f"Library {library_code} has no locations.")
 
 
 def retrieve_locations(library: str) -> str:
@@ -74,7 +74,7 @@ def retrieve_locations(library: str) -> str:
     logger.info(f"Trying to fetch all locations for library {library}.")
 
     locations_record = rest_setup.call_api(
-        f'/conf/libraries/{library}/locations', 'GET', 200
+        f"/conf/libraries/{library}/locations", "GET", 200
     )
 
     return locations_record
@@ -99,8 +99,8 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
 
     logger.info(f"Trying to extract alma_id for all members of set {set_id}.")
 
-    re_prefix = r'^/?\w+/'
-    regex_path = r'/\w+/'
+    re_prefix = r"^/?\w+/"
+    regex_path = r"/\w+/"
     has_url = False
 
     member_urls_and_ids = retrieve_set_member_link_and_id(set_id)
@@ -110,15 +110,15 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
         if member_url:
 
             has_url = True
-            member_url_path = member_url.replace(rest_setup.api_base_url, '')
+            member_url_path = member_url.replace(rest_setup.api_base_url, "")
 
             if member_url == member_url_path:
                 logger.error(f"Could not remove base_url as per env var from "
                              f"the member's URL. Please check env vars.")
                 raise ValueError
 
-            member_url_path_wo_prefix = re.sub(re_prefix, '', member_url_path)
-            alma_id = re.sub(regex_path, ',', member_url_path_wo_prefix)
+            member_url_path_wo_prefix = re.sub(re_prefix, "", member_url_path)
+            alma_id = re.sub(regex_path, ",", member_url_path_wo_prefix)
 
         else:
             # Usually we need more than one ID, this is just a fallback
@@ -142,25 +142,25 @@ def retrieve_set_member_link_and_id(set_id: str) -> Iterable[Iterable[str]]:
 
     num_members = retrieve_set_total_record_count(set_id)
 
-    api_url_path = f'/conf/sets/{set_id}/members'
-    api_url_parameters = {'limit': 100}
+    api_url_path = f"/conf/sets/{set_id}/members"
+    api_url_parameters = {"limit": 100}
 
     for page in range(0, num_members // 100 + 1):
 
-        api_url_parameters['offset'] = page * 100
+        api_url_parameters["offset"] = page * 100
         api_url = rest_setup.add_parameters(api_url_path, api_url_parameters)
 
-        set_response = rest_setup.call_api(api_url, 'GET', 200)
+        set_response = rest_setup.call_api(api_url, "GET", 200)
         set_response_xml = fromstring(set_response)
 
-        for member in set_response_xml.findall('member'):
+        for member in set_response_xml.findall("member"):
 
             try:
-                link = member.attrib['link']
+                link = member.attrib["link"]
             except KeyError:
                 link = ""
 
-            yield [link, member.find('id').text]
+            yield [link, member.find("id").text]
 
 
 def retrieve_set_total_record_count(set_id: str) -> int:
@@ -173,9 +173,9 @@ def retrieve_set_total_record_count(set_id: str) -> int:
     logger.info(f"Trying to fetch number of members for set {set_id}.")
 
     members_in_set = rest_setup.call_api(
-        f'/conf/sets/{set_id}/members?limit=1', 'GET', 200
+        f"/conf/sets/{set_id}/members?limit=1", "GET", 200
     )
     response_xml = fromstring(members_in_set)
-    num_members = response_xml.attrib['total_record_count']
+    num_members = response_xml.attrib["total_record_count"]
 
     return int(num_members)
