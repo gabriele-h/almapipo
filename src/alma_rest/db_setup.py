@@ -23,7 +23,10 @@ from sqlalchemy.dialects.postgresql import JSON
 logger = getLogger(__name__)
 
 # DB Setup
-does_sqlalchemy_log = bool(int(environ["ALMA_REST_DB_VERBOSE"]))
+try:
+    does_sqlalchemy_log = bool(int(environ["ALMA_REST_DB_VERBOSE"]))
+except KeyError:
+    does_sqlalchemy_log = False
 
 # Basic shortenings for SQLAlchemy
 metadata = MetaData()

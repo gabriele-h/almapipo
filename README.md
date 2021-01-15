@@ -94,7 +94,7 @@ export ALMA_REST_DB=                      # name of your database
 export ALMA_REST_DB_USER=                 # name of your user
 export ALMA_REST_DB_PW=                   # password of your user
 export ALMA_REST_DB_URL=                  # url if your database is remote, set 'localhost' otherwise
-export ALMA_REST_DB_VERBOSE=              # enable (1) or suppress (0) logging of SQLAlchemy
+export ALMA_REST_DB_VERBOSE=              # enable (1) or suppress (0) logging of SQLAlchemy, suppressed by default
 export ALMA_REST_API_KEY=                 # API key as per developers.exlibrisgroup.com
 export ALMA_REST_API_BASE_URL=            # base URL for your Alma API calls, usually ending with 'v1'
 ```
