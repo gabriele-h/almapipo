@@ -51,4 +51,3 @@ def add_csv_to_source_csv_table(
         )
 
     db_session.commit()
-    db_session.close()
