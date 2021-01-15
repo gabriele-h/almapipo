@@ -3,10 +3,9 @@
 from argparse import ArgumentParser
 from logging import getLogger
 
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
 
-from alma_rest import db_setup, logfile_setup
+from alma_rest import db_connect, db_setup, logfile_setup
 
 parser_description = """Create all tables necessary for the package alma_rest
 and view SQLAlchemy logs on stdout. If you run into any issues, check your
@@ -19,10 +18,6 @@ parser = ArgumentParser(
 
 args = parser.parse_args()
 
-# Basic shortenings for SQLAlchemy
-metadata = MetaData()
-Base = declarative_base()
-
 # logfile
 logger = getLogger(__name__)
 logfile_setup.log_to_stdout(logger)
@@ -30,7 +25,7 @@ logfile_setup.log_to_stdout(db_setup.logger)
 
 # create the tables
 
-connection_params = db_setup.prepare_connection_params_from_env()
+connection_params = db_connect.params
 db_engine = create_engine(connection_params, echo=True)
 
 db_setup.Base.metadata.create_all(db_engine)

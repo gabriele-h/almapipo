@@ -7,7 +7,9 @@ of the file.
 from logging import getLogger
 from typing import Iterable
 
-from alma_rest import db_read_write, db_setup, input_read
+from sqlalchemy.orm import Session
+
+from alma_rest import db_read_write, input_read
 
 logger = getLogger(__name__)
 
@@ -31,17 +33,18 @@ def csv_almaid_generator(
 def add_csv_to_source_csv_table(
         csv_path: str,
         job_timestamp: str,
-        validation: bool = False) -> Iterable[str]:
+        db_session: Session,
+        validation: bool = False
+) -> Iterable[str]:
     """
     Imports a whole csv or tsv file to the table source_csv.
     File existence check is done within alma_rest.input_read.
     :param csv_path: Path to the CSV file to be imported
     :param job_timestamp: Timestamp as set in alma_rest.alma_rest
+    :param db_session: SQLAlchemy Session
     :param validation: Check ID structure of first column, defaults to False
     :return: Generator of Alma IDs
     """
-
-    db_session = db_setup.create_db_session()
 
     csv_generator = input_read.read_csv_contents(csv_path, validation)
 
@@ -49,5 +52,3 @@ def add_csv_to_source_csv_table(
         db_read_write.add_csv_line_to_source_csv_table(
             csv_line, job_timestamp, db_session
         )
-
-    db_session.commit()

@@ -29,14 +29,14 @@ logger = getLogger(__name__)
 def check_data_sent_equals_response(
         alma_id: str,
         job_timestamp: datetime,
-        session: Session) -> bool:
+        db_session: Session) -> bool:
     """
     For given alma_id and job_timestamp check if the data sent via PUT/POST
     and the data received in the API's response are the same. Check depends on
     the two relevant database tables (sent_records and put_post_responses).
     :param alma_id: Comma separated string of Alma IDs to identify the record
     :param job_timestamp: Job that created the entry in the database tables
-    :param session: Session to be used for the check
+    :param db_session: Session to be used for the check
     :return: True if matches, False if non-existent or does not match.
     """
 
@@ -49,9 +49,9 @@ def check_data_sent_equals_response(
         db_setup.PutPostResponses.job_timestamp
     )
 
-    if check_data_sent_and_response_exist(alma_id, job_timestamp, session):
+    if check_data_sent_and_response_exist(alma_id, job_timestamp, db_session):
 
-        sent_received_matching = session.query(
+        sent_received_matching = db_session.query(
             db_setup.PutPostResponses
         ).join(
             db_setup.SentRecords,
@@ -76,18 +76,18 @@ def check_data_sent_equals_response(
 def check_data_sent_and_response_exist(
         alma_id: str,
         job_timestamp: datetime,
-        session: Session) -> bool:
+        db_session: Session) -> bool:
     """
     For given alma_id and job_timestamp check if the following exist:
     * data sent via PUT/POST
     * data received in the API's response
     :param alma_id: Comma separated string of Alma IDs to identify the record
     :param job_timestamp: Job that created the entry in the database tables
-    :param session: Session to be used for the check
+    :param db_session: Session to be used for the check
     :return: True if both exist, False if one or both do not exist
     """
 
-    record_sent = session.query(
+    record_sent = db_session.query(
         db_setup.SentRecords
     ).filter_by(
         job_timestamp=job_timestamp
@@ -95,7 +95,7 @@ def check_data_sent_and_response_exist(
         alma_id=alma_id
     )
 
-    record_received = session.query(
+    record_received = db_session.query(
         db_setup.PutPostResponses
     ).filter_by(
         job_timestamp=job_timestamp
@@ -115,7 +115,8 @@ def get_value_from_source_csv(
         alma_id_name: str,
         alma_id: str,
         job_timestamp: datetime,
-        json_key: str) -> str:
+        json_key: str,
+        db_session: Session) -> str:
     """
     For a given string of alma_id and job_timestamp, retrieve a specific value
     from the csv as it was saved in source_csv table.
@@ -123,10 +124,9 @@ def get_value_from_source_csv(
     :param alma_id: Comma separated string of Alma IDs to identify the record
     :param job_timestamp: Job that created the entry in source_csv
     :param json_key: Heading of the column that has the desired information
+    :param db_session: SQLAlchemy Session
     :return: Value from source_csv json for json_key
     """
-
-    db_session = db_setup.create_db_session()
 
     value_query = db_session.query(
         db_setup.SourceCsv
@@ -143,15 +143,17 @@ def get_value_from_source_csv(
     return json_value
 
 
-def get_fetched_xml_by_timestamp(job_timestamp: datetime) -> Iterable[Element]:
+def get_fetched_xml_by_timestamp(
+        job_timestamp: datetime,
+        db_session: Session
+) -> Iterable[Element]:
     """
     For a given job_timestamp get all fetched_record.alma_record (XML) from
     the database.
     :param job_timestamp: Job that created the entry in fetched_records
+    :param db_session: SQLAlchemy Session
     :return: XML of the records
     """
-
-    db_session = db_setup.create_db_session()
 
     record_query = db_session.query(
         db_setup.FetchedRecords.alma_record
@@ -159,21 +161,18 @@ def get_fetched_xml_by_timestamp(job_timestamp: datetime) -> Iterable[Element]:
         job_timestamp=job_timestamp
     )
 
-    db_session.close()
-
     for result in record_query.all():
         yield result[0]
 
 
-def get_most_recent_fetched_xml(alma_id: str):
+def get_most_recent_fetched_xml(alma_id: str, db_session: Session):
     """
     For a comma separated string of Alma IDs query for the record's
     most recently saved XML in the table fetched_records.
     :param alma_id: Comma separated string of Alma IDs to identify the record.
+    :param db_session: SQLAlchemy Session
     :return: SQLAlchemy query object of the record.
     """
-
-    db_session = db_setup.create_db_session()
 
     record_query = db_session.query(
         db_setup.FetchedRecords
@@ -192,18 +191,18 @@ def update_job_status(status: str,
                       alma_id: str,
                       method: str,
                       job_timestamp: datetime,
-                      session: Session) -> None:
+                      db_session: Session) -> None:
     """For a given alma_id and job_timestamp update the job_status in
     table job_status_per_id.
     :param status: New status to be set
     :param alma_id: Alma ID to set the status for
     :param method: "DELETE", "GET", "POST" or "PUT"
     :param job_timestamp: Job for which the status should be changed
-    :param session: Session to be used for the manipulation
+    :param db_session: Session to be used for the manipulation
     :return: None
     """
 
-    list_of_matched_rows = session.query(
+    list_of_matched_rows = db_session.query(
         db_setup.JobStatusPerId
     ).filter_by(
         job_timestamp=job_timestamp
@@ -220,18 +219,18 @@ def get_list_of_ids_by_status_and_method(
         status: str,
         method: str,
         job_timestamp: datetime,
-        session: Session) -> list:
+        db_session: Session) -> Query:
     """
     From table job_status_per_id get all Alma IDs that match the status
     given as the parameter.
     :param status: "new", "done" or "error"
     :param method: "DELETE", "GET", "POST" or "PUT"
-    :param session: DB session to connect to
+    :param db_session: DB session to connect to
     :param job_timestamp: Timestamp to identify the job that made the entry
     :return: List of IDs.
     """
 
-    list_of_ids = session.query(
+    list_of_ids = db_session.query(
         db_setup.JobStatusPerId.alma_id
     ).filter_by(
         job_timestamp=job_timestamp
@@ -248,7 +247,7 @@ def add_put_post_response(
         alma_id: str,
         record_data: str,
         job_timestamp: datetime,
-        session: Session) -> None:
+        db_session: Session) -> None:
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
@@ -256,7 +255,7 @@ def add_put_post_response(
     :param alma_id: Alma ID for one specific record.
     :param record_data: Response retrieved via Alma API.
     :param job_timestamp: Identifier of the job causing the DB-entry.
-    :param session: DB session to add the lines to.
+    :param db_session: DB session to add the lines to.
     :return: None
     """
 
@@ -268,14 +267,14 @@ def add_put_post_response(
         job_timestamp=job_timestamp,
     )
 
-    session.add(line_for_table_put_post_responses)
+    db_session.add(line_for_table_put_post_responses)
 
 
 def add_sent_record(
         alma_id: str,
         record_data: bytes,
         job_timestamp: datetime,
-        session: Session) -> None:
+        db_session: Session) -> None:
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
@@ -283,7 +282,7 @@ def add_sent_record(
     :param alma_id: Alma ID for one specific record.
     :param record_data: Record to be sent via Alma API.
     :param job_timestamp: Identifier of the job causing the DB-entry.
-    :param session: DB session to add the lines to.
+    :param db_session: DB session to add the lines to.
     :return: None
     """
 
@@ -295,14 +294,14 @@ def add_sent_record(
         job_timestamp=job_timestamp,
     )
 
-    session.add(line_for_table_sent_records)
+    db_session.add(line_for_table_sent_records)
 
 
 def add_response_content_to_fetched_records(
         alma_id: str,
         record_data,
         job_timestamp: datetime,
-        session: Session) -> None:
+        db_session: Session) -> None:
     """
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
@@ -310,7 +309,7 @@ def add_response_content_to_fetched_records(
     :param alma_id: Alma ID for one specific record.
     :param record_data: Record as retrieved via Alma API.
     :param job_timestamp: Identifier of the job causing the DB-entry.
-    :param session: DB session to add the lines to.
+    :param db_session: DB session to add the lines to.
     :return: None
     """
 
@@ -320,19 +319,19 @@ def add_response_content_to_fetched_records(
         job_timestamp=job_timestamp,
     )
 
-    session.add(line_for_table_fetched_records)
+    db_session.add(line_for_table_fetched_records)
 
 
 def add_csv_line_to_source_csv_table(
         csv_line: OrderedDict,
         job_timestamp: datetime,
-        session: Session) -> None:
+        db_session: Session) -> None:
     """
     For an ordered Dictionary of values retrieved from a csv/tsv file
     Adds one line to source_csv.
     :param csv_line: Ordered dictionary of values from one line from input file
     :param job_timestamp: Timestamp to identify the job which created the line
-    :param session: DB session to add the data to
+    :param db_session: DB session to add the data to
     :return: None
     """
 
@@ -341,20 +340,20 @@ def add_csv_line_to_source_csv_table(
         csv_line=csv_line
     )
 
-    session.add(line_for_table_source_csv)
+    db_session.add(line_for_table_source_csv)
 
 
 def add_alma_id_to_job_status_per_id(
         alma_id: str,
         method: str,
         job_timestamp: datetime,
-        session: Session) -> None:
+        db_session: Session) -> None:
     """
     For a string of Alma IDs create an entry in job_status_per_id.
     :param alma_id: IDs of the record to be manipulated.
     :param method: GET, PUT, POST or DELETE
     :param job_timestamp: Timestamp to identify the job which created the line.
-    :param session: DB session to add the data to.
+    :param db_session: DB session to add the data to.
     :return: None
     """
 
@@ -365,7 +364,7 @@ def add_alma_id_to_job_status_per_id(
         job_action=method
     )
 
-    session.add(line_for_table_job_status_per_id)
+    db_session.add(line_for_table_job_status_per_id)
 
 
 # noinspection PyArgumentList

@@ -13,7 +13,9 @@ from datetime import datetime, timezone
 from logging import getLogger
 from typing import Callable, Iterable
 
-from . import db_setup, db_read_write
+from sqlalchemy.orm import Session
+
+from . import db_read_write
 from . import rest_bibs, rest_conf, rest_electronic, rest_setup, rest_users
 
 # Timestamp as inserted in the database
@@ -23,15 +25,13 @@ job_timestamp = datetime.now(timezone.utc)
 logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
 
-# Use one db_session throughout the module
-db_session = db_setup.create_db_session()
-
 
 def call_api_for_set(
         set_id: str,
         api: str,
         record_type: str,
         method: str,
+        db_session: Session,
         manipulate_xml: Callable[[str, str], bytes] = None) -> None:
     """
     Retrieve the alma_ids of all members in a set and make API calls on them.
@@ -41,6 +41,7 @@ def call_api_for_set(
     :param api: First path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of record to call the API for (e. g. "holdings")
     :param method: "DELETE", "GET" or "PUT" (POST not implemented yet!)
+    :param db_session: SQLAlchemy session for DB connection
     :param manipulate_xml: Function with arguments alma_id and data_retrieved
     :return: None
     """
@@ -69,6 +70,7 @@ def call_api_for_list(
         api: str,
         record_type: str,
         method: str,
+        db_session: Session,
         manipulate_xml: Callable[[str, str], bytes] = None) -> None:
     """
     Call api for each record in the list, stores information in the db.
@@ -79,6 +81,7 @@ def call_api_for_list(
     :param api: First path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of record to call the API for (e. g. "holdings")
     :param method: "DELETE", "GET" or "PUT" (POST not implemented yet!)
+    :param db_session: SQLAlchemy session for DB connection
     :param manipulate_xml: Function with arguments alma_id and data_retrieved
     :return: None
     """
@@ -96,6 +99,7 @@ def call_api_for_record(
         api: str,
         record_type: str,
         method: str,
+        db_session: Session,
         manipulate_xml: Callable[[str, str], bytes] = None) -> None:
     """
     For one alma_id this function does the following:
@@ -110,6 +114,7 @@ def call_api_for_record(
     :param api: First path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of record to call the API for (e. g. "holdings")
     :param method: "DELETE", "GET" or "PUT" (POST not implemented yet!)
+    :param db_session: SQLAlchemy session for DB connection
     :param manipulate_xml: Function with arguments alma_id and data_retrieved
     :return:
     """

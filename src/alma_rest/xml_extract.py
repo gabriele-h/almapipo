@@ -9,27 +9,38 @@ from typing import Iterable
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
+from sqlalchemy.orm import Session
+
 from . import db_read_write
 
 # Logfile
 logger = getLogger(__name__)
 
 
-def extract_response_from_fetched_records(alma_id: str) -> ElementTree:
+def extract_response_from_fetched_records(
+        alma_id: str,
+        db_session: Session
+) -> ElementTree:
     """
     From the table fetched_records extract the whole response for the record.
     Only most recent version supported.
-    :param alma_id: Comma separated string of Alma IDs to identify the record.
-    :return: ElementTree of the record.
+    :param alma_id: Comma separated string of Alma IDs to identify the record
+    :param db_session: SQLAlchemy Session
+    :return: ElementTree of the record
     """
     logger.info(f"Extracting most recent response for alma_id {alma_id} from "
                 f"table fetched_records.")
-    response_query = db_read_write.get_most_recent_fetched_xml(alma_id)
+    response_query = db_read_write.get_most_recent_fetched_xml(
+        alma_id, db_session
+    )
     response = response_query.alma_record
     return response
 
 
-def extract_marc_for_job_timestamp(job_timestamp: datetime) -> Iterable[dict]:
+def extract_marc_for_job_timestamp(
+        job_timestamp: datetime,
+        db_session: Session
+) -> Iterable[dict]:
     """
     For a given job_timestamp, query all records from the database and extract
     the MARC21 categories to a dictionary. Please mind that this is a one-way
@@ -42,12 +53,14 @@ def extract_marc_for_job_timestamp(job_timestamp: datetime) -> Iterable[dict]:
     data in Excel.
 
     :param job_timestamp: Job to extract the data for
+    :param db_session: SQLAlchemy Session
     :return: Generator of dictionaries
     """
     logger.info(f"Getting bibs retrieved on {job_timestamp} from table"
                 f"fetched_records.")
     db_record_generator = db_read_write.get_fetched_xml_by_timestamp(
-        job_timestamp
+        job_timestamp,
+        db_session
     )
 
     for db_record in db_record_generator:

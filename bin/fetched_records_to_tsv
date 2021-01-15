@@ -6,7 +6,7 @@ from logging import getLogger
 from sys import argv
 import warnings
 
-from alma_rest import db_read_write, logfile_setup, xml_extract
+from alma_rest import db_connect, db_read_write, logfile_setup, xml_extract
 from marc_tools import marcxml_to_lists
 
 logger = getLogger(__name__)
@@ -35,6 +35,8 @@ args = parser.parse_args()
 
 timestamp_format = "%Y-%m-%d %H:%M:%S.%f%z"
 
+db_session = db_connect.DBSession()
+
 try:
 
     job_timestamp = datetime.strptime(argv[1], timestamp_format)
@@ -55,7 +57,8 @@ else:
     else:
 
         gen_record_elements = db_read_write.get_fetched_xml_by_timestamp(
-            job_timestamp
+            job_timestamp,
+            db_session
         )
         tsv_columns = marcxml_to_lists.extract_keys_for_records(
             gen_record_elements

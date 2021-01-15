@@ -79,17 +79,25 @@ class TestAddCsvToSourceCsvTable:
     """
 
     def test_all_entries_added_to_db(
-            self, prevent_check_file_path, csv_with_contents, db_writer
+            self,
+            prevent_check_file_path,
+            csv_with_contents,
+            db_writer,
+            db_session
     ):
         input_helpers.add_csv_to_source_csv_table(
-            "/path/to/csv", "1970-01-01 00:00:00+00:00"
+            "/path/to/csv", "1970-01-01 00:00:00+00:00", db_session
         )
         assert db_writer.call_count == 2
 
     def test_no_entries_added_to_db(
-            self, prevent_check_file_path, csv_without_contents, db_writer
+            self,
+            prevent_check_file_path,
+            csv_without_contents,
+            db_writer,
+            db_session
     ):
         input_helpers.add_csv_to_source_csv_table(
-            "/path/to/csv", "1970-01-01 00:00:00+00:00"
+            "/path/to/csv", "1970-01-01 00:00:00+00:00", db_session
         )
         assert db_writer.call_count == 0
