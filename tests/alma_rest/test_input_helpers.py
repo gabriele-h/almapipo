@@ -5,6 +5,7 @@ Tests for alma_rest.input_helpers
 from unittest import mock
 
 import pytest
+from sqlalchemy.orm import Session
 
 from alma_rest import input_helpers
 
@@ -30,10 +31,10 @@ def csv_without_contents(monkeypatch):
     monkeypatch.setattr("alma_rest.input_read.read_csv_contents", lambda*_: {})
 
 
-@pytest.fixture(autouse=True)
-def mock_db_session(monkeypatch):
-    monkeypatch.setattr("alma_rest.db_setup."
-                        "create_db_session", lambda: mock.MagicMock())
+@pytest.fixture()
+def db_session(monkeypatch):
+    db_session = mock.Mock(spec_set=Session)
+    return db_session
 
 
 @pytest.fixture
