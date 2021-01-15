@@ -11,6 +11,7 @@ Then for each REST operation (POST, GET, PUT, DELETE) there is one base
 function that the more specific modules (like rest_bibs) can make use of.
 """
 
+from importlib import metadata
 from logging import getLogger
 from os import environ
 from requests import Session, Response
@@ -270,7 +271,7 @@ def create_alma_api_session(session_format) -> Session:
         "accept": "application/" + session_format,
         "Content-Type": "application/" + session_format,
         "authorization": f"apikey {api_key}",
-        "User-Agent": "alma_rest/0.0.1"
+        "User-Agent": f"alma_rest/{metadata.version}"
     })
 
     return session
