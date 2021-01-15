@@ -21,12 +21,12 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.9',
     install_requires=[
         "psycopg2 ~= 2.8.0; sys_platform == 'linux'",
         "psycopg2-binary ~= 2.8.0; sys_platform != 'linux'",
-        "pytest ~= 5.4.0",
+        "pytest ~= 5.4.3",
         "requests ~= 2.23.0",
-        "sqlalchemy ~= 1.3.0",
+        "sqlalchemy ~= 1.3.22",
     ],
 )
