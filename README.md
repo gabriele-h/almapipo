@@ -233,7 +233,9 @@ in the example below as it defaults to True.
 
 ```python
 from alma_rest import alma_rest
-alma_id_list = alma_rest.csv_id_generator_and_import_source_csv('./test_hols.tsv')
+from alma_rest import input_helpers
+input_helpers.add_csv_to_source_csv_table('./test_hols.tsv', alma_rest.job_timestamp)
+alma_id_list = input_helpers.csv_almaid_generator('./test_hols.tsv')
 alma_rest.call_api_for_list(alma_id_list, 'bibs', 'holdings', 'GET')
 ```
 
@@ -269,7 +271,7 @@ as an xml.etree Element:
 
 ```python
 from alma_rest import xml_extract
-xml_extract.extract_record_from_fetched_records('991234567890123,221234567890123')
+xml_extract.extract_response_from_fetched_records('991234567890123,221234567890123')
 ```
 
 # `alma_rest.xml_modify`
