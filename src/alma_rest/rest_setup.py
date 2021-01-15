@@ -16,13 +16,18 @@ from logging import getLogger
 from os import environ
 from requests import Session, Response
 from urllib import parse
+import warnings
 
 
 # Logfile
 logger = getLogger(__name__)
 
-api_key = environ["ALMA_REST_API_KEY"]
-api_base_url = environ["ALMA_REST_API_BASE_URL"]
+try:
+    api_key = environ["ALMA_REST_API_KEY"]
+    api_base_url = environ["ALMA_REST_API_BASE_URL"]
+except KeyError:
+    warnings.warn("One of the env vars necessary for API calls are "
+                  "missing. Please check the README for further info.")
 
 
 def test_calls_remaining_today():
