@@ -11,7 +11,6 @@ This will import the other modules and do the following:
 
 from datetime import datetime, timezone
 from logging import getLogger
-from sqlalchemy.orm import Session
 from typing import Callable, Iterable
 
 from . import db_setup, db_read_write
@@ -23,6 +22,9 @@ job_timestamp = datetime.now(timezone.utc)
 # Logfile
 logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
+
+# Use one db_session throughout the module
+db_session = db_setup.create_db_session()
 
 
 def call_api_for_set(
@@ -42,7 +44,6 @@ def call_api_for_set(
     :param manipulate_xml: Function with arguments alma_id and data_retrieved
     :return: None
     """
-    db_session = db_setup.create_db_session()
     db_read_write.add_alma_id_to_job_status_per_id(
         "GET", set_id, job_timestamp, db_session
     )
@@ -61,7 +62,6 @@ def call_api_for_set(
     )
 
     db_session.commit()
-    db_session.close()
 
 
 def call_api_for_list(
@@ -83,15 +83,12 @@ def call_api_for_list(
     :return: None
     """
 
-    db_session = db_setup.create_db_session()
-
     for alma_id in alma_ids:
         call_api_for_record(
-            alma_id, api, record_type, method, db_session, manipulate_xml
+            alma_id, api, record_type, method, manipulate_xml
         )
 
     db_read_write.log_success_rate(method, job_timestamp, db_session)
-    db_session.close()
 
 
 def call_api_for_record(
@@ -99,7 +96,6 @@ def call_api_for_record(
         api: str,
         record_type: str,
         method: str,
-        db_session: Session,
         manipulate_xml: Callable[[str, str], bytes] = None) -> None:
     """
     For one alma_id this function does the following:
@@ -114,7 +110,6 @@ def call_api_for_record(
     :param api: First path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of record to call the API for (e. g. "holdings")
     :param method: "DELETE", "GET" or "PUT" (POST not implemented yet!)
-    :param db_session: Session for the postgres database
     :param manipulate_xml: Function with arguments alma_id and data_retrieved
     :return:
     """
