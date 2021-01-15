@@ -8,17 +8,11 @@ The DB is intended to do the following:
 
 from datetime import datetime
 from logging import getLogger
-from typing import Iterable
+from typing import Iterable, OrderedDict
 from xml.etree.ElementTree import fromstring, Element
 
-try:
-    from typing import OrderedDict
-except ImportError:
-    from typing import MutableMapping
-    OrderedDict = MutableMapping
-
 from sqlalchemy import func, String
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
 
 from . import db_setup
 
@@ -367,7 +361,6 @@ def add_alma_id_to_job_status_per_id(
     db_session.add(line_for_table_job_status_per_id)
 
 
-# noinspection PyArgumentList
 def log_success_rate(
         method: str,
         job_timestamp: datetime,
