@@ -274,9 +274,9 @@ def create_alma_api_session(session_format) -> Session:
 
     session.headers.update({
         "accept": "application/" + session_format,
-        "Content-Type": "application/" + session_format,
+        "Content-Type": f"application/{session_format}; charset=utf-8",
         "authorization": f"apikey {api_key}",
-        "User-Agent": f"alma_rest/{metadata.version}"
+        "User-Agent": f"alma_rest/{metadata.version('alma_rest')}"
     })
 
     return session
