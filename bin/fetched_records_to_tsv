@@ -65,7 +65,8 @@ else:
         )
 
     gen_record_elements = xml_extract.extract_marc_for_job_timestamp(
-        job_timestamp
+        job_timestamp,
+        db_session
     )
 
     with open(args.tsv_path, "w") as tsv_file:
