@@ -43,7 +43,12 @@ def test_calls_remaining_today():
             f"{api_base_url}/bibs/test", "GET", session
         )
         alma_response_headers = alma_response.headers
-        calls_remaining = alma_response_headers["X-Exl-Api-Remaining"]
+
+        try:
+            calls_remaining = alma_response_headers["X-Exl-Api-Remaining"]
+        except KeyError:
+            logger.error(alma_response_headers)
+            return None
 
         info_string = f"""API calls left for today: {calls_remaining}"""
         logger.info(info_string)

@@ -37,11 +37,12 @@ def retrieve_library(library: str) -> str:
     return library_record
 
 
-def retrieve_all_locations_generator() -> Iterable[str]:
+def retrieve_all_locations_generator(lang: str = None) -> Iterable[str]:
     """
     Retrieve all locations for all libraries in Alma. Note that this will add
     the attribute "library" to the root element "locations" of all xml strings
     in the generator.
+    :param lang: Use if different lang than 'en' is needed.
     :return: Generator of strings from get_locations() plus attribute "library"
     """
 
@@ -54,27 +55,32 @@ def retrieve_all_locations_generator() -> Iterable[str]:
     for library in libraries_xml.findall("library/code"):
 
         library_code = library.text
-        locations = retrieve_locations(library_code)
+        locations = retrieve_locations(library_code, lang)
         locations_xml = fromstring(locations)
 
         if locations_xml:
             locations_xml.set("library", library_code)
             yield tostring(locations_xml, encoding="unicode")
+        else:
+            logger.warning(f"Library {library_code} has no locations.")
 
-        logger.warning(f"Library {library_code} has no locations.")
 
-
-def retrieve_locations(library: str) -> str:
+def retrieve_locations(library: str, lang: str = None) -> str:
     """
     Get the locations of one specific library.
-    :param library:
+    :param library: Library to fetch the locations for.
+    :param lang: Use if a different language than 'en' is needed.
     :return: str
     """
+    if lang:
+        lang_suffix = f"?lang={lang}"
+    else:
+        lang_suffix = ""
 
     logger.info(f"Trying to fetch all locations for library {library}.")
 
     locations_record = rest_setup.call_api(
-        f"/conf/libraries/{library}/locations", "GET", 200
+        f"/conf/libraries/{library}/locations{lang_suffix}", "GET", 200
     )
 
     return locations_record

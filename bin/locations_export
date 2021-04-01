@@ -13,6 +13,16 @@ from alma_rest import rest_conf
 parser_description = """
 After getting all libraries, iterate over the possible values and
 retrieve all according locations. Output as XML.
+
+If additional lang-codes are provided, the values type, name and external_name
+will be provided in Englisch and any further given language by appending
+the language-code to the XML tag.
+
+CAUTION - This requires for each language:
+* one call to get all library codes
+* for each library one call to retrieve their locations
+Depending on the number of languages and libraries this might
+take some time. You can monitor the progress in the logfile.
 """
 
 parser = ArgumentParser(
@@ -20,6 +30,8 @@ parser = ArgumentParser(
     epilog="")
 help_xml_file = "Path to the output file."
 parser.add_argument("xml_file", type=str, help=help_xml_file)
+help_addlang = "Comma-separated list of lang-codes other than default 'en'."
+parser.add_argument("--addlang", dest="lang", type=str, help=help_addlang)
 
 args = parser.parse_args()
 
@@ -32,8 +44,43 @@ logger.info("Starting extract of all locations.")
 
 all_locations = fromstring("<all_locations />")
 
-for locations in rest_conf.retrieve_all_locations_generator():
-    all_locations.append(fromstring(locations))
+for lang_locations in rest_conf.retrieve_all_locations_generator():
+    all_locations.append(fromstring(lang_locations))
+
+if args.lang:
+
+    for current_lang in args.lang.split(','):
+
+        logger.info(f"Adding data for lang {current_lang}.")
+        lang_data = rest_conf.retrieve_all_locations_generator(current_lang)
+
+        for lang_locations in lang_data:
+
+            lang_library = fromstring(lang_locations).get('library')
+            current_locations = all_locations.find(
+                f"locations[@library='{lang_library}']"
+            )
+
+            for lang_location in fromstring(lang_locations).findall('location'):
+
+                lang_code = lang_location.find('code')
+                lang_code.tag = f'code_{current_lang}'
+
+                lang_type = lang_location.find('type')
+                lang_type.tag = f'type_{current_lang}'
+
+                lang_name = lang_location.find('name')
+                lang_name.tag = f'name_{current_lang}'
+
+                lang_ext_name = lang_location.find('external_name')
+                lang_ext_name.tag = f'external_name_{current_lang}'
+
+                for current_location in current_locations:
+                    if current_location.find('code').text == lang_code.text:
+                        current_location.append(lang_code)
+                        current_location.append(lang_type)
+                        current_location.append(lang_name)
+                        current_location.append(lang_ext_name)
 
 with open(xml_file, "wb") as f:
     f.write(tostring(all_locations, encoding='utf-8'))
