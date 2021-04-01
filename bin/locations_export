@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+from argparse import ArgumentParser
+from logging import getLogger
+from xml.etree.ElementTree import fromstring, tostring
+
+# noinspection PyUnresolvedReferences
+from alma_rest import logfile_setup
+from alma_rest import rest_conf
+
+# provide -h information on the script
+
+parser_description = """
+After getting all libraries, iterate over the possible values and
+retrieve all according locations. Output as XML.
+"""
+
+parser = ArgumentParser(
+    description=parser_description,
+    epilog="")
+help_xml_file = "Path to the output file."
+parser.add_argument("xml_file", type=str, help=help_xml_file)
+
+args = parser.parse_args()
+
+xml_file = args.xml_file
+
+# Logfile
+logger = getLogger(__name__)
+
+logger.info("Starting extract of all locations.")
+
+all_locations = fromstring("<all_locations />")
+
+for locations in rest_conf.retrieve_all_locations_generator():
+    all_locations.append(fromstring(locations))
+
+with open(xml_file, "wb") as f:
+    f.write(tostring(all_locations, encoding='utf-8'))
