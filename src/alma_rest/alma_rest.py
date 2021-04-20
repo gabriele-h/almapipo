@@ -26,13 +26,13 @@ logger = getLogger(__name__)
 logger.info(f"Starting {__name__} with Job-ID {job_timestamp}")
 
 
-def call_api_for_set(
+def call_api_for_alma_set(
         set_id: str,
         api: str,
         record_type: str,
         method: str,
         db_session: Session,
-        manipulate_xml: Callable[[str, str], bytes] = None) -> None:
+        manipulate_xml: Callable[[str, str], bytes] = None) -> bool:
     """
     Retrieve the alma_ids of all members in a set and make API calls on them.
     Will add one line to job_status_per_id for the set itself.
@@ -43,7 +43,7 @@ def call_api_for_set(
     :param method: "DELETE", "GET" or "PUT" (POST not implemented yet!)
     :param db_session: SQLAlchemy session for DB connection
     :param manipulate_xml: Function with arguments alma_id and data_retrieved
-    :return: None
+    :return: Success of set retrieval
     """
     db_read_write.add_alma_id_to_job_status_per_id(
         "GET", set_id, job_timestamp, db_session
@@ -56,13 +56,17 @@ def call_api_for_set(
         )
         logger.error(f"An error occurred while retrieving the set's members."
                      f" Is the set {set_id} empty?")
+        return False
 
     call_api_for_list(alma_id_list, api, record_type, method, manipulate_xml)
+
     db_read_write.update_job_status(
         "done", set_id, "GET", job_timestamp, db_session
     )
 
     db_session.commit()
+
+    return True
 
 
 def call_api_for_list(

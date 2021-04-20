@@ -252,8 +252,9 @@ Please note that `call_api_for_set` makes use of `call_api_for_list`.
 
 ```python
 from alma_rest import alma_rest
+
 set_id = '123123123123123'
-alma_rest.call_api_for_set(set_id, 'bibs', 'bibs', 'GET')
+alma_rest.call_api_for_alma_set(set_id, 'bibs', 'bibs', 'GET')
 ```
 
 **Note:** As mentioned above this will not work for all kinds of sets.
