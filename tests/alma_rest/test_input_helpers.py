@@ -52,24 +52,24 @@ class TestCsvAlmaIdGenerator:
 
     def test_file_check_negative(self, prevent_check_file_path):
         with pytest.raises(ValueError):
-            g = input_helpers.csv_almaid_generator("/path/to/csv")
+            g = input_helpers.CsvHelper("/path/to/csv").extract_almaids()
             next(g)   # advance generator to provoke the exception
 
     def test_file_check_positive(self, csv_without_contents):
-        g = input_helpers.csv_almaid_generator("/path/to/csv")
+        g = input_helpers.CsvHelper("/path/to/csv").extract_almaids()
         assert list(g) == []
 
     def test_func_yields_all_entries(
             self, prevent_check_file_path, csv_with_contents
     ):
-        g = input_helpers.csv_almaid_generator("/path/to/csv")
+        g = input_helpers.CsvHelper("/path/to/csv").extract_almaids()
         result = list(g)
         assert result == ["9981093873901234", "9981093873911234"]
 
     def test_process_empty_csv(
             self, prevent_check_file_path, csv_without_contents
     ):
-        g = input_helpers.csv_almaid_generator("/path/to/csv")
+        g = input_helpers.CsvHelper("/path/to/csv").extract_almaids()
         result = list(g)
         assert not result
 
@@ -86,8 +86,8 @@ class TestAddCsvToSourceCsvTable:
             db_writer,
             db_session
     ):
-        input_helpers.add_csv_to_source_csv_table(
-            "/path/to/csv", "1970-01-01 00:00:00+00:00", db_session
+        input_helpers.CsvHelper("/path/to/csv").add_to_source_csv_table(
+            "1970-01-01 00:00:00+00:00", db_session
         )
         assert db_writer.call_count == 2
 
@@ -98,7 +98,7 @@ class TestAddCsvToSourceCsvTable:
             db_writer,
             db_session
     ):
-        input_helpers.add_csv_to_source_csv_table(
-            "/path/to/csv", "1970-01-01 00:00:00+00:00", db_session
+        input_helpers.CsvHelper("/path/to/tsv").add_to_source_csv_table(
+            "1970-01-01 00:00:00+00:00", db_session
         )
         assert db_writer.call_count == 0

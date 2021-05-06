@@ -14,41 +14,45 @@ from alma_rest import db_read_write, input_read
 logger = getLogger(__name__)
 
 
-def csv_almaid_generator(
-        csv_path: str, validation: bool = False) -> Iterable[str]:
+class CsvHelper:
     """
-    Generator of alma_ids as per first column of the csv file.
+    Helper Class for CSV-files. Base is a reader with one ordered
+    dictionary per line, which is available as a set.
     File existence check is done within alma_rest.input_read.
     :param csv_path: Path to the CSV file to be imported
-    :param validation: Check ID structure of first column, defaults to False
-    :return: Generator of Alma IDs
+    :param validation: Check ID structure of first column, default is False
     """
 
-    csv_generator = input_read.read_csv_contents(csv_path, validation)
-
-    for csv_line in csv_generator:
-        yield list(csv_line.values())[0]
-
-
-def add_csv_to_source_csv_table(
-        csv_path: str,
-        job_timestamp: str,
-        db_session: Session,
-        validation: bool = False
-) -> Iterable[str]:
-    """
-    Imports a whole csv or tsv file to the table source_csv.
-    File existence check is done within alma_rest.input_read.
-    :param csv_path: Path to the CSV file to be imported
-    :param job_timestamp: Timestamp as set in alma_rest.alma_rest
-    :param db_session: SQLAlchemy Session
-    :param validation: Check ID structure of first column, defaults to False
-    :return: Generator of Alma IDs
-    """
-
-    csv_generator = input_read.read_csv_contents(csv_path, validation)
-
-    for csv_line in csv_generator:
-        db_read_write.add_csv_line_to_source_csv_table(
-            csv_line, job_timestamp, db_session
+    def __init__(
+            self,
+            csv_path: str,
+            validation: bool = False
+    ):
+        self.csv_line_set = (
+            input_read.read_csv_contents(csv_path, validation)
         )
+
+    def extract_almaids(self) -> Iterable[str]:
+        """
+        Generator of alma_ids as per first column of the csv file.
+        :return: Generator of Alma IDs
+        """
+        for csv_line in self.csv_line_set:
+            yield list(csv_line.values())[0]
+
+    def add_to_source_csv_table(
+            self,
+            job_timestamp: str,
+            db_session: Session,
+    ) -> Iterable[str]:
+        """
+        Imports a whole csv or tsv file to the table source_csv.
+        File existence check is done within alma_rest.input_read.
+        :param job_timestamp: Timestamp as set in alma_rest.alma_rest
+        :param db_session: SQLAlchemy Session
+        :return: Generator of Alma IDs
+        """
+        for csv_line in self.csv_line_set:
+            db_read_write.add_csv_line_to_source_csv_table(
+                csv_line, job_timestamp, db_session
+            )
