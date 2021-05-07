@@ -21,7 +21,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.9',
+    python_requires='>=3.8.5',
     install_requires=[
         "psycopg2 ~= 2.8.0; sys_platform == 'linux'",
         "psycopg2-binary ~= 2.8.0; sys_platform != 'linux'",
