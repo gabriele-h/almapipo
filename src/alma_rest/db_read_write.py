@@ -4,6 +4,8 @@ The DB is intended to do the following:
 * Store IDs as fetched from a CSV file
 * Store the status of those IDs (new, done, error)
 * Store which start time of the job triggered the DB-entry
+* Store API response contents
+* Store data sent to the API
 """
 
 from datetime import datetime
