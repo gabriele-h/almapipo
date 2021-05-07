@@ -8,7 +8,7 @@ from alma_rest import input_read, logfile_setup
 
 # Logfile
 
-logger = getLogger(__name__)
+logger = getLogger('input_check')
 logfile_setup.log_to_stdout(logger)
 logfile_setup.log_to_stdout(input_read.logger)
 
@@ -28,23 +28,7 @@ parser.add_argument("input_file", type=str, help=help_input_file)
 args = parser.parse_args()
 
 
-def set_csv_path_from_argv1() -> str:
-    """
-    Only relevant if read_input is run from commandline.
-    :return: String of the file-path provided as argv1.
-    """
-    try:
-        argv1 = argv[1]
-    except IndexError:
-        logger.error("Please provide csv or tsv file as argument.")
-        exit(1)
-    else:
-        if input_read.check_file_path(argv1):
-            return argv[1]
-        exit(1)
-
-
-csv_path = set_csv_path_from_argv1()
+csv_path = args.input_file
 generator_from_csv = input_read.read_csv_contents(csv_path, True)
 first_row = next(generator_from_csv)
 
