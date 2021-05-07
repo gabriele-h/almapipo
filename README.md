@@ -196,10 +196,10 @@ Main part making use of most of the other modules.
 ## Actions on lists of Alma-IDs
 
 There is one function to issue an Alma API request per alma-id. If successful,
-job_status in `job_status_per_id` will be set from "new" to "done",
+job\_status in `job_status_per_id` will be set from "new" to "done",
 otherwise "error". For all calls other than GET a second request per
 alma-id is done for the action specified, so there will be two
-lines in `job_status_per_id` for those function calls per alma_id.
+lines in `job_status_per_id` for those function calls per alma\_id.
 
 The successfully retrieved records will be saved to the table
 `fetched_records`, where the whole API response content is saved
@@ -226,16 +226,15 @@ should be called for. Final parameter is the method.
 #### Using a tsv File as Input
 
 The following will import the CSV lines to the table `source_csv` and
-create a generator of alma_ids. If the generator is empty, you might want to
-add the additional parameter `validation` to `False`, which skips the check
-whether the first column contained a valid `alma_id`. The value is not set
-in the example below as it defaults to True.
+create a generator of alma\_ids. If you want to make sure you are handling, 
+valid alma\_ids only, set `validation` in CsvHelper, which checks 
+whether the first column contained a valid `alma_id`. Defaults to False.
 
 ```python
-from alma_rest import alma_rest
-from alma_rest import input_helpers
-input_helpers.add_csv_to_source_csv_table('./test_hols.tsv', alma_rest.job_timestamp)
-alma_id_list = input_helpers.csv_almaid_generator('./test_hols.tsv')
+from alma_rest import alma_rest, db_connect, input_helpers
+csv_helper = input_helpers.CsvHelper('./test_hols.tsv')
+csv_helper.add_to_source_csv_table(alma_rest.job_timestamp, db_connect.DBSession)
+csv_helper.extract_almaids()
 alma_rest.call_api_for_list(alma_id_list, 'bibs', 'holdings', 'GET')
 ```
 
