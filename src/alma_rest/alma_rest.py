@@ -58,7 +58,7 @@ def call_api_for_alma_set(
                      f" Is the set {set_id} empty?")
         return False
 
-    call_api_for_list(alma_id_list, api, record_type, method, manipulate_xml)
+    call_api_for_list(alma_id_list, api, record_type, method, db_session, manipulate_xml)
 
     db_read_write.update_job_status(
         "done", set_id, "GET", job_timestamp, db_session
@@ -92,7 +92,7 @@ def call_api_for_list(
 
     for alma_id in alma_ids:
         call_api_for_record(
-            alma_id, api, record_type, method, manipulate_xml
+            alma_id, api, record_type, method, db_session, manipulate_xml
         )
 
     db_read_write.log_success_rate(method, job_timestamp, db_session)
