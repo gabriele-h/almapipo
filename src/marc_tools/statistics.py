@@ -5,7 +5,6 @@ Count occurrences for combinations of MARC content designators.
 from logging import getLogger
 from typing import Iterable
 
-from alma_rest import logfile_setup
 
 # Logfile
 logger = getLogger('marc_to_tsv')
