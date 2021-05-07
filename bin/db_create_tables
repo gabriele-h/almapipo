@@ -19,7 +19,7 @@ parser = ArgumentParser(
 args = parser.parse_args()
 
 # logfile
-logger = getLogger(__name__)
+logger = getLogger('db_create_tables')
 logfile_setup.log_to_stdout(logger)
 logfile_setup.log_to_stdout(db_setup.logger)
 

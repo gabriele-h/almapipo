@@ -38,7 +38,7 @@ args = parser.parse_args()
 xml_file = args.xml_file
 
 # Logfile
-logger = getLogger(__name__)
+logger = getLogger('locations_export')
 
 logger.info("Starting extract of all locations.")
 
