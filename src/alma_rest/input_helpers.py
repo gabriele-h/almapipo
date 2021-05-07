@@ -4,6 +4,7 @@ db-table source_csv and creating a generator for almaids as per first column
 of the file.
 """
 
+from datetime import datetime
 from logging import getLogger
 from typing import Iterable
 
@@ -42,9 +43,9 @@ class CsvHelper:
 
     def add_to_source_csv_table(
             self,
-            job_timestamp: str,
+            job_timestamp: datetime,
             db_session: Session,
-    ) -> Iterable[str]:
+    ):
         """
         Imports a whole csv or tsv file to the table source_csv.
         File existence check is done within alma_rest.input_read.

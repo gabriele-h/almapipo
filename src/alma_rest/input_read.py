@@ -15,7 +15,7 @@ import warnings
 from csv import DictReader
 from logging import getLogger
 from os import access, environ, path, R_OK
-from typing import Iterable
+from typing import Iterator
 
 # Logfile
 logger = getLogger(__name__)
@@ -25,7 +25,7 @@ ALMA_ID_PATTERN = r"^(22|23|53|61|62|81|99)\d{{2,}}{alma_id_suffix}$"
 
 def read_csv_contents(
         csv_path: str,
-        validation: bool = False) -> Iterable[dict]:
+        validation: bool = False) -> Iterator[dict]:
     """
     Feeds the contents of a csv or tsv file into a generator via DictReader.
     If the first column does not match an Alma ID, the whole row
@@ -60,7 +60,7 @@ def read_csv_contents(
 
             if all(is_this_an_alma_id(string)
                    for string in str.split(first_column_value, ",")) \
-                   or not validation:
+                    or not validation:
                 yield row
             else:
                 logger.warning(f"The following row was discarded: {row}")
