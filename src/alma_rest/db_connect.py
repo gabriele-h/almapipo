@@ -5,7 +5,6 @@ from os import environ
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-
 # SQLAlchemy logging behavior
 
 try:
