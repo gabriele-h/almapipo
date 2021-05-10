@@ -16,6 +16,7 @@ setup(
         'bin/db_create_tables',
         'bin/input_check',
         'bin/fetched_records_to_tsv',
+        'bin/locations_export',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
