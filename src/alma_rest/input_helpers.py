@@ -18,7 +18,7 @@ logger = getLogger(__name__)
 class CsvHelper:
     """
     Helper Class for CSV-files. Base is a reader with one ordered
-    dictionary per line, which is available as a set.
+    dictionary per line, which is available as a list.
     File existence check is done within alma_rest.input_read.
     :param csv_path: Path to the CSV file to be imported
     :param validation: Check ID structure of first column, default is False
@@ -38,7 +38,7 @@ class CsvHelper:
         Generator of alma_ids as per first column of the csv file.
         :return: Generator of Alma IDs
         """
-        for csv_line in self.csv_line_set:
+        for csv_line in self.csv_line_list:
             yield list(csv_line.values())[0]
 
     def add_to_source_csv_table(
@@ -53,7 +53,7 @@ class CsvHelper:
         :param db_session: SQLAlchemy Session
         :return: Generator of Alma IDs
         """
-        for csv_line in self.csv_line_set:
+        for csv_line in self.csv_line_list:
             db_read_write.add_csv_line_to_source_csv_table(
                 csv_line, job_timestamp, db_session
             )
