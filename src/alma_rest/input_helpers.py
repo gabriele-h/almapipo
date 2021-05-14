@@ -29,8 +29,8 @@ class CsvHelper:
             csv_path: str,
             validation: bool = False
     ):
-        self.csv_line_set = (
-            input_read.read_csv_contents(csv_path, validation)
+        self.csv_line_list = (
+            list(input_read.read_csv_contents(csv_path, validation))
         )
 
     def extract_almaids(self) -> Iterable[str]:
