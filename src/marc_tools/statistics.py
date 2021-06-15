@@ -12,7 +12,7 @@ logger = getLogger('marc_to_tsv')
 
 def count_for_tag_and_inds(all_records: Iterable[dict], designators: Iterable[str]) -> dict:
     """
-    For a list of records as returned by alma_rest.xml_extract.extract_marc_for_job_timestamp
+    For a list of records as returned by almapipo.xml_extract.extract_marc_for_job_timestamp
     create a dictionary with counters for the given content designators.
     :param all_records: Generator of all records given as dictionaries
     :param designators: List of tags with indicators concatenated into one string, e. g. '035  '

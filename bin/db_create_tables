@@ -5,9 +5,9 @@ from logging import getLogger
 
 from sqlalchemy import create_engine
 
-from alma_rest import db_connect, db_setup, logfile_setup
+from almapipo import db_connect, db_setup, logfile_setup
 
-parser_description = """Create all tables necessary for the package alma_rest
+parser_description = """Create all tables necessary for the package almapipo
 and view SQLAlchemy logs on stdout. If you run into any issues, check your
 environment variables and the permissions for the database."""
 

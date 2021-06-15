@@ -1,5 +1,5 @@
 """
-Tests for alma_rest.input_helpers
+Tests for almapipo.input_helpers
 """
 
 from unittest import mock
@@ -7,12 +7,12 @@ from unittest import mock
 import pytest
 from sqlalchemy.orm import Session
 
-from alma_rest import input_helpers
+from almapipo import input_helpers
 
 
 @pytest.fixture
 def prevent_check_file_path(monkeypatch):
-    monkeypatch.setattr("alma_rest.input_read.check_file_path", lambda _: True)
+    monkeypatch.setattr("almapipo.input_read.check_file_path", lambda _: True)
 
 
 @pytest.fixture
@@ -22,13 +22,13 @@ def csv_with_contents(monkeypatch):
         {"MMS-ID": "9981093873911234", "Consortium-ID": "XY0002"}
     ]
 
-    monkeypatch.setattr("alma_rest.input_read."
+    monkeypatch.setattr("almapipo.input_read."
                         "read_csv_contents", lambda *_: contents)
 
 
 @pytest.fixture
 def csv_without_contents(monkeypatch):
-    monkeypatch.setattr("alma_rest.input_read.read_csv_contents", lambda*_: {})
+    monkeypatch.setattr("almapipo.input_read.read_csv_contents", lambda*_: {})
 
 
 @pytest.fixture()
@@ -40,14 +40,14 @@ def db_session(monkeypatch):
 @pytest.fixture
 def db_writer(monkeypatch):
     writer = mock.MagicMock()
-    monkeypatch.setattr("alma_rest.db_read_write."
+    monkeypatch.setattr("almapipo.db_read_write."
                         "add_csv_line_to_source_csv_table", writer)
     return writer
 
 
 class TestCsvAlmaIdGenerator:
     """
-    Tests for alma_rest.input_helpers.csv_almaid_generator
+    Tests for almapipo.input_helpers.csv_almaid_generator
     """
 
     def test_file_check_negative(self, prevent_check_file_path):
@@ -76,7 +76,7 @@ class TestCsvAlmaIdGenerator:
 
 class TestAddCsvToSourceCsvTable:
     """
-    Tests for alma_rest.input_helpers.add_csv_to_source_csv_table
+    Tests for almapipo.input_helpers.add_csv_to_source_csv_table
     """
 
     def test_all_entries_added_to_db(

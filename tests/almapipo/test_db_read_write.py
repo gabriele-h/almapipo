@@ -2,4 +2,4 @@
 
 import pytest
 
-from alma_rest import db_read_write
+from almapipo import db_read_write

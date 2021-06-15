@@ -10,7 +10,7 @@ from typing import Iterable
 
 from sqlalchemy.orm import Session
 
-from alma_rest import db_read_write, input_read
+from almapipo import db_read_write, input_read
 
 logger = getLogger(__name__)
 
@@ -19,7 +19,7 @@ class CsvHelper:
     """
     Helper Class for CSV-files. Base is a reader with one ordered
     dictionary per line, which is available as a list.
-    File existence check is done within alma_rest.input_read.
+    File existence check is done within almapipo.input_read.
     :param csv_path: Path to the CSV file to be imported
     :param validation: Check ID structure of first column, default is False
     """
@@ -48,8 +48,8 @@ class CsvHelper:
     ):
         """
         Imports a whole csv or tsv file to the table source_csv.
-        File existence check is done within alma_rest.input_read.
-        :param job_timestamp: Timestamp as set in alma_rest.alma_rest
+        File existence check is done within almapipo.input_read.
+        :param job_timestamp: Timestamp as set in almapipo.almapipo
         :param db_session: SQLAlchemy Session
         :return: Generator of Alma IDs
         """

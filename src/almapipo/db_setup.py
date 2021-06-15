@@ -1,6 +1,6 @@
 """Setup of DB tables
 
-Table definitions necessary for use of alma_rest
+Table definitions necessary for use of almapipo
 """
 
 from logging import getLogger

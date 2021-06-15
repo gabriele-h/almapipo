@@ -4,12 +4,12 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="alma_rest",
-    version="0.0.1",
+    name="almapipo",
+    version="1.0.0",
     description="Use Alma's REST APIs and store data in a Postgres DB.",
     long_description=long_description,
     long_description_content="text/markdown",
-    url="https://github.com/gabriele-h/alma_rest",
+    url="https://github.com/gabriele-h/almapipo",
     packages=find_packages(where="src"),
     package_dir={'': 'src'},
     scripts=[
