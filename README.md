@@ -1,4 +1,22 @@
-# About
+# About *almapipo*
+
+almapipo is short for "ALMa API Client with POstgres".
+
+The intention to have an implementation with a Postgres DB is to store
+the following information:
+* For which IDs where API-calls made and were they successful
+* Responses for all successful GET calls
+* Request content sent to the API for successful calls
+* Response content received from the API for successful calls
+* CSV files that were used as an input for the API calls
+
+This way it should be easy to determine which API calls need to be
+analyzed and/or sent another time. All data is sent and requested as XML
+as this is the only format supported for all API calls. This also enables
+us to query the database by xpath.
+
+All calls that were done without success will log the content of
+the API's response to the logfile.
 
 ## Scenario
 
