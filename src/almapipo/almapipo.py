@@ -265,6 +265,13 @@ def instantiate_api_class(
         else:
             raise NotImplementedError
 
+    elif api == "acq":
+
+        if record_type == "vendors":
+            return rest_acq.VendorsApi()
+        else:
+            raise NotImplementedError
+
     logger.error("The API you are trying to call is not implemented yet"
                  " or does not exist.")
     raise NotImplementedError
