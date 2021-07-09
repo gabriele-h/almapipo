@@ -9,7 +9,7 @@ from logging import getLogger
 from typing import Iterable
 from xml.etree.ElementTree import Element
 
-from alma_rest import xml_extract
+from almapipo import xml_extract
 
 logger = getLogger(__name__)
 

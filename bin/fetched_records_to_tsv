@@ -6,7 +6,7 @@ from logging import getLogger
 from sys import argv
 import warnings
 
-from alma_rest import db_connect, db_read_write, logfile_setup, xml_extract
+from almapipo import db_connect, db_read_write, logfile_setup, xml_extract
 from marc_tools import marcxml_to_lists
 
 logger = getLogger('fetched_records_to_tsv')

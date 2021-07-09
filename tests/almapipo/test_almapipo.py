@@ -1,13 +1,13 @@
-"""Tests for alma_rest.alma_rest"""
+"""Tests for almapipo.almapipo"""
 
 import pytest
 
-from alma_rest import alma_rest, rest_bibs, rest_electronic, rest_users
+from almapipo import almapipo, rest_bibs, rest_electronic, rest_users
 
 
 class TestInstantiateApiClass:
     """
-    Tests for alma_rest.alma_rest.instantiate_api_class
+    Tests for almapipo.almapipo.instantiate_api_class
     Tests for specific kinds of APIs will be listed in their own inner classes,
         e. g. TestInstantiateApiClassBibs
     Tests for NotImplementedErros are indicated by the string "nonexistent"
@@ -15,26 +15,26 @@ class TestInstantiateApiClass:
 
     def test_instantiate_api_class_nonexistent(self):
         with pytest.raises(NotImplementedError):
-            alma_rest.instantiate_api_class("123", "nonexistent", "bibs")
+            almapipo.instantiate_api_class("123", "nonexistent", "bibs")
 
     class TestInstantiateApiClassBibs:
 
         def test_instantiate_api_class_bibs_bibs(self):
-            CurrentApi = alma_rest.instantiate_api_class(
+            CurrentApi = almapipo.instantiate_api_class(
                 "9981093873901234", "bibs", "bibs"
             )
             assert isinstance(CurrentApi, rest_bibs.BibsApi) \
                 and CurrentApi.base_path == "/bibs/"
 
         def test_instantiate_api_class_bibs_holdings(self):
-            CurrentApi = alma_rest.instantiate_api_class(
+            CurrentApi = almapipo.instantiate_api_class(
                 "9981093873901234,22447985240001234", "bibs", "holdings"
             )
             assert isinstance(CurrentApi, rest_bibs.HoldingsApi) \
                 and CurrentApi.base_path == "/bibs/9981093873901234/holdings/"
 
         def test_instantiate_api_class_bibs_items(self):
-            CurrentApi = alma_rest.instantiate_api_class(
+            CurrentApi = almapipo.instantiate_api_class(
                 "9981093873901234,22447985240001234,23447985190001234",
                 "bibs",
                 "items"
@@ -44,7 +44,7 @@ class TestInstantiateApiClass:
                                             "holdings/22447985240001234/items/"
 
         def test_instantiate_api_class_bibs_portfolios(self):
-            CurrentApi = alma_rest.instantiate_api_class(
+            CurrentApi = almapipo.instantiate_api_class(
                 "9981093873901234", "bibs", "portfolios"
             )
             assert isinstance(CurrentApi, rest_bibs.PortfoliosApi) \
@@ -53,21 +53,21 @@ class TestInstantiateApiClass:
 
         def test_instantiate_api_class_bibs_nonexistent(self):
             with pytest.raises(NotImplementedError):
-                alma_rest.instantiate_api_class(
+                almapipo.instantiate_api_class(
                     "9981093873901234", "bibs", "nonexistent"
                 )
 
     class TestInstantiateApiClassElectronic:
 
         def test_instantiate_api_class_electronic_ecollections(self):
-            CurrentApi = alma_rest.instantiate_api_class(
+            CurrentApi = almapipo.instantiate_api_class(
                 "6181093873901234", "electronic", "e-collections"
             )
             assert isinstance(CurrentApi, rest_electronic.EcollectionsApi) \
                 and CurrentApi.base_path == "/electronic/e-collections/"
 
         def test_instantiate_api_class_electronic_eservices(self):
-            CurrentApi = alma_rest.instantiate_api_class(
+            CurrentApi = almapipo.instantiate_api_class(
                 "6181093873901234,6281093873901234", "electronic", "e-services"
             )
             assert isinstance(CurrentApi, rest_electronic.EservicesApi) \
@@ -75,7 +75,7 @@ class TestInstantiateApiClass:
                                             "6181093873901234/"
 
         def test_instantiate_api_class_electronic_portfolios(self):
-            CurrentApi = alma_rest.instantiate_api_class(
+            CurrentApi = almapipo.instantiate_api_class(
                 "6181093873901234,6281093873901234,5381093873901234",
                 "electronic",
                 "portfolios"
@@ -87,14 +87,14 @@ class TestInstantiateApiClass:
 
         def test_instantiate_api_class_electronic_nonexistent(self):
             with pytest.raises(NotImplementedError):
-                alma_rest.instantiate_api_class(
+                almapipo.instantiate_api_class(
                     "6181093873901234", "electronic", "nonexistent"
                 )
 
     class TestInstantiateApiClassUsers:
 
         def test_instantiate_api_class_users_users(self):
-            CurrentApi = alma_rest.instantiate_api_class(
+            CurrentApi = almapipo.instantiate_api_class(
                 "test1234", "users", "users"
             )
             assert isinstance(CurrentApi, rest_users.UsersApi) and \
@@ -102,6 +102,6 @@ class TestInstantiateApiClass:
 
         def test_instantiate_api_class_users_nonexistent(self):
             with pytest.raises(NotImplementedError):
-                alma_rest.instantiate_api_class(
+                almapipo.instantiate_api_class(
                     "test1234", "users", "nonexistent"
                 )

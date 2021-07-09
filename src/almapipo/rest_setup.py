@@ -281,7 +281,7 @@ def create_alma_api_session(session_format) -> Session:
         "accept": "application/" + session_format,
         "Content-Type": f"application/{session_format}; charset=utf-8",
         "authorization": f"apikey {api_key}",
-        "User-Agent": f"alma_rest/{metadata.version('alma_rest')}"
+        "User-Agent": f"almapipo/{metadata.version('almapipo')}"
     })
 
     return session

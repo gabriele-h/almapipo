@@ -1,4 +1,22 @@
-# About
+# About *almapipo*
+
+almapipo is short for "ALMa API Client with POstgres".
+
+The intention to have an implementation with a Postgres DB is to store
+the following information:
+* For which IDs where API-calls made and were they successful
+* Responses for all successful GET calls
+* Request content sent to the API for successful calls
+* Response content received from the API for successful calls
+* CSV files that were used as an input for the API calls
+
+This way it should be easy to determine which API calls need to be
+analyzed and/or sent another time. All data is sent and requested as XML
+as this is the only format supported for all API calls. This also enables
+us to query the database by xpath.
+
+All calls that were done without success will log the content of
+the API's response to the logfile.
 
 ## Scenario
 
@@ -74,7 +92,7 @@ See https://docs.python.org/3/library/venv.html for further info.
 ## Install All From `requirements.txt`
 
 The requirements are actually defined within `setup.py` and `requirements.txt`
-has just one entry referring to that. Installing alma_rest via pip will install the
+has just one entry referring to that. Installing almapipo via pip will install the
 requirements as defined in `setup.py` automatically.
 
 **The following is only necessary if you got the code directly via Github:**
@@ -122,7 +140,7 @@ The following function will iterate trough the set by 100 at a time and
 yield the `alma_id` of each record, making it a generator:
 
 ```python
-from alma_rest import rest_conf
+from almapipo import rest_conf
 alma_ids = rest_conf.retrieve_set_member_alma_ids('1199999999123')
 ```
 
@@ -176,7 +194,7 @@ in the future. It returns the number of left calls and logs them to the log file
 **Note:** The function itself makes a call to /bibs/test and will be counted as an API call.
 
 ```python
-from alma_rest import rest_setup
+from almapipo import rest_setup
 num_calls = rest_setup.test_calls_remaining_today()
 print(num_calls)
 ```
@@ -189,7 +207,7 @@ There might be something missing and/or wrong in your configuration.
 
 If it does look like that, you can find the same message in the logfile.
 
-# `alma_rest.alma_rest`
+# `almapipo.almapipo`
 
 Main part making use of most of the other modules.
 
@@ -214,7 +232,7 @@ need to be analyzed intellectually anyways.
 
 **Note:** If you call the api for a record multiple times there will be a
 separate row for each call in all of the aforementioned tables. These
-rows can be distinguished by the `job_timestamp` set when the `alma_rest`
+rows can be distinguished by the `job_timestamp` set when the `almapipo`
 module is imported.
 
 ### Usage Examples Python Console
@@ -231,11 +249,11 @@ valid alma\_ids only, set `validation` in CsvHelper, which checks
 whether the first column contained a valid `alma_id`. Defaults to False.
 
 ```python
-from alma_rest import alma_rest, db_connect, input_helpers
+from almapipo import almapipo, db_connect, input_helpers
 csv_helper = input_helpers.CsvHelper('./test_hols.tsv')
-csv_helper.add_to_source_csv_table(alma_rest.job_timestamp, db_connect.DBSession)
+csv_helper.add_to_source_csv_table(almapipo.job_timestamp, db_connect.DBSession)
 csv_helper.extract_almaids()
-alma_rest.call_api_for_list(alma_id_list, 'bibs', 'holdings', 'GET')
+almapipo.call_api_for_list(alma_id_list, 'bibs', 'holdings', 'GET')
 ```
 
 #### Using a Set as Input
@@ -250,16 +268,16 @@ happen if the set is empty or does not exist. Otherwise the status for the
 Please note that `call_api_for_set` makes use of `call_api_for_list`.
 
 ```python
-from alma_rest import alma_rest
+from almapipo import almapipo
 
 set_id = '123123123123123'
-alma_rest.call_api_for_alma_set(set_id, 'bibs', 'bibs', 'GET')
+almapipo.call_api_for_alma_set(set_id, 'bibs', 'bibs', 'GET')
 ```
 
 **Note:** As mentioned above this will not work for all kinds of sets.
 Use `help(rest_conf.retrieve_set_member_alma_ids)` for more info.
 
-# `alma_rest.xml_extract`
+# `almapipo.xml_extract`
 
 For records retrieved via GET, extract the record's API response or XML
 record from the table `fetched_records`.
@@ -270,11 +288,11 @@ The following extracts the XML of one holding record and returns it
 as an xml.etree Element:
 
 ```python
-from alma_rest import xml_extract
+from almapipo import xml_extract
 xml_extract.extract_response_from_fetched_records('991234567890123,221234567890123')
 ```
 
-# `alma_rest.xml_modify`
+# `almapipo.xml_modify`
 
 For a given ElementTree object a copy is created for the manipulation.
 This is to say that one should keep in mind that the returned ElementTree
@@ -291,7 +309,7 @@ The following appends a new Element to all children that match a specific
 path:
 
 ```python
-from alma_rest import xml_modify
+from almapipo import xml_modify
 from xml.etree.ElementTree import fromstring, tostring
 my_xml_string = '<parent><child></child><child></child></parent>'
 my_xml = fromstring(my_xml_string)
@@ -303,7 +321,7 @@ Gives the Output:
 b'<parent><child><grandchild appended="yes">text</grandchild></child><child><grandchild appended="yes">text</grandchild></child></parent>'
 ```
 
-# `alma_rest.input_read`
+# `almapipo.input_read`
 
 Read a CSV- or TSV-file and return information for further handling by other modules.
 
@@ -316,7 +334,7 @@ as if it were a header).
 column will be kept for further processing. Providing a correct value
 in env var `ALMA_REST_ID_INSTITUTIONAL_SUFFIX` is crucial here.
 
-# `alma_rest.db_read_write`
+# `almapipo.db_read_write`
 
 Can be used to do the following:
 
@@ -349,7 +367,7 @@ The strings provided in the function correspond with the headings of those
 columns.
 
 ```python
-from alma_rest import db_read_write
+from almapipo import db_read_write
 from datetime import datetime, timezone
 alma_id = "991234567890123,221234567890123"
 job_timestamp = datetime(2020, 2, 20, 20, 00, 20, timezone.utc)
