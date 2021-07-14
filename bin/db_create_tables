@@ -5,7 +5,7 @@ from logging import getLogger
 
 from sqlalchemy import create_engine
 
-from almapipo import db_connect, db_setup, logfile_setup
+from almapipo import db_connect, setup_db, setup_logfile
 
 parser_description = """Create all tables necessary for the package almapipo
 and view SQLAlchemy logs on stdout. If you run into any issues, check your
@@ -20,12 +20,12 @@ args = parser.parse_args()
 
 # logfile
 logger = getLogger('db_create_tables')
-logfile_setup.log_to_stdout(logger)
-logfile_setup.log_to_stdout(db_setup.logger)
+setup_logfile.log_to_stdout(logger)
+setup_logfile.log_to_stdout(setup_db.logger)
 
 # create the tables
 
 connection_params = db_connect.params
 db_engine = create_engine(connection_params, echo=True)
 
-db_setup.Base.metadata.create_all(db_engine)
+setup_db.Base.metadata.create_all(db_engine)

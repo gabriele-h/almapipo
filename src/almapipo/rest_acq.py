@@ -4,13 +4,13 @@ Query the Alma API for vendors
 
 from logging import getLogger
 
-from . import rest_setup
+from . import setup_rest
 
 # Logfile
 logger = getLogger(__name__)
 
 
-class VendorsApi(rest_setup.GenericApi):
+class VendorsApi(setup_rest.GenericApi):
     """
     Make calls for acq records.
     """

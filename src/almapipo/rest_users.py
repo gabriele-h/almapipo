@@ -5,13 +5,13 @@ See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/o
 
 from logging import getLogger
 
-from . import rest_setup
+from . import setup_rest
 
 # Logfile
 logger = getLogger(__name__)
 
 
-class UsersApi(rest_setup.GenericApi):
+class UsersApi(setup_rest.GenericApi):
     """
     Make calls for bibliographic records. Here the record_id is the MMS ID.
     """

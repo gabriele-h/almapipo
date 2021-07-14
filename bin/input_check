@@ -4,13 +4,13 @@ from argparse import ArgumentParser
 from logging import getLogger
 from sys import argv
 
-from almapipo import input_read, logfile_setup
+from almapipo import input_read, setup_logfile
 
 # Logfile
 
 logger = getLogger('input_check')
-logfile_setup.log_to_stdout(logger)
-logfile_setup.log_to_stdout(input_read.logger)
+setup_logfile.log_to_stdout(logger)
+setup_logfile.log_to_stdout(input_read.logger)
 
 # provide -h information on the script
 

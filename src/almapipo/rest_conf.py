@@ -8,7 +8,7 @@ from logging import getLogger
 from typing import Iterable
 from xml.etree.ElementTree import fromstring, tostring
 
-from . import rest_setup
+from . import setup_rest
 
 # Logfile
 logger = getLogger(__name__)
@@ -20,7 +20,7 @@ def retrieve_libraries() -> str:
     :return: str
     """
     logger.info("Trying to fetch all libraries configured in Alma.")
-    libraries_record = rest_setup.call_api(f"/conf/libraries/", "GET", 200)
+    libraries_record = setup_rest.call_api(f"/conf/libraries/", "GET", 200)
     return libraries_record
 
 
@@ -31,7 +31,7 @@ def retrieve_library(library: str) -> str:
     :return: str
     """
     logger.info(f"Trying to fetch one library with code {library}.")
-    library_record = rest_setup.call_api(
+    library_record = setup_rest.call_api(
         f"/conf/libraries/{library}", "GET", 200
     )
     return library_record
@@ -79,7 +79,7 @@ def retrieve_locations(library: str, lang: str = None) -> str:
 
     logger.info(f"Trying to fetch all locations for library {library}.")
 
-    locations_record = rest_setup.call_api(
+    locations_record = setup_rest.call_api(
         f"/conf/libraries/{library}/locations{lang_suffix}", "GET", 200
     )
 
@@ -116,7 +116,7 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
         if member_url:
 
             has_url = True
-            member_url_path = member_url.replace(rest_setup.api_base_url, "")
+            member_url_path = member_url.replace(setup_rest.api_base_url, "")
 
             if member_url == member_url_path:
                 logger.error(f"Could not remove base_url as per env var from "
@@ -154,9 +154,9 @@ def retrieve_set_member_link_and_id(set_id: str) -> Iterable[Iterable[str]]:
     for page in range(0, num_members // 100 + 1):
 
         api_url_parameters["offset"] = page * 100
-        api_url = rest_setup.add_parameters(api_url_path, api_url_parameters)
+        api_url = setup_rest.add_parameters(api_url_path, api_url_parameters)
 
-        set_response = rest_setup.call_api(api_url, "GET", 200)
+        set_response = setup_rest.call_api(api_url, "GET", 200)
         set_response_xml = fromstring(set_response)
 
         for member in set_response_xml.findall("member"):
@@ -178,7 +178,7 @@ def retrieve_set_total_record_count(set_id: str) -> int:
 
     logger.info(f"Trying to fetch number of members for set {set_id}.")
 
-    members_in_set = rest_setup.call_api(
+    members_in_set = setup_rest.call_api(
         f"/conf/sets/{set_id}/members?limit=1", "GET", 200
     )
     response_xml = fromstring(members_in_set)

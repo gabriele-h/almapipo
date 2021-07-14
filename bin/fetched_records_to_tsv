@@ -6,11 +6,11 @@ from logging import getLogger
 from sys import argv
 import warnings
 
-from almapipo import db_connect, db_read, logfile_setup
+from almapipo import db_connect, db_read, setup_logfile
 from marc_tools import marcxml_to_lists
 
 logger = getLogger('fetched_records_to_tsv')
-logfile_setup.log_to_stdout(logger)
+setup_logfile.log_to_stdout(logger)
 
 # provide info for help when called from commandline
 

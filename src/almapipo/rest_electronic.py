@@ -5,13 +5,13 @@ See https://developers.exlibrisgroup.com/console/?url=/wp-content/uploads/alma/o
 
 from logging import getLogger
 
-from . import rest_setup
+from . import setup_rest
 
 # Logfile
 logger = getLogger(__name__)
 
 
-class EcollectionsApi(rest_setup.GenericApi):
+class EcollectionsApi(setup_rest.GenericApi):
     """
     Make API calls for e-collections.
     """
@@ -26,7 +26,7 @@ class EcollectionsApi(rest_setup.GenericApi):
         super().__init__(base_path)
 
 
-class EservicesApi(rest_setup.GenericApi):
+class EservicesApi(setup_rest.GenericApi):
     """
     Make API calls for e-services.
     """
@@ -44,7 +44,7 @@ class EservicesApi(rest_setup.GenericApi):
         super().__init__(base_path)
 
 
-class PortfoliosApi(rest_setup.GenericApi):
+class PortfoliosApi(setup_rest.GenericApi):
     """
     Make API calls for portfolios.
     """

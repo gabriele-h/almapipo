@@ -14,7 +14,7 @@ from xml.etree.ElementTree import fromstring
 
 from sqlalchemy.orm import Session
 
-from . import db_setup
+from . import setup_db
 
 
 def update_job_status(status: str,
@@ -33,7 +33,7 @@ def update_job_status(status: str,
     """
 
     list_of_matched_rows = db_session.query(
-        db_setup.JobStatusPerId
+        setup_db.JobStatusPerId
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(
@@ -63,7 +63,7 @@ def add_put_post_response(
 
     record_data_xml = fromstring(record_data)
 
-    line_for_table_put_post_responses = db_setup.PutPostResponses(
+    line_for_table_put_post_responses = setup_db.PutPostResponses(
         alma_id=alma_id,
         alma_record=record_data_xml,
         job_timestamp=job_timestamp,
@@ -90,7 +90,7 @@ def add_sent_record(
 
     record_data_xml = fromstring(record_data)
 
-    line_for_table_sent_records = db_setup.SentRecords(
+    line_for_table_sent_records = setup_db.SentRecords(
         alma_id=alma_id,
         alma_record=record_data_xml,
         job_timestamp=job_timestamp,
@@ -115,7 +115,7 @@ def add_response_content_to_fetched_records(
     :return: None
     """
 
-    line_for_table_fetched_records = db_setup.FetchedRecords(
+    line_for_table_fetched_records = setup_db.FetchedRecords(
         alma_id=alma_id,
         alma_record=record_data,
         job_timestamp=job_timestamp,
@@ -137,7 +137,7 @@ def add_csv_line_to_source_csv_table(
     :return: None
     """
 
-    line_for_table_source_csv = db_setup.SourceCsv(
+    line_for_table_source_csv = setup_db.SourceCsv(
         job_timestamp=job_timestamp,
         csv_line=csv_line
     )
@@ -159,7 +159,7 @@ def add_alma_id_to_job_status_per_id(
     :return: None
     """
 
-    line_for_table_job_status_per_id = db_setup.JobStatusPerId(
+    line_for_table_job_status_per_id = setup_db.JobStatusPerId(
         job_timestamp=job_timestamp,
         alma_id=alma_id,
         job_status="new",

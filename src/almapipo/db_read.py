@@ -15,7 +15,7 @@ from xml.etree.ElementTree import Element
 from sqlalchemy import func, String
 from sqlalchemy.orm import Session, Query
 
-from . import db_setup
+from . import setup_db
 
 # Logfile
 logger = getLogger(__name__)
@@ -36,24 +36,24 @@ def check_data_sent_equals_response(
     """
 
     sent_id = func.concat(
-        db_setup.SentRecords.alma_id,
-        db_setup.SentRecords.job_timestamp
+        setup_db.SentRecords.alma_id,
+        setup_db.SentRecords.job_timestamp
     )
     response_id = func.concat(
-        db_setup.PutPostResponses.alma_id,
-        db_setup.PutPostResponses.job_timestamp
+        setup_db.PutPostResponses.alma_id,
+        setup_db.PutPostResponses.job_timestamp
     )
 
     if check_data_sent_and_response_exist(alma_id, job_timestamp, db_session):
 
         sent_received_matching = db_session.query(
-            db_setup.PutPostResponses
+            setup_db.PutPostResponses
         ).join(
-            db_setup.SentRecords,
+            setup_db.SentRecords,
             sent_id == response_id
         ).filter(
-            db_setup.SentRecords.alma_record.cast(String) ==
-            db_setup.PutPostResponses.alma_record.cast(String)
+            setup_db.SentRecords.alma_record.cast(String) ==
+            setup_db.PutPostResponses.alma_record.cast(String)
         ).filter_by(
             job_timestamp=job_timestamp
         ).filter_by(
@@ -83,7 +83,7 @@ def check_data_sent_and_response_exist(
     """
 
     record_sent = db_session.query(
-        db_setup.SentRecords
+        setup_db.SentRecords
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(
@@ -91,7 +91,7 @@ def check_data_sent_and_response_exist(
     )
 
     record_received = db_session.query(
-        db_setup.PutPostResponses
+        setup_db.PutPostResponses
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(
@@ -124,9 +124,9 @@ def get_value_from_source_csv(
     """
 
     value_query = db_session.query(
-        db_setup.SourceCsv
+        setup_db.SourceCsv
     ).filter(
-        db_setup.SourceCsv.csv_line[alma_id_name].astext == alma_id
+        setup_db.SourceCsv.csv_line[alma_id_name].astext == alma_id
     ).filter_by(
         job_timestamp=job_timestamp
     )
@@ -149,7 +149,7 @@ def get_fetched_xml_by_timestamp(
     """
 
     record_query = db_session.query(
-        db_setup.FetchedRecords.alma_record
+        setup_db.FetchedRecords.alma_record
     ).filter_by(
         job_timestamp=job_timestamp
     )
@@ -168,11 +168,11 @@ def get_most_recent_fetched_xml(alma_id: str, db_session: Session):
     """
 
     record_query = db_session.query(
-        db_setup.FetchedRecords
+        setup_db.FetchedRecords
     ).filter_by(
         alma_id=alma_id
     ).order_by(
-        db_setup.FetchedRecords.job_timestamp.desc()
+        setup_db.FetchedRecords.job_timestamp.desc()
     ).limit(1)
 
     return record_query.first()
@@ -194,7 +194,7 @@ def get_list_of_ids_by_status_and_method(
     """
 
     list_of_ids = db_session.query(
-        db_setup.JobStatusPerId.alma_id
+        setup_db.JobStatusPerId.alma_id
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(

@@ -22,7 +22,7 @@ from . import (
     rest_bibs,
     rest_conf,
     rest_electronic,
-    rest_setup,
+    setup_rest,
     rest_users,
 )
 
@@ -232,7 +232,7 @@ def call_api_for_record(
 def instantiate_api_class(
         alma_id: str,
         api: str,
-        record_type: str) -> rest_setup.GenericApi:
+        record_type: str) -> setup_rest.GenericApi:
     """
     Kind of a switch for api calls.
     :param alma_id: Comma-separated string of record-ids, most specific last

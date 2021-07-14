@@ -194,8 +194,9 @@ in the future. It returns the number of left calls and logs them to the log file
 **Note:** The function itself makes a call to /bibs/test and will be counted as an API call.
 
 ```python
-from almapipo import rest_setup
-num_calls = rest_setup.test_calls_remaining_today()
+from almapipo import setup_rest
+
+num_calls = setup_rest.test_calls_remaining_today()
 print(num_calls)
 ```
 Output should look something like this:

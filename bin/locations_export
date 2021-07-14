@@ -5,7 +5,7 @@ from logging import getLogger
 from xml.etree.ElementTree import fromstring, tostring
 
 # noinspection PyUnresolvedReferences
-from almapipo import logfile_setup
+from almapipo import setup_logfile
 from almapipo import rest_conf
 
 # provide -h information on the script
