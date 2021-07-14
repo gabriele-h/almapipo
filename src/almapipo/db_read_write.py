@@ -134,8 +134,6 @@ def get_value_from_source_csv(
 
     json_value = value_query.first().csv_line[json_key]
 
-    db_session.close()
-
     return json_value
 
 
@@ -177,8 +175,6 @@ def get_most_recent_fetched_xml(alma_id: str, db_session: Session):
     ).order_by(
         db_setup.FetchedRecords.job_timestamp.desc()
     ).limit(1)
-
-    db_session.close()
 
     return record_query.first()
 
