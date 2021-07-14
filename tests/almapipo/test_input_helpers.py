@@ -40,7 +40,7 @@ def db_session(monkeypatch):
 @pytest.fixture
 def db_writer(monkeypatch):
     writer = mock.MagicMock()
-    monkeypatch.setattr("almapipo.db_read_write."
+    monkeypatch.setattr("almapipo.db_write."
                         "add_csv_line_to_source_csv_table", writer)
     return writer
 

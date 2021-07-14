@@ -11,7 +11,7 @@ from xml.etree.ElementTree import Element
 
 from sqlalchemy.orm import Session
 
-from . import db_read_write
+from . import db_read
 
 # Logfile
 logger = getLogger(__name__)
@@ -30,7 +30,7 @@ def extract_response_from_fetched_records(
     """
     logger.info(f"Extracting most recent response for alma_id {alma_id} from "
                 f"table fetched_records.")
-    response_query = db_read_write.get_most_recent_fetched_xml(
+    response_query = db_read.get_most_recent_fetched_xml(
         alma_id, db_session
     )
     response = response_query.alma_record
@@ -58,7 +58,8 @@ def extract_marc_for_job_timestamp(
     """
     logger.info(f"Getting bibs retrieved on {job_timestamp} from table"
                 f"fetched_records.")
-    db_record_generator = db_read_write.get_fetched_xml_by_timestamp(
+
+    db_record_generator = db_read.get_fetched_xml_by_timestamp(
         job_timestamp,
         db_session
     )

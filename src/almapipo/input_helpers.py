@@ -10,7 +10,7 @@ from typing import Iterable
 
 from sqlalchemy.orm import Session
 
-from almapipo import db_read_write, input_read
+from almapipo import db_write, input_read
 
 logger = getLogger(__name__)
 
@@ -54,7 +54,7 @@ class CsvHelper:
         :return: Generator of Alma IDs
         """
         for csv_line in self.csv_line_list:
-            db_read_write.add_csv_line_to_source_csv_table(
+            db_write.add_csv_line_to_source_csv_table(
                 csv_line, job_timestamp, db_session
             )
             

@@ -6,7 +6,7 @@ from logging import getLogger
 from sys import argv
 import warnings
 
-from almapipo import db_connect, db_read_write, logfile_setup, xml_extract
+from almapipo import db_connect, db_read, logfile_setup
 from marc_tools import marcxml_to_lists
 
 logger = getLogger('fetched_records_to_tsv')
@@ -50,7 +50,7 @@ else:
 
     # extract data
 
-    gen_record_elements = db_read_write.get_fetched_xml_by_timestamp(
+    gen_record_elements = db_read.get_fetched_xml_by_timestamp(
         job_timestamp,
         db_session
     )
@@ -64,7 +64,7 @@ else:
         tsv_columns = marcxml_to_lists.extract_keys_for_records(
             gen_record_elements
         )
-        gen_record_elements = db_read_write.get_fetched_xml_by_timestamp(
+        gen_record_elements = db_read.get_fetched_xml_by_timestamp(
             job_timestamp,
             db_session
         )

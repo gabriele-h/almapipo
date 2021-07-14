@@ -15,8 +15,16 @@ from typing import Callable, Iterable
 
 from sqlalchemy.orm import Session
 
-from . import db_read_write
-from . import rest_bibs, rest_conf, rest_electronic, rest_setup, rest_users
+from . import (
+    db_read,
+    db_write,
+    rest_acq,
+    rest_bibs,
+    rest_conf,
+    rest_electronic,
+    rest_setup,
+    rest_users,
+)
 
 # Timestamp as inserted in the database
 job_timestamp = datetime.now(timezone.utc)
@@ -45,22 +53,24 @@ def call_api_for_alma_set(
     :param manipulate_xml: Function with arguments alma_id and data_retrieved
     :return: Success of set retrieval
     """
-    db_read_write.add_alma_id_to_job_status_per_id(
+    db_write.add_alma_id_to_job_status_per_id(
         "GET", set_id, job_timestamp, db_session
     )
     alma_id_list = rest_conf.retrieve_set_member_alma_ids(set_id)
 
     if type(alma_id_list) is None:
-        db_read_write.update_job_status(
+        db_write.update_job_status(
             "error", set_id, "GET", job_timestamp, db_session
         )
         logger.error(f"An error occurred while retrieving the set's members."
                      f" Is the set {set_id} empty?")
         return False
 
-    call_api_for_list(alma_id_list, api, record_type, method, db_session, manipulate_xml)
+    call_api_for_list(
+        alma_id_list, api, record_type, method, db_session, manipulate_xml
+    )
 
-    db_read_write.update_job_status(
+    db_write.update_job_status(
         "done", set_id, "GET", job_timestamp, db_session
     )
 
@@ -95,7 +105,7 @@ def call_api_for_list(
             alma_id, api, record_type, method, db_session, manipulate_xml
         )
 
-    db_read_write.log_success_rate(method, job_timestamp, db_session)
+    db_read.log_success_rate(method, job_timestamp, db_session)
 
 
 def call_api_for_record(
@@ -132,7 +142,7 @@ def call_api_for_record(
 
     CurrentApi = instantiate_api_class(alma_id, api, record_type)
 
-    db_read_write.add_alma_id_to_job_status_per_id(
+    db_write.add_alma_id_to_job_status_per_id(
         alma_id, "GET", job_timestamp, db_session
     )
 
@@ -141,14 +151,14 @@ def call_api_for_record(
 
     if not record_data:
         logger.error(f"Could not fetch record {alma_id}.")
-        db_read_write.update_job_status(
+        db_write.update_job_status(
             "error", alma_id, "GET", job_timestamp, db_session
         )
     else:
-        db_read_write.add_response_content_to_fetched_records(
+        db_write.add_response_content_to_fetched_records(
             alma_id, record_data, job_timestamp, db_session
         )
-        db_read_write.update_job_status(
+        db_write.update_job_status(
             "done", alma_id, "GET", job_timestamp, db_session
         )
 
@@ -156,24 +166,24 @@ def call_api_for_record(
 
         if method == "DELETE":
 
-            db_read_write.add_alma_id_to_job_status_per_id(
+            db_write.add_alma_id_to_job_status_per_id(
                 alma_id, method, job_timestamp, db_session
             )
 
             alma_response = CurrentApi.delete(record_id)
 
             if alma_response is None:
-                db_read_write.update_job_status(
+                db_write.update_job_status(
                     "error", alma_id, method, job_timestamp, db_session
                 )
             else:
-                db_read_write.update_job_status(
+                db_write.update_job_status(
                     "done", alma_id, method, job_timestamp, db_session
                 )
 
         elif method == "PUT":
 
-            db_read_write.add_alma_id_to_job_status_per_id(
+            db_write.add_alma_id_to_job_status_per_id(
                 alma_id, method, job_timestamp, db_session
             )
 
@@ -182,7 +192,7 @@ def call_api_for_record(
             if not new_record_data:
 
                 logger.error(f"Could not manipulate data of record {alma_id}.")
-                db_read_write.update_job_status(
+                db_write.update_job_status(
                     "error", alma_id, method, job_timestamp, db_session
                 )
 
@@ -195,16 +205,16 @@ def call_api_for_record(
                     logger.info(f"Manipulation for {alma_id} successful."
                                 f" Adding to put_post_responses.")
 
-                    db_read_write.add_put_post_response(
+                    db_write.add_put_post_response(
                         alma_id, response, job_timestamp, db_session
                     )
-                    db_read_write.add_sent_record(
+                    db_write.add_sent_record(
                         alma_id, new_record_data, job_timestamp, db_session
                     )
-                    db_read_write.update_job_status(
+                    db_write.update_job_status(
                         "done", alma_id, method, job_timestamp, db_session
                     )
-                    db_read_write.check_data_sent_equals_response(
+                    db_read.check_data_sent_equals_response(
                         alma_id, job_timestamp, db_session
                     )
 
@@ -212,7 +222,7 @@ def call_api_for_record(
 
                     logger.error(f"Did not receive a response for {alma_id}?")
 
-                    db_read_write.update_job_status(
+                    db_write.update_job_status(
                         "error", alma_id, method, job_timestamp, db_session
                     )
 

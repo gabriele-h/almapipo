@@ -149,7 +149,7 @@ alma_ids = rest_conf.retrieve_set_member_alma_ids('1199999999123')
 As of now only the first column of the CSV or TSV file are relevant for
 this package. The first column should include one or more Alma-IDs of the
 record you want to manipulate. There is a function for retrieving content of
-any column in the `db_read_write` module.
+any column in the `db_read` module.
 
 Some operations require more than one ID to work, e. g. if you want to
 operate on holdings, you will also need the MMS-ID. In such cases the
@@ -161,7 +161,7 @@ to most specific** (e. g. MMS-ID,holding-ID,item-ID).
 The example below shows the IDs necessary for querying a holding record in
 the first column. All other columns may contain any data that is necessary
 for understanding when analyzed intellectually or for defining contents of
-data updates via `db_read_write.get_value_from_csv_json`.
+data updates via `db_read.get_value_from_csv_json`.
 
 In case of a holding record the first column should include one string with both
 the MMS-ID and the holding-ID, where the MMS-ID is listed before the holding-ID.
@@ -250,10 +250,13 @@ whether the first column contained a valid `alma_id`. Defaults to False.
 
 ```python
 from almapipo import almapipo, db_connect, input_helpers
-csv_helper = input_helpers.CsvHelper('./test_hols.tsv')
-csv_helper.add_to_source_csv_table(almapipo.job_timestamp, db_connect.DBSession)
-csv_helper.extract_almaids()
-almapipo.call_api_for_list(alma_id_list, 'bibs', 'holdings', 'GET')
+
+with db_connect.DBSession() as dbsession:
+
+    csv_helper = input_helpers.CsvHelper('./test_hols.tsv')
+    csv_helper.add_to_source_csv_table(almapipo.job_timestamp, dbsession)
+    
+    almapipo.call_api_for_list(csv_helper.extract_almaids(), 'bibs', 'holdings', 'GET', dbsession)
 ```
 
 #### Using a Set as Input
@@ -268,10 +271,11 @@ happen if the set is empty or does not exist. Otherwise the status for the
 Please note that `call_api_for_set` makes use of `call_api_for_list`.
 
 ```python
-from almapipo import almapipo
+from almapipo import almapipo, db_connect
 
-set_id = '123123123123123'
-almapipo.call_api_for_alma_set(set_id, 'bibs', 'bibs', 'GET')
+with db_connect.DBSession() as dbsession:
+    set_id = '123123123123123'
+    almapipo.call_api_for_alma_set(set_id, 'bibs', 'bibs', 'GET', dbsession)
 ```
 
 **Note:** As mentioned above this will not work for all kinds of sets.
@@ -288,8 +292,10 @@ The following extracts the XML of one holding record and returns it
 as an xml.etree Element:
 
 ```python
-from almapipo import xml_extract
-xml_extract.extract_response_from_fetched_records('991234567890123,221234567890123')
+from almapipo import db_connect, xml_extract
+
+with db_connect.DBSession() as dbsession:
+    xml_extract.extract_response_from_fetched_records('991234567890123,221234567890123', dbsession)
 ```
 
 # `almapipo.xml_modify`
@@ -334,18 +340,13 @@ as if it were a header).
 column will be kept for further processing. Providing a correct value
 in env var `ALMA_REST_ID_INSTITUTIONAL_SUFFIX` is crucial here.
 
-# `almapipo.db_read_write`
+# `almapipo.db_read`
 
 Can be used to do the following:
 
-* Create a DB session
-* Insert lines from input CSV file into the table `source_csv`
-* Insert valid Alma IDs into table `job_status_per_id` and set `job_status` (new, done, error)
 * Get a list of IDs for a specific `action` (e. g. 'GET'), `job_timestamp` and `job_status`
 * Retrieve information from CSV columns
 * Extract xml from `fetched records`
-* Add xml of sent records to `sent_records` table
-* Add responses from the API to `put_post_responses` table
 * Check if data sent equals data received for PUT and POST
 
 Please note that this script uses **SQLAlchemy**. If the env variable
@@ -367,12 +368,24 @@ The strings provided in the function correspond with the headings of those
 columns.
 
 ```python
-from almapipo import db_read_write
+from almapipo import db_connect, db_read
 from datetime import datetime, timezone
+
 alma_id = "991234567890123,221234567890123"
 job_timestamp = datetime(2020, 2, 20, 20, 00, 20, timezone.utc)
-db_read_write.get_value_from_source_csv('alma-ids', alma_id, job_timestamp, 'title')
+
+with db_connect.DBSession() as dbsession:
+    db_read.get_value_from_source_csv('alma-ids', alma_id, job_timestamp, 'title', dbsession)
 ```
+
+# `almapipo.db_write`
+
+Can be used to do the following:
+
+* Insert lines from input CSV file into the table `source_csv`
+* Insert valid Alma IDs into table `job_status_per_id` and set `job_status` (new, done, error)
+* Add xml of sent records to `sent_records` table
+* Add responses from the API to `put_post_responses` table
 
 # Scripts Added to PATH
 
@@ -413,7 +426,7 @@ useful.
 
 ## PUT/POST data does not equal response
 
-The function `db_read_write.get_value_from_source_csv` will make
+The function `db_read.get_value_from_source_csv` will make
 use of a similar query with the difference of creating and ID
 consisting of a concatenation of `alma_id` and `job_timestamp`.
 
