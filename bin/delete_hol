@@ -53,5 +53,3 @@ with db_connect.DBSession() as db_session:
         db_session
     )
     db_session.commit()
-
-    db_read.log_success_rate("DELETE", job_timestamp, db_session)
