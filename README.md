@@ -393,13 +393,27 @@ Can be used to do the following:
 The following will only work after activating your venv, which adds the scripts
 to your PATH variable.
 
-## Extract MARC as TSV
+## Create DB tables: `db_create_tables`
+
+This is only necessary for the initial Setup of a newly defined database. You
+will have to run this for both databases you use for production and sandbox
+API calls - it is highly recommended to keep these in separate databases!
+
+## Delete Holdings: `delete_hol`
+
+For a CSV file containing a list of "MMSID,HOLID", delete the corresponding
+holdings. The CSV file needs to have a heading.
+
+The holdings will be fetched first to have a backup in the database in
+case of erroneous deletions.
+
+## Extract MARC as TSV: `fetched_records_to_tsv`
 
 This will work only for records that have prior been fetched via GET.
 
 Currently work in progress, more documentation soon.
 
-## Check File Validity From Commandline
+## Check File Validity From Commandline: `input_check`
 
 When used from commandline with csv-path as argv1 the script will check file validity.
 It will check if the first column is a valid Alma ID. For further information
@@ -407,6 +421,12 @@ on how the according regular expression came into existence have a look at SvG's
 [Alma record number cheat sheet][1].
 
 [1]: https://knowledge.exlibrisgroup.com/Alma/Community_Knowledge/How_to_-_A_cheat_sheet_for_Alma_record_numbers
+
+## Export Locations: `locations_export`
+
+For all libraries of an institution retrieve all locations and build an XML file
+that contains all of the retrieved information. The resulting XML file
+can be opened in Excel.
 
 ### Usage Example Bash
 
