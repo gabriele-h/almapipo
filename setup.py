@@ -28,6 +28,6 @@ setup(
         "psycopg2-binary ~= 2.8.0; sys_platform != 'linux'",
         "pytest ~= 5.4.3",
         "requests ~= 2.23.0",
-        "sqlalchemy ~= 1.3.22",
+        "sqlalchemy ~= 1.4.21",
     ],
 )
