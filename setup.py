@@ -14,6 +14,7 @@ setup(
     package_dir={'': 'src'},
     scripts=[
         'bin/db_create_tables',
+        'bin/delete_hol',
         'bin/input_check',
         'bin/fetched_records_to_tsv',
         'bin/locations_export',
