@@ -23,6 +23,9 @@ params = f"postgresql://{db_user}:{db_pw}@{db_url}/{database}"
 
 db_engine = create_engine(
     params,
-    echo=does_sqlalchemy_log
+    echo=does_sqlalchemy_log,
+    execution_options={
+        "isolation_level": "AUTOCOMMIT"
+    }
 )
 DBSession = sessionmaker(bind=db_engine)

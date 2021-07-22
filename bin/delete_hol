@@ -43,7 +43,6 @@ alma_id_generator = csv.extract_almaids()
 with db_connect.DBSession() as db_session:
 
     csv.add_to_source_csv_table(job_timestamp, db_session)
-    db_session.commit()
 
     almapipo.call_api_for_list(
         alma_id_generator,
@@ -52,4 +51,3 @@ with db_connect.DBSession() as db_session:
         "DELETE",
         db_session
     )
-    db_session.commit()

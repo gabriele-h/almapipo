@@ -74,8 +74,6 @@ def call_api_for_alma_set(
         "done", set_id, "GET", job_timestamp, db_session
     )
 
-    db_session.commit()
-
     return True
 
 
@@ -162,8 +160,6 @@ def call_api_for_record(
             "done", alma_id, "GET", job_timestamp, db_session
         )
 
-        db_session.commit()
-
         if method == "DELETE":
 
             db_write.add_alma_id_to_job_status_per_id(
@@ -225,8 +221,6 @@ def call_api_for_record(
                     db_write.update_job_status(
                         "error", alma_id, method, job_timestamp, db_session
                     )
-
-    db_session.commit()
 
 
 def instantiate_api_class(

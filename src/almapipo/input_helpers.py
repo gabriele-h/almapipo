@@ -57,5 +57,3 @@ class CsvHelper:
             db_write.add_csv_line_to_source_csv_table(
                 csv_line, job_timestamp, db_session
             )
-            
-        db_session.commit()
