@@ -255,7 +255,7 @@ def _instantiate_acq_api(record_type: str):
         raise NotImplementedError
 
 
-def _instantiate_bibs_api(split_almaid: List, record_type: str):
+def _instantiate_bibs_api(split_almaid: list, record_type: str):
     if record_type == "bibs":
         return rest_bibs.BibsApi()
     elif record_type == "holdings":
@@ -268,7 +268,7 @@ def _instantiate_bibs_api(split_almaid: List, record_type: str):
         raise NotImplementedError
 
 
-def _instantiate_electronic_api(split_almaid: List, record_type: str):
+def _instantiate_electronic_api(split_almaid: list, record_type: str):
     if record_type == "e-collections":
         return rest_electronic.EcollectionsApi()
     elif record_type == "e-services":
