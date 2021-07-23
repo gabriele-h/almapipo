@@ -159,12 +159,11 @@ def call_api_for_record(
         db_write.update_job_status(
             "done", almaid, "GET", job_timestamp, db_session
         )
+        db_write.add_almaid_to_job_status_per_id(
+            almaid, method, job_timestamp, db_session
+        )
 
         if method == "DELETE":
-
-            db_write.add_almaid_to_job_status_per_id(
-                almaid, method, job_timestamp, db_session
-            )
 
             alma_response = CurrentApi.delete(record_id)
 
@@ -178,10 +177,6 @@ def call_api_for_record(
                 )
 
         elif method == "PUT":
-
-            db_write.add_almaid_to_job_status_per_id(
-                almaid, method, job_timestamp, db_session
-            )
 
             new_record_data = manipulate_xml(almaid, record_data)
 
