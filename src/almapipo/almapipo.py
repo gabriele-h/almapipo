@@ -228,7 +228,7 @@ def instantiate_api_class(
         api: str,
         record_type: str) -> setup_rest.GenericApi:
     """
-    Kind of a switch for api calls.
+    Switch for api calls.
     :param almaid: Comma-separated string of record-ids, most specific last
     :param api: First path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of record to call the API for (e. g. "holdings")
@@ -236,46 +236,58 @@ def instantiate_api_class(
     """
     split_almaid = str.split(almaid, ",")
 
-    if api == "bibs":
+    if api == "acq":
+        return _instantiate_acq_api(record_type)
 
-        if record_type == "bibs":
-            return rest_bibs.BibsApi()
-        elif record_type == "holdings":
-            return rest_bibs.HoldingsApi(split_almaid[0])
-        elif record_type == "items":
-            return rest_bibs.ItemsApi(split_almaid[0], split_almaid[1])
-        elif record_type == "portfolios":
-            return rest_bibs.PortfoliosApi(split_almaid[0])
-        else:
-            raise NotImplementedError
+    elif api == "bibs":
+        return _instantiate_bibs_api(split_almaid, record_type)
 
     elif api == "electronic":
-
-        if record_type == "e-collections":
-            return rest_electronic.EcollectionsApi()
-        elif record_type == "e-services":
-            return rest_electronic.EservicesApi(split_almaid[0])
-        elif record_type == "portfolios":
-            return rest_electronic.PortfoliosApi(
-                split_almaid[0], split_almaid[1]
-            )
-        else:
-            raise NotImplementedError
+        return _instantiate_electronic_api(split_almaid, record_type)
 
     elif api == "users":
-
-        if record_type == "users":
-            return rest_users.UsersApi()
-        else:
-            raise NotImplementedError
-
-    elif api == "acq":
-
-        if record_type == "vendors":
-            return rest_acq.VendorsApi()
-        else:
-            raise NotImplementedError
+        return _instantiate_users_api(record_type)
 
     logger.error("The API you are trying to call is not implemented yet"
                  " or does not exist.")
     raise NotImplementedError
+
+
+def _instantiate_acq_api(record_type: str):
+    if record_type == "vendors":
+        return rest_acq.VendorsApi()
+    else:
+        raise NotImplementedError
+
+
+def _instantiate_bibs_api(split_almaid: List, record_type: str):
+    if record_type == "bibs":
+        return rest_bibs.BibsApi()
+    elif record_type == "holdings":
+        return rest_bibs.HoldingsApi(split_almaid[0])
+    elif record_type == "items":
+        return rest_bibs.ItemsApi(split_almaid[0], split_almaid[1])
+    elif record_type == "portfolios":
+        return rest_bibs.PortfoliosApi(split_almaid[0])
+    else:
+        raise NotImplementedError
+
+
+def _instantiate_electronic_api(split_almaid: List, record_type: str):
+    if record_type == "e-collections":
+        return rest_electronic.EcollectionsApi()
+    elif record_type == "e-services":
+        return rest_electronic.EservicesApi(split_almaid[0])
+    elif record_type == "portfolios":
+        return rest_electronic.PortfoliosApi(
+            split_almaid[0], split_almaid[1]
+        )
+    else:
+        raise NotImplementedError
+
+
+def _instantiate_users_api(record_type: str):
+    if record_type == "users":
+        return rest_users.UsersApi()
+    else:
+        raise NotImplementedError
