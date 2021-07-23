@@ -22,17 +22,17 @@ class TestDoesStringEqualAlmaID:
         environ["ALMA_REST_ID_INSTITUTIONAL_SUFFIX"] = old_suffix
 
     def test_almaids_only(self, set_env_id_suffix):
-        assert all(input_read.is_this_an_almaid(id_)
+        assert all(input_read.is_almaid(id_)
                    for id_ in self.set_of_almaids)
 
     def test_minimum_length(self):
-        assert not input_read.is_this_an_almaid("811234")
+        assert not input_read.is_almaid("811234")
 
     def test_empty(self):
-        assert not input_read.is_this_an_almaid("")
+        assert not input_read.is_almaid("")
 
     def test_number_not_string(self):
-        assert not input_read.is_this_an_almaid(8156789234)
+        assert not input_read.is_almaid(8156789234)
 
     def test_set_not_string_either(self):
-        assert not input_read.is_this_an_almaid(self.set_of_almaids)
+        assert not input_read.is_almaid(self.set_of_almaids)

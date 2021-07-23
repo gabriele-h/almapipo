@@ -58,7 +58,7 @@ def read_csv_contents(
 
             first_column_value = list(row.values())[0]
 
-            if all(is_this_an_almaid(string)
+            if all(is_almaid(string)
                    for string in str.split(first_column_value, ",")) \
                     or not validation:
                 yield row
@@ -83,7 +83,7 @@ def check_file_path(file_path: str) -> bool:
                  f"not end on csv, tsv, CSV or TSV.")
 
 
-def is_this_an_almaid(identifier: str) -> bool:
+def is_almaid(identifier: str) -> bool:
     """
     Expected input is a string of an identifier. This function checks
     if the ID provided matches the expected pattern of Alma IDs.
