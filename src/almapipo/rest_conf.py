@@ -86,9 +86,9 @@ def retrieve_locations(library: str, lang: str = None) -> str:
     return locations_record
 
 
-def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
+def retrieve_set_member_almaids(set_id: str) -> Iterable[str]:
     """
-    For a given set retrieve the alma_id for all members from their link
+    For a given set retrieve the almaid for all members from their link
     attribute. If the link is not available, this function will return
     member/id, but be aware, that this is not always sufficient!
 
@@ -100,10 +100,10 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
     this function must return a comma-separated string of those three IDs!
 
     :param set_id: Set ID as given in Set Details in the Alma UI
-    :return: Generator of alma_id
+    :return: Generator of almaid
     """
 
-    logger.info(f"Trying to extract alma_id for all members of set {set_id}.")
+    logger.info(f"Trying to extract almaid for all members of set {set_id}.")
 
     re_prefix = r"^/?\w+/"
     regex_path = r"/\w+/"
@@ -124,13 +124,13 @@ def retrieve_set_member_alma_ids(set_id: str) -> Iterable[str]:
                 raise ValueError
 
             member_url_path_wo_prefix = re.sub(re_prefix, "", member_url_path)
-            alma_id = re.sub(regex_path, ",", member_url_path_wo_prefix)
+            almaid = re.sub(regex_path, ",", member_url_path_wo_prefix)
 
         else:
             # Usually we need more than one ID, this is just a fallback
-            alma_id = member_id
+            almaid = member_id
 
-        yield alma_id
+        yield almaid
 
     if not has_url:
         logger.info("Element member did not have a link attribute. Generator "

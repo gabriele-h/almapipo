@@ -20,7 +20,7 @@ from typing import Iterator
 # Logfile
 logger = getLogger(__name__)
 
-ALMA_ID_PATTERN = r"^(22|23|53|61|62|81|99)\d{{2,}}{alma_id_suffix}$"
+ALMA_ID_PATTERN = r"^(22|23|53|61|62|81|99)\d{{2,}}{almaid_suffix}$"
 
 
 def read_csv_contents(
@@ -58,7 +58,7 @@ def read_csv_contents(
 
             first_column_value = list(row.values())[0]
 
-            if all(is_this_an_alma_id(string)
+            if all(is_this_an_almaid(string)
                    for string in str.split(first_column_value, ",")) \
                     or not validation:
                 yield row
@@ -83,7 +83,7 @@ def check_file_path(file_path: str) -> bool:
                  f"not end on csv, tsv, CSV or TSV.")
 
 
-def is_this_an_alma_id(identifier: str) -> bool:
+def is_this_an_almaid(identifier: str) -> bool:
     """
     Expected input is a string of an identifier. This function checks
     if the ID provided matches the expected pattern of Alma IDs.
@@ -101,7 +101,7 @@ def is_this_an_alma_id(identifier: str) -> bool:
 
     try:
 
-        alma_id_suffix = environ["ALMA_REST_ID_INSTITUTIONAL_SUFFIX"]
+        almaid_suffix = environ["ALMA_REST_ID_INSTITUTIONAL_SUFFIX"]
 
     except KeyError:
 
@@ -109,7 +109,7 @@ def is_this_an_alma_id(identifier: str) -> bool:
 
     else:
 
-        pattern = ALMA_ID_PATTERN.format(alma_id_suffix=alma_id_suffix)
+        pattern = ALMA_ID_PATTERN.format(almaid_suffix=almaid_suffix)
 
         if re.fullmatch(pattern, identifier):
             return True

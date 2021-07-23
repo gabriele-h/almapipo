@@ -32,14 +32,14 @@ parser = ArgumentParser(
 parser.add_argument(
     "input_file",
     type=Path,
-    help="File containing a list of alma_ids to be deleted. Format per line "
+    help="File containing a list of almaids to be deleted. Format per line "
          "should be MMSID,HOLID and the file should contain a header."
 )
 args = parser.parse_args()
 
 # read CSV
 csv = input_helpers.CsvHelper(str(args.input_file))
-alma_id_generator = csv.extract_almaids()
+almaid_generator = csv.extract_almaids()
 
 
 if __name__ == "__main__":
@@ -48,9 +48,9 @@ if __name__ == "__main__":
 
         csv.add_to_source_csv_table(job_timestamp, db_session)
 
-        def call_api_for_pool(alma_id: str):
+        def call_api_for_pool(almaid: str):
             almapipo.call_api_for_record(
-                alma_id,
+                almaid,
                 "bibs",
                 "holdings",
                 "DELETE",
@@ -58,7 +58,7 @@ if __name__ == "__main__":
             )
 
         with Pool() as p:
-            p.map(call_api_for_pool, alma_id_generator)
+            p.map(call_api_for_pool, almaid_generator)
 
         db_read.log_success_rate('GET', job_timestamp, db_session)
         db_read.log_success_rate('DELETE', job_timestamp, db_session)

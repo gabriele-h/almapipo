@@ -131,18 +131,18 @@ production an all-caps prefix.
 You can make use of a function that extracts the `link` attribute of all
 members in a set. Please note - as mentioned above - that not all sets will
 have the link attribute in their members. Without a link attribute, the function
-`rest_conf.retrieve_set_member_alma_ids` will make use of the `id` element of
+`rest_conf.retrieve_set_member_almaids` will make use of the `id` element of
 each member. If the path to the member is more complex and includes ancestors,
 making use of such an Alma set (such as electronic portfolios) will not be possible.
 
 #### Usage example
 
 The following function will iterate trough the set by 100 at a time and
-yield the `alma_id` of each record, making it a generator:
+yield the `almaid` of each record, making it a generator:
 
 ```python
 from almapipo import rest_conf
-alma_ids = rest_conf.retrieve_set_member_alma_ids('1199999999123')
+almaids = rest_conf.retrieve_set_member_almaids('1199999999123')
 ```
 
 ### CSV or TSV file
@@ -248,7 +248,7 @@ should be called for. Final parameter is the method.
 The following will import the CSV lines to the table `source_csv` and
 create a generator of alma\_ids. If you want to make sure you are handling, 
 valid alma\_ids only, set `validation` in CsvHelper, which checks 
-whether the first column contained a valid `alma_id`. Defaults to False.
+whether the first column contained a valid `almaid`. Defaults to False.
 
 ```python
 from almapipo import almapipo, db_connect, input_helpers
@@ -264,7 +264,7 @@ with db_connect.DBSession() as dbsession:
 #### Using a Set as Input
 
 The function `call_api_for_set` will add a line to `job_status_per_id` for
-the given `set_id`. If the function `rest_conf.retrieve_set_member_alma_ids`
+the given `set_id`. If the function `rest_conf.retrieve_set_member_almaids`
 does not return the expected Iterable, the status within
 `job_status_per_id` will be updated to `error`. This will
 happen if the set is empty or does not exist. Otherwise the status for the
@@ -281,7 +281,7 @@ with db_connect.DBSession() as dbsession:
 ```
 
 **Note:** As mentioned above this will not work for all kinds of sets.
-Use `help(rest_conf.retrieve_set_member_alma_ids)` for more info.
+Use `help(rest_conf.retrieve_set_member_almaids)` for more info.
 
 # `almapipo.xml_extract`
 
@@ -373,11 +373,11 @@ columns.
 from almapipo import db_connect, db_read
 from datetime import datetime, timezone
 
-alma_id = "991234567890123,221234567890123"
+almaid = "991234567890123,221234567890123"
 job_timestamp = datetime(2020, 2, 20, 20, 00, 20, timezone.utc)
 
 with db_connect.DBSession() as dbsession:
-    db_read.get_value_from_source_csv('alma-ids', alma_id, job_timestamp, 'title', dbsession)
+    db_read.get_value_from_source_csv('alma-ids', almaid, job_timestamp, 'title', dbsession)
 ```
 
 # `almapipo.db_write`
@@ -450,14 +450,14 @@ useful.
 
 The function `db_read.get_value_from_source_csv` will make
 use of a similar query with the difference of creating and ID
-consisting of a concatenation of `alma_id` and `job_timestamp`.
+consisting of a concatenation of `almaid` and `job_timestamp`.
 
 ```sql
-SELECT put_post_responses.alma_id
+SELECT put_post_responses.almaid
   FROM sent_records
   JOIN put_post_responses
 	ON sent_records.job_timestamp = put_post_responses.job_timestamp
-	AND sent_records.alma_id = put_post_responses.alma_id
+	AND sent_records.almaid = put_post_responses.almaid
   WHERE CAST(sent_records.alma_record AS VARCHAR) != cast(put_post_responses.alma_record AS VARCHAR);
 ```
 
@@ -492,7 +492,7 @@ SELECT count(primary_key)
   AND job_action = 'GET';
 ```
 
-## Get content of CSV by column heading for one `alma_id`
+## Get content of CSV by column heading for one `almaid`
 
 In this example you would have to replace 'MMS Id,HOL Id' by the
 column heading of your first column and 'HOL 245' by the column

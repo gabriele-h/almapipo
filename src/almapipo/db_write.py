@@ -2,7 +2,7 @@
 
 The DB is intended to do the following:
 * Store CSV files used for API calls
-* Store the status of calls per alma_ids (new, done, error)
+* Store the status of calls per almaids (new, done, error)
 * Store which start time of the job triggered the DB-entry
 * Store API response contents
 * Store data sent to the API
@@ -18,14 +18,14 @@ from . import setup_db
 
 
 def update_job_status(status: str,
-                      alma_id: str,
+                      almaid: str,
                       method: str,
                       job_timestamp: datetime,
                       db_session: Session) -> None:
-    """For a given alma_id and job_timestamp update the job_status in
+    """For a given almaid and job_timestamp update the job_status in
     table job_status_per_id.
     :param status: New status to be set
-    :param alma_id: Alma ID to set the status for
+    :param almaid: Alma ID to set the status for
     :param method: "DELETE", "GET", "POST" or "PUT"
     :param job_timestamp: Job for which the status should be changed
     :param db_session: Session to be used for the manipulation
@@ -37,7 +37,7 @@ def update_job_status(status: str,
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(
-        alma_id=alma_id
+        almaid=almaid
     ).filter_by(
         job_action=method
     )
@@ -46,7 +46,7 @@ def update_job_status(status: str,
 
 
 def add_put_post_response(
-        alma_id: str,
+        almaid: str,
         record_data: str,
         job_timestamp: datetime,
         db_session: Session) -> None:
@@ -54,7 +54,7 @@ def add_put_post_response(
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
     Adds one line per Alma record with the data retrieved via Alma API.
-    :param alma_id: Alma ID for one specific record.
+    :param almaid: Alma ID for one specific record.
     :param record_data: Response retrieved via Alma API.
     :param job_timestamp: Identifier of the job causing the DB-entry.
     :param db_session: DB session to add the lines to.
@@ -64,7 +64,7 @@ def add_put_post_response(
     record_data_xml = fromstring(record_data)
 
     line_for_table_put_post_responses = setup_db.PutPostResponses(
-        alma_id=alma_id,
+        almaid=almaid,
         alma_record=record_data_xml,
         job_timestamp=job_timestamp,
     )
@@ -73,7 +73,7 @@ def add_put_post_response(
 
 
 def add_sent_record(
-        alma_id: str,
+        almaid: str,
         record_data: bytes,
         job_timestamp: datetime,
         db_session: Session) -> None:
@@ -81,7 +81,7 @@ def add_sent_record(
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
     Adds one line per Alma record with the data to be sent via Alma API.
-    :param alma_id: Alma ID for one specific record.
+    :param almaid: Alma ID for one specific record.
     :param record_data: Record to be sent via Alma API.
     :param job_timestamp: Identifier of the job causing the DB-entry.
     :param db_session: DB session to add the lines to.
@@ -91,7 +91,7 @@ def add_sent_record(
     record_data_xml = fromstring(record_data)
 
     line_for_table_sent_records = setup_db.SentRecords(
-        alma_id=alma_id,
+        almaid=almaid,
         alma_record=record_data_xml,
         job_timestamp=job_timestamp,
     )
@@ -100,7 +100,7 @@ def add_sent_record(
 
 
 def add_response_content_to_fetched_records(
-        alma_id: str,
+        almaid: str,
         record_data,
         job_timestamp: datetime,
         db_session: Session) -> None:
@@ -108,7 +108,7 @@ def add_response_content_to_fetched_records(
     Create an entry in the database that identifies the job
     responsible for the entry (job_timestamp).
     Adds one line per Alma record with the data retrieved via Alma API.
-    :param alma_id: Alma ID for one specific record.
+    :param almaid: Alma ID for one specific record.
     :param record_data: Record as retrieved via Alma API.
     :param job_timestamp: Identifier of the job causing the DB-entry.
     :param db_session: DB session to add the lines to.
@@ -116,7 +116,7 @@ def add_response_content_to_fetched_records(
     """
 
     line_for_table_fetched_records = setup_db.FetchedRecords(
-        alma_id=alma_id,
+        almaid=almaid,
         alma_record=record_data,
         job_timestamp=job_timestamp,
     )
@@ -145,14 +145,14 @@ def add_csv_line_to_source_csv_table(
     db_session.add(line_for_table_source_csv)
 
 
-def add_alma_id_to_job_status_per_id(
-        alma_id: str,
+def add_almaid_to_job_status_per_id(
+        almaid: str,
         method: str,
         job_timestamp: datetime,
         db_session: Session) -> None:
     """
     For a string of Alma IDs create an entry in job_status_per_id.
-    :param alma_id: IDs of the record to be manipulated.
+    :param almaid: IDs of the record to be manipulated.
     :param method: GET, PUT, POST or DELETE
     :param job_timestamp: Timestamp to identify the job which created the line.
     :param db_session: DB session to add the data to.
@@ -161,7 +161,7 @@ def add_alma_id_to_job_status_per_id(
 
     line_for_table_job_status_per_id = setup_db.JobStatusPerId(
         job_timestamp=job_timestamp,
-        alma_id=alma_id,
+        almaid=almaid,
         job_status="new",
         job_action=method
     )

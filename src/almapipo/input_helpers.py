@@ -35,7 +35,7 @@ class CsvHelper:
 
     def extract_almaids(self) -> Iterable[str]:
         """
-        Generator of alma_ids as per first column of the csv file.
+        Generator of almaids as per first column of the csv file.
         :return: Generator of Alma IDs
         """
         for csv_line in self.csv_line_list:

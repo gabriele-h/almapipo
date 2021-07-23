@@ -18,20 +18,20 @@ logger = getLogger(__name__)
 
 
 def extract_response_from_fetched_records(
-        alma_id: str,
+        almaid: str,
         db_session: Session
 ) -> ElementTree:
     """
     From the table fetched_records extract the whole response for the record.
     Only most recent version supported.
-    :param alma_id: Comma separated string of Alma IDs to identify the record
+    :param almaid: Comma separated string of Alma IDs to identify the record
     :param db_session: SQLAlchemy Session
     :return: ElementTree of the record
     """
-    logger.info(f"Extracting most recent response for alma_id {alma_id} from "
+    logger.info(f"Extracting most recent response for almaid {almaid} from "
                 f"table fetched_records.")
     response_query = db_read.get_most_recent_fetched_xml(
-        alma_id, db_session
+        almaid, db_session
     )
     response = response_query.alma_record
     return response

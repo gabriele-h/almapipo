@@ -22,29 +22,29 @@ logger = getLogger(__name__)
 
 
 def check_data_sent_equals_response(
-        alma_id: str,
+        almaid: str,
         job_timestamp: datetime,
         db_session: Session) -> bool:
     """
-    For given alma_id and job_timestamp check if the data sent via PUT/POST
+    For given almaid and job_timestamp check if the data sent via PUT/POST
     and the data received in the API's response are the same. Check depends on
     the two relevant database tables (sent_records and put_post_responses).
-    :param alma_id: Comma separated string of Alma IDs to identify the record
+    :param almaid: Comma separated string of Alma IDs to identify the record
     :param job_timestamp: Job that created the entry in the database tables
     :param db_session: Session to be used for the check
     :return: True if matches, False if non-existent or does not match.
     """
 
     sent_id = func.concat(
-        setup_db.SentRecords.alma_id,
+        setup_db.SentRecords.almaid,
         setup_db.SentRecords.job_timestamp
     )
     response_id = func.concat(
-        setup_db.PutPostResponses.alma_id,
+        setup_db.PutPostResponses.almaid,
         setup_db.PutPostResponses.job_timestamp
     )
 
-    if check_data_sent_and_response_exist(alma_id, job_timestamp, db_session):
+    if check_data_sent_and_response_exist(almaid, job_timestamp, db_session):
 
         sent_received_matching = db_session.query(
             setup_db.PutPostResponses
@@ -57,26 +57,26 @@ def check_data_sent_equals_response(
         ).filter_by(
             job_timestamp=job_timestamp
         ).filter_by(
-            alma_id=alma_id
+            almaid=almaid
         )
 
         if sent_received_matching.count() > 0:
             return True
 
-    logger.warning(f"Data in sent_records and put_post_responses for {alma_id}"
+    logger.warning(f"Data in sent_records and put_post_responses for {almaid}"
                    f" and {job_timestamp} did not match.")
     return False
 
 
 def check_data_sent_and_response_exist(
-        alma_id: str,
+        almaid: str,
         job_timestamp: datetime,
         db_session: Session) -> bool:
     """
-    For given alma_id and job_timestamp check if the following exist:
+    For given almaid and job_timestamp check if the following exist:
     * data sent via PUT/POST
     * data received in the API's response
-    :param alma_id: Comma separated string of Alma IDs to identify the record
+    :param almaid: Comma separated string of Alma IDs to identify the record
     :param job_timestamp: Job that created the entry in the database tables
     :param db_session: Session to be used for the check
     :return: True if both exist, False if one or both do not exist
@@ -87,7 +87,7 @@ def check_data_sent_and_response_exist(
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(
-        alma_id=alma_id
+        almaid=almaid
     )
 
     record_received = db_session.query(
@@ -95,28 +95,28 @@ def check_data_sent_and_response_exist(
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(
-        alma_id=alma_id
+        almaid=almaid
     )
 
     if record_sent.count() > 0 and record_received.count() > 0:
         return True
 
-    logger.error(f"No data in sent_records or put_post_responses for {alma_id}"
+    logger.error(f"No data in sent_records or put_post_responses for {almaid}"
                  f" and {job_timestamp}.")
     return False
 
 
 def get_value_from_source_csv(
-        alma_id_name: str,
-        alma_id: str,
+        almaid_name: str,
+        almaid: str,
         job_timestamp: datetime,
         json_key: str,
         db_session: Session) -> str:
     """
-    For a given string of alma_id and job_timestamp, retrieve a specific value
+    For a given string of almaid and job_timestamp, retrieve a specific value
     from the csv as it was saved in source_csv table.
-    :param alma_id_name: Key of the alma_id, heading of first column in csv
-    :param alma_id: Comma separated string of Alma IDs to identify the record
+    :param almaid_name: Key of the almaid, heading of first column in csv
+    :param almaid: Comma separated string of Alma IDs to identify the record
     :param job_timestamp: Job that created the entry in source_csv
     :param json_key: Heading of the column that has the desired information
     :param db_session: SQLAlchemy Session
@@ -126,7 +126,7 @@ def get_value_from_source_csv(
     value_query = db_session.query(
         setup_db.SourceCsv
     ).filter(
-        setup_db.SourceCsv.csv_line[alma_id_name].astext == alma_id
+        setup_db.SourceCsv.csv_line[almaid_name].astext == almaid
     ).filter_by(
         job_timestamp=job_timestamp
     )
@@ -158,11 +158,11 @@ def get_fetched_xml_by_timestamp(
         yield result[0]
 
 
-def get_most_recent_fetched_xml(alma_id: str, db_session: Session):
+def get_most_recent_fetched_xml(almaid: str, db_session: Session):
     """
     For a comma separated string of Alma IDs query for the record's
     most recently saved XML in the table fetched_records.
-    :param alma_id: Comma separated string of Alma IDs to identify the record.
+    :param almaid: Comma separated string of Alma IDs to identify the record.
     :param db_session: SQLAlchemy Session
     :return: SQLAlchemy query object of the record.
     """
@@ -170,7 +170,7 @@ def get_most_recent_fetched_xml(alma_id: str, db_session: Session):
     record_query = db_session.query(
         setup_db.FetchedRecords
     ).filter_by(
-        alma_id=alma_id
+        almaid=almaid
     ).order_by(
         setup_db.FetchedRecords.job_timestamp.desc()
     ).limit(1)
@@ -194,7 +194,7 @@ def get_list_of_ids_by_status_and_method(
     """
 
     list_of_ids = db_session.query(
-        setup_db.JobStatusPerId.alma_id
+        setup_db.JobStatusPerId.almaid
     ).filter_by(
         job_timestamp=job_timestamp
     ).filter_by(

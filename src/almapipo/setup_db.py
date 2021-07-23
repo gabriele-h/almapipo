@@ -50,7 +50,7 @@ class JobStatusPerId(Base):
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime(timezone=True))
-    alma_id = Column(String(100))
+    almaid = Column(String(100))
     job_status = Column(String(5))
     job_action = Column(String(6))
 
@@ -68,7 +68,7 @@ class FetchedRecords(Base):
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime(timezone=True))
-    alma_id = Column(String(100))
+    almaid = Column(String(100))
     alma_record = Column(XMLType)
 
 
@@ -77,7 +77,7 @@ class SentRecords(Base):
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime(timezone=True))
-    alma_id = Column(String(100))
+    almaid = Column(String(100))
     alma_record = Column(XMLType)
 
 
@@ -86,5 +86,5 @@ class PutPostResponses(Base):
 
     primary_key = Column(Integer, primary_key=True)
     job_timestamp = Column(DateTime(timezone=True))
-    alma_id = Column(String(100))
+    almaid = Column(String(100))
     alma_record = Column(XMLType)
