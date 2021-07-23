@@ -42,20 +42,22 @@ csv = input_helpers.CsvHelper(str(args.input_file))
 almaid_generator = csv.extract_almaids()
 
 
+def call_api_for_pool(almaid: str):
+    with db_connect.DBSession() as session:
+        almapipo.call_api_for_record(
+            almaid,
+            "bibs",
+            "holdings",
+            "DELETE",
+            session
+        )
+
+
 if __name__ == "__main__":
 
     with db_connect.DBSession() as db_session:
 
         csv.add_to_source_csv_table(job_timestamp, db_session)
-
-        def call_api_for_pool(almaid: str):
-            almapipo.call_api_for_record(
-                almaid,
-                "bibs",
-                "holdings",
-                "DELETE",
-                db_session
-            )
 
         with Pool() as p:
             p.map(call_api_for_pool, almaid_generator)
