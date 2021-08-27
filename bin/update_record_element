@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+"""
+For a given alma-set of items, change description.
+
+Please mind that this expects a set with a single kind of record.
+If you have a set with both portfolios and items, you should
+look for a different way to make the change!
+
+Makes use of multiprocessing.
+"""
+
+from argparse import ArgumentParser
+from logging import getLogger
+from multiprocessing import Pool
+from xml.etree.ElementTree import tostring, fromstring
+
+from almapipo import (
+    almapipo,
+    db_connect,
+    db_read,
+    rest_conf,
+    setup_logfile,
+    xml_modify,
+)
+
+# timestamp
+job_timestamp = almapipo.job_timestamp
+
+# Logfile
+logger = getLogger("update_record_element")
+setup_logfile.log_to_stdout(logger)
+
+# provide -h information on the script
+parser = ArgumentParser(
+    description="For all members of an alma-set change one xml-element's text.",
+    epilog="NOTE: All members of the set need to be the same kind of record!")
+parser.add_argument(
+    "set_id",
+    type=str,
+    help="ID of the Alma Set of Items to make the description change for."
+)
+parser.add_argument(
+    "api",
+    type=str,
+    help="API to make the call for, e.g. 'bibs'."
+)
+parser.add_argument(
+    "record_type",
+    type=str,
+    help="Type of record to make the change for, e.g. 'items'."
+)
+parser.add_argument(
+    "xpath",
+    type=str,
+    help="XPATH leading to the element to make the change for, e.g. 'item_data/description'."
+)
+parser.add_argument(
+    "element_text",
+    type=str,
+    help="New text to set for the xml-element."
+)
+args = parser.parse_args()
+
+
+almaid_generator = rest_conf.retrieve_set_member_almaids(args.set_id)
+
+
+def change_element(alma_id: str, record_data: str):
+
+    try:
+        xml = fromstring(record_data)
+    except ValueError:
+        logger.warning(f"Could not call fromstring on record for {alma_id}.")
+    else:
+        logger.info(
+            f"Sending PUT for {alma_id}, changing '{args.xpath}'s text to '{args.element_text}'."
+        )
+        xml = xml_modify.update_element(
+            xml, args.xpath, None, args.element_text)
+
+        return tostring(xml)
+
+
+def call_api_for_pool(almaid: str):
+    with db_connect.DBSession() as session:
+        almapipo.call_api_for_record(
+            almaid,
+            xargs.api,
+            xargs.record_type,
+            "PUT",
+            session,
+            change_element
+        )
+
+
+if __name__ == "__main__":
+
+    with db_connect.DBSession() as db_session:
+
+        with Pool() as p:
+            p.map(call_api_for_pool, almaid_generator)
+
+        db_read.log_success_rate('GET', job_timestamp, db_session)
+        db_read.log_success_rate('PUT', job_timestamp, db_session)
