@@ -18,6 +18,8 @@ from requests import Session, Response
 from urllib import parse
 import warnings
 
+from . import exceptions
+
 
 # Logfile
 logger = getLogger(__name__)
@@ -237,9 +239,16 @@ def call_api(
 
             return alma_response_content
 
+        error_text = alma_response.content.decode('utf-8')
+
         logger.error(f"{method} for '{alma_url}' failed. Reason: "
                      f"{alma_response.status_code} - "
-                     f"{alma_response.content.decode('utf-8')}")
+                     f"{error_text}")
+
+        if "DAILY_THRESHOLD" in error_text:
+            raise exceptions.ThresholdException(
+                "Daily API threshold exceeded. No more API calls possible until midnight."
+            )
 
 
 def switch_api_method(
