@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-For a given alma-set of items, change description.
+For a given alma-set change one element in the XML.
 
 Please mind that this expects a set with a single kind of record.
 If you have a set with both portfolios and items, you should
