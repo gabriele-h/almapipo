@@ -4,7 +4,7 @@ from os import environ
 
 import pytest
 
-from alma_pipo import input_read
+from almapipo import input_read
 
 
 class TestDoesStringEqualAlmaID:
