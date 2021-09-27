@@ -138,14 +138,14 @@ def call_api_for_record(
     if method == "POST":
         raise NotImplementedError
 
-    CurrentApi = instantiate_api_class(almaid, api, record_type)
+    current_api = instantiate_api_class(almaid, api, record_type)
 
     db_write.add_almaid_to_job_status_per_id(
         almaid, "GET", job_timestamp, db_session
     )
 
     record_id = str.split(almaid, ",")[-1]
-    record_data = CurrentApi.retrieve(record_id)
+    record_data = current_api.retrieve(record_id)
 
     if not record_data:
         logger.error(f"Could not fetch record {almaid}.")
@@ -165,7 +165,7 @@ def call_api_for_record(
 
         if method == "DELETE":
 
-            alma_response = CurrentApi.delete(record_id)
+            alma_response = current_api.delete(record_id)
 
             if alma_response is None:
                 db_write.update_job_status(
@@ -189,7 +189,7 @@ def call_api_for_record(
 
             else:
 
-                response = CurrentApi.update(record_id, new_record_data)
+                response = current_api.update(record_id, new_record_data)
 
                 if response:
 
