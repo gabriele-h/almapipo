@@ -12,6 +12,7 @@ This will import the other modules and do the following:
 from datetime import datetime, timezone
 from logging import getLogger
 from typing import Callable, Iterable
+from xml.etree.ElementTree import fromstring
 
 from sqlalchemy.orm import Session
 
@@ -112,7 +113,8 @@ def call_api_for_record(
         record_type: str,
         method: str,
         db_session: Session,
-        manipulate_xml: Callable[[str, str], bytes] = None) -> None:
+        manipulate_xml: Callable[[str, str], bytes] = None,
+        record_post_data: bytes = None) -> None:
     """
     For one almaid this function does the following:
     * Add almaid to job_status_per_id
@@ -125,97 +127,154 @@ def call_api_for_record(
     :param almaid: Comma-separated string of record-ids, most specific last
     :param api: First path-argument after "almaws/v1" (e. g. "bibs")
     :param record_type: Type of record to call the API for (e. g. "holdings")
-    :param method: "DELETE", "GET" or "PUT" (POST not implemented yet!)
+    :param method: "DELETE", "GET", "POST" or "PUT"
     :param db_session: SQLAlchemy session for DB connection
     :param manipulate_xml: Function with arguments almaid and data_retrieved
+    :param record_post_data: Data to be sent via POST calls
     :return:
     """
 
-    if method not in ["DELETE", "GET", "PUT", "POST"]:
+    if method not in ["DELETE", "GET", "POST", "PUT"]:
         logger.error(f"Provided method {method} not known.")
         raise ValueError
 
-    if method == "POST":
-        raise NotImplementedError
-
     current_api = instantiate_api_class(almaid, api, record_type)
 
-    db_write.add_almaid_to_job_status_per_id(
-        almaid, "GET", job_timestamp, db_session
-    )
+    if method != "POST":
+        db_write.add_almaid_to_job_status_per_id(
+            almaid, "GET", job_timestamp, db_session
+        )
+        record_id = str.split(almaid, ",")[-1]
+        record_get_data = current_api.retrieve(record_id)
 
-    record_id = str.split(almaid, ",")[-1]
-    record_data = current_api.retrieve(record_id)
+        if not record_get_data:
+            logger.error(f"Could not fetch record {almaid}.")
+            db_write.update_job_status(
+                "error", almaid, "GET", job_timestamp, db_session
+            )
+            return
+        else:
+            db_write.add_response_content_to_fetched_records(
+                almaid, record_get_data, job_timestamp, db_session
+            )
+            db_write.update_job_status(
+                "done", almaid, "GET", job_timestamp, db_session
+            )
 
-    if not record_data:
-        logger.error(f"Could not fetch record {almaid}.")
-        db_write.update_job_status(
-            "error", almaid, "GET", job_timestamp, db_session
-        )
-    else:
-        db_write.add_response_content_to_fetched_records(
-            almaid, record_data, job_timestamp, db_session
-        )
-        db_write.update_job_status(
-            "done", almaid, "GET", job_timestamp, db_session
-        )
         db_write.add_almaid_to_job_status_per_id(
             almaid, method, job_timestamp, db_session
         )
 
         if method == "DELETE":
-
-            alma_response = current_api.delete(record_id)
-
-            if alma_response is None:
-                db_write.update_job_status(
-                    "error", almaid, method, job_timestamp, db_session
-                )
-            else:
-                db_write.update_job_status(
-                    "done", almaid, method, job_timestamp, db_session
-                )
-
+            __delete_record(almaid, record_id, current_api, method, db_session)
         elif method == "PUT":
+            __put_record(almaid, record_id, current_api, method, db_session, record_get_data, manipulate_xml)
+            
+    elif method == "POST":
+        db_write.add_almaid_to_job_status_per_id(
+            almaid, method, job_timestamp, db_session
+        )
+        __post_record(almaid, current_api, method, db_session, record_post_data)
 
-            new_record_data = manipulate_xml(almaid, record_data)
 
-            if not new_record_data:
+def __delete_record(
+        almaid: str,
+        record_id: str,
+        current_api: setup_rest.GenericApi,
+        method: str,
+        db_session) -> None:
 
-                logger.error(f"Could not manipulate data of record {almaid}.")
-                db_write.update_job_status(
-                    "error", almaid, method, job_timestamp, db_session
-                )
+    alma_response = current_api.delete(record_id)
 
-            else:
+    if alma_response is None:
+        db_write.update_job_status(
+            "error", almaid, method, job_timestamp, db_session
+        )
+    else:
+        db_write.update_job_status(
+            "done", almaid, method, job_timestamp, db_session
+        )
 
-                response = current_api.update(record_id, new_record_data)
 
-                if response:
+def __put_record(
+        almaid: str,
+        record_id: str,
+        current_api: setup_rest.GenericApi,
+        method: str,
+        db_session,
+        record_data: bytes,
+        manipulate_xml: Callable[[str, str], bytes] = None) -> None:
 
-                    logger.info(f"Manipulation for {almaid} successful."
-                                f" Adding to put_post_responses.")
+    new_record_data = manipulate_xml(almaid, record_data)
 
-                    db_write.add_put_post_response(
-                        almaid, response, job_timestamp, db_session
-                    )
-                    db_write.add_sent_record(
-                        almaid, new_record_data, job_timestamp, db_session
-                    )
-                    db_write.update_job_status(
-                        "done", almaid, method, job_timestamp, db_session
-                    )
-                    db_read.check_data_sent_equals_response(
-                        almaid, job_timestamp, db_session
-                    )
+    if not new_record_data:
+        logger.error(f"Could not manipulate data of record {almaid}.")
+        db_write.update_job_status(
+            "error", almaid, method, job_timestamp, db_session
+        )
+    else:
+        response = current_api.update(record_id, new_record_data)
 
-                else:
+        if response:
+            logger.info(f"Manipulation for {almaid} successful."
+                        f" Adding to put_post_responses.")
 
-                    logger.error(f"Did not receive a response for {almaid}?")
+            db_write.add_put_post_response(
+                almaid, response, job_timestamp, db_session
+            )
+            db_write.add_sent_record(
+                almaid, new_record_data, job_timestamp, db_session
+            )
+            db_write.update_job_status(
+                "done", almaid, method, job_timestamp, db_session
+            )
+            db_read.check_data_sent_equals_response(
+                almaid, job_timestamp, db_session
+            )
 
-                    db_write.update_job_status(
-                        "error", almaid, method, job_timestamp, db_session
-                    )
+        else:
+            logger.error(f"Did not receive a response for {almaid}?")
+            db_write.update_job_status(
+                "error", almaid, method, job_timestamp, db_session
+            )
+
+
+def __post_record(
+        almaid: str,
+        current_api: setup_rest.GenericApi,
+        method: str,
+        db_session,
+        record_data: bytes) -> None:
+
+    response = current_api.create(record_data)
+
+    if response:
+        response_xml = fromstring(response)
+        response_link = response_xml.find('/*/').attrib['link']
+        almaid = response_link.split('/')[-1]
+
+        logger.info(f"Creation for {almaid} successful."
+                    f" Adding to put_post_responses.")
+
+        db_write.add_put_post_response(
+            almaid, response, job_timestamp, db_session
+        )
+        db_write.add_sent_record(
+            almaid, record_data, job_timestamp, db_session
+        )
+        db_write.update_job_status(
+            "done", almaid, method, job_timestamp, db_session
+        )
+        db_read.check_data_sent_equals_response(
+            almaid, job_timestamp, db_session
+        )
+
+    else:
+        logger.error(f"Did not receive a response for {almaid}. Marking as "
+                     f"erroneous.")
+        db_write.update_job_status(
+            "error", almaid, method, job_timestamp, db_session
+        )
 
 
 def instantiate_api_class(
