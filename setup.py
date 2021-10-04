@@ -8,7 +8,6 @@ setup(
     version="1.0.0",
     description="Use Alma's REST APIs and store data in a Postgres DB.",
     long_description=long_description,
-    long_description_content="text/markdown",
     url="https://github.com/gabriele-h/almapipo",
     packages=find_packages(where="src"),
     package_dir={'': 'src'},
@@ -16,8 +15,8 @@ setup(
         'bin/db_create_tables',
         'bin/delete_hol',
         'bin/input_check',
-        'bin/fetched_records_to_tsv',
         'bin/locations_export',
+        'bin/update_record_element',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
