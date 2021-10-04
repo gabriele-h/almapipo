@@ -160,10 +160,10 @@ def call_api_for_record(
             db_write.update_job_status(
                 "done", almaid, "GET", job_timestamp, db_session
             )
-
-        db_write.add_almaid_to_job_status_per_id(
-            almaid, method, job_timestamp, db_session
-        )
+        if method != "GET":
+            db_write.add_almaid_to_job_status_per_id(
+                almaid, method, job_timestamp, db_session
+            )
 
         if method == "DELETE":
             __delete_record(almaid, record_id, current_api, method, db_session)
@@ -202,7 +202,7 @@ def __put_record(
         current_api: setup_rest.GenericApi,
         method: str,
         db_session,
-        record_data: bytes,
+        record_data: str,
         manipulate_xml: Callable[[str, str], bytes] = None) -> None:
 
     new_record_data = manipulate_xml(almaid, record_data)
@@ -228,9 +228,6 @@ def __put_record(
             db_write.update_job_status(
                 "done", almaid, method, job_timestamp, db_session
             )
-            db_read.check_data_sent_equals_response(
-                almaid, job_timestamp, db_session
-            )
 
         else:
             logger.error(f"Did not receive a response for {almaid}?")
@@ -249,11 +246,11 @@ def __post_record(
     response = current_api.create(record_data)
 
     if response:
-        response_xml = fromstring(response)
-        response_link = response_xml.find('/*/').attrib['link']
-        almaid = response_link.split('/')[-1]
+        response_root = fromstring(response)
+        response_link = response_root.attrib['link']
+        recordid = response_link.split('/')[-1]
 
-        logger.info(f"Creation for {almaid} successful."
+        logger.info(f"Creation for {almaid} successful, record ID is {recordid}."
                     f" Adding to put_post_responses.")
 
         db_write.add_put_post_response(
@@ -264,9 +261,6 @@ def __post_record(
         )
         db_write.update_job_status(
             "done", almaid, method, job_timestamp, db_session
-        )
-        db_read.check_data_sent_equals_response(
-            almaid, job_timestamp, db_session
         )
 
     else:
