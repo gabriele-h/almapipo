@@ -247,10 +247,21 @@ def __post_record(
 
     if response:
         response_root = fromstring(response)
-        response_link = response_root.attrib['link']
-        recordid = response_link.split('/')[-1]
+        recordid = "unknown"
 
-        logger.info(f"Creation for {almaid} successful, record ID is {recordid}."
+        try:
+            response_link = response_root.attrib['link']
+            recordid = response_link.split('/')[-1]
+        except KeyError:
+            logger.info("Could not parse link-attribute. "
+                        "Using text of first element.")
+            try:
+                recordid = response_root.findall('.')[0].text
+            except KeyError:
+                logger.info("Could not parse first element-text either. "
+                            "Will set recordid to 'unknown'.")
+
+        logger.info(f"Creation for '{almaid}' successful, new record ID is {recordid}."
                     f" Adding to put_post_responses.")
 
         db_write.add_put_post_response(
