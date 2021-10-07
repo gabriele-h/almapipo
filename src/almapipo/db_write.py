@@ -18,16 +18,12 @@ from . import setup_db
 
 
 def update_job_status(status: str,
-                      almaid: str,
-                      method: str,
-                      job_timestamp: datetime,
+                      primary_key: int,
                       db_session: Session) -> None:
     """For a given almaid and job_timestamp update the job_status in
     table job_status_per_id.
     :param status: New status to be set
-    :param almaid: Alma ID to set the status for
-    :param method: "DELETE", "GET", "POST" or "PUT"
-    :param job_timestamp: Job for which the status should be changed
+    :param primary_key: Primary key of the row to change the status for
     :param db_session: Session to be used for the manipulation
     :return: None
     """
@@ -35,11 +31,7 @@ def update_job_status(status: str,
     list_of_matched_rows = db_session.query(
         setup_db.JobStatusPerId
     ).filter_by(
-        job_timestamp=job_timestamp
-    ).filter_by(
-        almaid=almaid
-    ).filter_by(
-        job_action=method
+        primary_key=primary_key
     )
 
     list_of_matched_rows[0].job_status = status
@@ -149,14 +141,14 @@ def add_almaid_to_job_status_per_id(
         almaid: str,
         method: str,
         job_timestamp: datetime,
-        db_session: Session) -> None:
+        db_session: Session) -> int:
     """
     For a string of Alma IDs create an entry in job_status_per_id.
     :param almaid: IDs of the record to be manipulated.
     :param method: GET, PUT, POST or DELETE
     :param job_timestamp: Timestamp to identify the job which created the line.
     :param db_session: DB session to add the data to.
-    :return: None
+    :return: Primary key of added row
     """
 
     line_for_table_job_status_per_id = setup_db.JobStatusPerId(
@@ -167,3 +159,6 @@ def add_almaid_to_job_status_per_id(
     )
 
     db_session.add(line_for_table_job_status_per_id)
+    db_session.commit()
+    db_session.refresh(line_for_table_job_status_per_id)
+    return line_for_table_job_status_per_id.primary_key
