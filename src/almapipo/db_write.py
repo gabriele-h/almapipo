@@ -28,14 +28,13 @@ def update_job_status(status: str,
     :return: None
     """
 
-    row_to_update = db_session.query(
+    status_row = db_session.query(
         setup_db.JobStatusPerId
     ).get(
         primary_key
     )
 
-    row_to_update.job_status = status
-    db_session.add(row_to_update)
+    status_row.update({"job_status": status})
 
 
 def add_put_post_response(
