@@ -35,6 +35,7 @@ def update_job_status(status: str,
     )
 
     status_row.job_status = status
+    db_session.commit()
 
 
 def add_put_post_response(
