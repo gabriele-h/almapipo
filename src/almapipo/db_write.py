@@ -28,13 +28,13 @@ def update_job_status(status: str,
     :return: None
     """
 
-    list_of_matched_rows = db_session.query(
+    list_of_matched_row = db_session.query(
         setup_db.JobStatusPerId
-    ).filter_by(
+    ).get(
         primary_key=primary_key
     )
 
-    list_of_matched_rows[0].job_status = status
+    list_of_matched_row.job_status = status
 
 
 def add_put_post_response(
@@ -159,6 +159,4 @@ def add_almaid_to_job_status_per_id(
     )
 
     db_session.add(line_for_table_job_status_per_id)
-    db_session.commit()
-    db_session.refresh(line_for_table_job_status_per_id)
     return line_for_table_job_status_per_id.primary_key
