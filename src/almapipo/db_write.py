@@ -31,7 +31,7 @@ def update_job_status(status: str,
     list_of_matched_row = db_session.query(
         setup_db.JobStatusPerId
     ).get(
-        primary_key=primary_key
+        primary_key
     )
 
     list_of_matched_row.job_status = status
