@@ -34,7 +34,7 @@ def update_job_status(status: str,
         primary_key
     )
 
-    status_row.update({"job_status": status})
+    status_row.job_status = status
 
 
 def add_put_post_response(
@@ -159,6 +159,6 @@ def add_almaid_to_job_status_per_id(
     )
 
     db_session.add(line_for_table_job_status_per_id)
-    db_session.commit()
+    db_session.flush()
     db_session.refresh(line_for_table_job_status_per_id)
     return line_for_table_job_status_per_id.primary_key
