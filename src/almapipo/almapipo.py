@@ -54,15 +54,13 @@ def call_api_for_alma_set(
     :param manipulate_xml: Function with arguments almaid and data_retrieved
     :return: Success of set retrieval
     """
-    primary_key = db_write.add_almaid_to_job_status_per_id(
+    status_row = db_write.add_almaid_to_job_status_per_id(
         "GET", set_id, job_timestamp, db_session
     )
     almaid_list = rest_conf.retrieve_set_member_almaids(set_id)
 
     if type(almaid_list) is None:
-        db_write.update_job_status(
-            "error", primary_key, db_session
-        )
+        db_write.update_job_status("error", status_row)
         logger.error(f"An error occurred while retrieving the set's members."
                      f" Is the set {set_id} empty?")
         return False
@@ -71,9 +69,7 @@ def call_api_for_alma_set(
         almaid_list, api, record_type, method, db_session, manipulate_xml
     )
 
-    db_write.update_job_status(
-        "done", primary_key, db_session
-    )
+    db_write.update_job_status("done", status_row)
 
     return True
 
@@ -141,7 +137,7 @@ def call_api_for_record(
     current_api = instantiate_api_class(almaid, api, record_type)
 
     if method != "POST":
-        primary_key_get = db_write.add_almaid_to_job_status_per_id(
+        status_line_get = db_write.add_almaid_to_job_status_per_id(
             almaid, "GET", job_timestamp, db_session
         )
         record_id = str.split(almaid, ",")[-1]
@@ -149,61 +145,53 @@ def call_api_for_record(
 
         if not record_get_data:
             logger.error(f"Could not fetch record {almaid}.")
-            db_write.update_job_status(
-                "error", primary_key_get, db_session
-            )
+            db_write.update_job_status("error", status_line_get)
             return
         else:
             db_write.add_response_content_to_fetched_records(
                 almaid, record_get_data, job_timestamp, db_session
             )
-            db_write.update_job_status(
-                "done", primary_key_get, db_session
-            )
+            db_write.update_job_status("done", status_line_get)
 
         if method == "GET":
             return
 
-        primary_key_other = db_write.add_almaid_to_job_status_per_id(
+        status_row_other = db_write.add_almaid_to_job_status_per_id(
             almaid, method, job_timestamp, db_session
         )
 
         if method == "DELETE":
-            __delete_record(almaid, record_id, primary_key_other, current_api, db_session)
+            __delete_record(almaid, record_id, status_row_other, current_api, db_session)
         elif method == "PUT":
-            __put_record(almaid, record_id, primary_key_other, current_api, db_session, record_get_data, manipulate_xml)
+            __put_record(almaid, record_id, status_row_other, current_api, db_session, record_get_data, manipulate_xml)
             
     elif method == "POST":
-        primary_key_post = db_write.add_almaid_to_job_status_per_id(
+        status_row_post = db_write.add_almaid_to_job_status_per_id(
             almaid, method, job_timestamp, db_session
         )
-        __post_record(almaid, primary_key_post, current_api, db_session, record_post_data)
+        __post_record(almaid, status_row_post, current_api, db_session, record_post_data)
 
 
 def __delete_record(
         almaid: str,
         record_id: str,
-        primary_key: int,
+        status_row: int,
         current_api: setup_rest.GenericApi,
         db_session) -> None:
 
     alma_response = current_api.delete(record_id)
 
     if alma_response is None:
-        db_write.update_job_status(
-            "error", primary_key, db_session
-        )
+        db_write.update_job_status("error", status_row)
         logger.error(f"Deletion did not succeed for {almaid}.")
     else:
-        db_write.update_job_status(
-            "done", primary_key, db_session
-        )
+        db_write.update_job_status("done", status_row)
 
 
 def __put_record(
         almaid: str,
         record_id: str,
-        primary_key: int,
+        status_row: int,
         current_api: setup_rest.GenericApi,
         db_session,
         record_data: str,
@@ -213,9 +201,7 @@ def __put_record(
 
     if not new_record_data:
         logger.error(f"Could not manipulate data of record {almaid}.")
-        db_write.update_job_status(
-            "error", primary_key, db_session
-        )
+        db_write.update_job_status("error", status_row)
     else:
         response = current_api.update(record_id, new_record_data)
 
@@ -229,20 +215,16 @@ def __put_record(
             db_write.add_sent_record(
                 almaid, new_record_data, job_timestamp, db_session
             )
-            db_write.update_job_status(
-                "done", primary_key, db_session
-            )
+            db_write.update_job_status("done", status_row)
 
         else:
             logger.error(f"Did not receive a response for {almaid}?")
-            db_write.update_job_status(
-                "error", primary_key, db_session
-            )
+            db_write.update_job_status("error", status_row)
 
 
 def __post_record(
         almaid: str,
-        primary_key: int,
+        status_row: int,
         current_api: setup_rest.GenericApi,
         db_session,
         record_data: bytes) -> None:
@@ -274,16 +256,12 @@ def __post_record(
         db_write.add_sent_record(
             almaid, record_data, job_timestamp, db_session
         )
-        db_write.update_job_status(
-            "done", primary_key, db_session
-        )
+        db_write.update_job_status("done", status_row)
 
     else:
         logger.error(f"Did not receive a response for {almaid}. Marking as "
                      f"erroneous.")
-        db_write.update_job_status(
-            "error", primary_key, db_session
-        )
+        db_write.update_job_status("error", status_row)
 
 
 def instantiate_api_class(
