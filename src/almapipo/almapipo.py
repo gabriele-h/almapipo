@@ -23,6 +23,7 @@ from . import (
     rest_bibs,
     rest_conf,
     rest_electronic,
+    setup_db,
     setup_rest,
     rest_users,
 )
@@ -175,7 +176,7 @@ def call_api_for_record(
 def __delete_record(
         almaid: str,
         record_id: str,
-        status_row: int,
+        status_row: setup_db.JobStatusPerId,
         current_api: setup_rest.GenericApi,
         db_session) -> None:
 
@@ -191,7 +192,7 @@ def __delete_record(
 def __put_record(
         almaid: str,
         record_id: str,
-        status_row: int,
+        status_row: setup_db.JobStatusPerId,
         current_api: setup_rest.GenericApi,
         db_session,
         record_data: str,
@@ -224,7 +225,7 @@ def __put_record(
 
 def __post_record(
         almaid: str,
-        status_row: int,
+        status_row: setup_db.JobStatusPerId,
         current_api: setup_rest.GenericApi,
         db_session,
         record_data: bytes) -> None:
