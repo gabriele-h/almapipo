@@ -114,7 +114,7 @@ def call_api_for_record(
         method: str,
         db_session: Session,
         manipulate_xml: Callable[[str, str], bytes] = None,
-        record_post_data: bytes = None) -> None:
+        record_post_data: bytes = None) -> str:
     """
     For one almaid this function does the following:
     * Add almaid to job_status_per_id
@@ -131,7 +131,7 @@ def call_api_for_record(
     :param db_session: SQLAlchemy session for DB connection
     :param manipulate_xml: Function with arguments almaid and data_retrieved
     :param record_post_data: Data to be sent via POST calls
-    :return:
+    :return: Only for POST the ID of the newly generated record
     """
 
     if method not in ["DELETE", "GET", "POST", "PUT"]:
@@ -177,7 +177,7 @@ def call_api_for_record(
         primary_key_post = db_write.add_almaid_to_job_status_per_id(
             almaid, method, job_timestamp, db_session
         )
-        __post_record(almaid, primary_key_post, current_api, db_session, record_post_data)
+        return __post_record(almaid, primary_key_post, current_api, db_session, record_post_data)
 
 
 def __delete_record(
@@ -245,7 +245,7 @@ def __post_record(
         primary_key: int,
         current_api: setup_rest.GenericApi,
         db_session,
-        record_data: bytes) -> None:
+        record_data: bytes) -> str:
 
     response = current_api.create(record_data)
 
@@ -260,7 +260,7 @@ def __post_record(
             logger.info("Could not parse link-attribute. "
                         "Using text of first element.")
             try:
-                recordid = response_root.findall('.')[0].text
+                recordid = response_root.findall('./*')[0].text
             except KeyError:
                 logger.info("Could not parse first element-text either. "
                             "Will set recordid to 'unknown'.")
@@ -277,6 +277,7 @@ def __post_record(
         db_write.update_job_status(
             "done", primary_key, db_session
         )
+        return recordid
 
     else:
         logger.error(f"Did not receive a response for {almaid}. Marking as "
