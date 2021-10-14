@@ -13,7 +13,7 @@ timestamp_str = timestamp_datetime.strftime("%Y%m%d%H%M%S.0")
 logger = getLogger(__name__)
 
 
-def create_record(record_keys: List[str], record_values: List[str]) -> Element:
+def create_marc(record_keys: List[str], record_values: List[str]) -> Element:
     """
     For two lists, one with keys, the other with values, create
     a MARC XML record to create new records. You will need to
