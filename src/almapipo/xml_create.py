@@ -135,9 +135,9 @@ class ItemRecord:
     """
     def __init__(self):
         self.root = Element('item')
-        self.item_data = SubElement(self.root, 'item_data')
-        self.item_data.set("link", "")
+        self.root.set("link", "")
         self.holding_data = SubElement(self.root, 'holding_data')
+        self.item_data = SubElement(self.root, 'item_data')
         self.holding_data.set("link", "")
         self.holding_id = SubElement(self.holding_data, 'holding_id')
         self.copy_id = SubElement(self.holding_data, 'copy_id')
