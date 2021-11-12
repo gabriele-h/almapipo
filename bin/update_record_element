@@ -37,7 +37,7 @@ parser = ArgumentParser(
 parser.add_argument(
     "set_id",
     type=str,
-    help="ID of the Alma Set of Items to make the description change for."
+    help="ID of the Alma set of records to make the change for."
 )
 parser.add_argument(
     "api",
@@ -85,8 +85,8 @@ def call_api_for_pool(almaid: str):
     with db_connect.DBSession() as session:
         almapipo.call_api_for_record(
             almaid,
-            xargs.api,
-            xargs.record_type,
+            args.api,
+            args.record_type,
             "PUT",
             session,
             change_element
