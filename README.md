@@ -4,17 +4,17 @@ almapipo is short for "ALMa API Client with POstgres".
 
 The intention of having an implementation with a Postgres DB is to store
 the following information:
-* For which IDs where API-calls made
-* Where the API-calls successful
-* Responses for all successful GET calls
+* List of IDs for which an API call was made
+* Were the calls successful
+* Responses for all successful calls
 * Request content sent to the API for successful PUT/POST calls
 * Response content received from the API for successful PUT/POST calls
 * CSV files that were used as an input for the API calls
 
 This way it should be easy to determine which API calls need to be
 analyzed and/or sent another time. All data is sent and requested as XML
-as this is the only format supported for all API calls. This also enables
-us to query the database by xpath.
+as this is the only format supported for all API calls. This also makes
+it possible to query the database by xpath.
 
 All calls that were done without success will log the content of
 the API's response to the logfile.
@@ -32,10 +32,8 @@ known and saved in a **semicolon or tab delimited file**.
 
 Working with a set will currently work only for some kinds of sets.
 Since some API calls require more than just the record's ID, but also those of
-its ancestors, and only some of the sets will have a link to their members,
-calls on the sets of e. g. electronic portfolios are
-not supported until the missing link attribute is hopefully fixed by Ex Libris
-(see case 00874282).
+its ancestors and not all sets include that information (e.g. electronic 
+portfolios).
 
 The first column of the csv/tsv file needs to be the Alma-ID
 or a list of Alma-IDs (see below "Input data").
@@ -44,7 +42,8 @@ or a list of Alma-IDs (see below "Input data").
 
 In a **Postgres database** the **status of the api call** and - where applicable -
 the input data used are saved on a per-line or per-record basis.
-All records will be retrieved prior to deletion, update, or creation. A
+Records will be retrieved before any change to have both the possibility to do
+a before and after analysis and to possibly do a rollback. A
 **copy of each record before the action** will be saved to the database.
 **Responses to PUT and POST** requests will be saved too.
 
@@ -66,7 +65,7 @@ Alma APIs seem to be implemented xml-first.
 
 At the time I write this: A lot!
 
-Currently I am not implementing all the APIs with some kind of grand
+I am not implementing all the APIs with some kind of grand
 scheme, but as I need them. If you want and are able to contribute, I
 will be happy to receive your pull requests. Or you can try using the
 generic functions included in `setup_rest.py`. If both is not an option:
@@ -79,7 +78,7 @@ curious make use of python's `help`-function.
 
 # Requirements
 
-* Python 3.6.9 or higher, see requirements.txt for Python packages
+* Python 3.8.5 or higher, see setup.py for Python Packages
 * A PostgreSQL database with read and write access
 * An Alma API-key with the necessary permissions for your operations
 
@@ -90,10 +89,10 @@ curious make use of python's `help`-function.
 Please make use of a virtual environment.
 See https://docs.python.org/3/library/venv.html for further info.
 
-## Install All From `requirements.txt`
+## Install almapipo
 
-The requirements are actually defined within `setup.py` and `requirements.txt`
-has just one entry referring to that. Installing almapipo via pip will install the
+The requirements are defined within `setup.py`.
+Installing almapipo via pip will install the
 requirements as defined in `setup.py` automatically.
 
 **The following is only necessary if you got the code directly via Github:**
@@ -118,10 +117,10 @@ export ALMA_REST_API_KEY=                 # API key as per developers.exlibrisgr
 export ALMA_REST_API_BASE_URL=            # base URL for your Alma API calls, usually ending with 'v1'
 ```
 
-**Note:** It is strongly recommended to have two separate api-keys, databases
-and log files for your Sandbox and Production environment as this package
+**Note:** It is strongly recommended using two separate api-keys, databases
+and log files for your sandbox and production environment as this package
 will and can not make this differentiation for you. Make sure that you default
-to the env file for the Sandbox environment, e. g. by giving the file for
+to the env file for the sandbox environment, e.g. by giving the file for
 production an all-caps prefix.
 
 ## Input Data
@@ -133,12 +132,12 @@ members in a set. Please note - as mentioned above - that not all sets will
 have the link attribute in their members. Without a link attribute, the function
 `rest_conf.retrieve_set_member_almaids` will make use of the `id` element of
 each member. If the path to the member is more complex and includes ancestors,
-making use of such an Alma set (such as electronic portfolios) will not be possible.
+making use of such an Alma set (e.g. electronic portfolios) will not be possible.
 
 #### Usage example
 
-The following function will iterate trough the set by 100 at a time and
-yield the `almaid` of each record, making it a generator:
+The following function will iterate through the set by 100 at a time and
+yield the `almaid` of each record:
 
 ```python
 from almapipo import rest_conf
@@ -147,22 +146,22 @@ almaids = rest_conf.retrieve_set_member_almaids('1199999999123')
 
 ### CSV or TSV file
 
-As of now only the first column of the CSV or TSV file are relevant for
+As of now only the first column of the CSV or TSV file is relevant for
 this package. The first column should include one or more Alma-IDs of the
 record you want to manipulate. There is a function for retrieving content of
 any column in the `db_read` module.
 
-Some operations require more than one ID to work, e. g. if you want to
+Some operations require more than one ID to work, e.g. if you want to
 operate on holdings, you will also need the MMS-ID. In such cases the
 **first column is still just one string with all necessary IDs separated
-by comma without blanks**. The IDs should be listed from **least specific
-to most specific** (e. g. MMS-ID,holding-ID,item-ID).
+by commas without blanks**. The IDs should be listed from **least specific
+to most specific** (e.g. MMS-ID,holding-ID,item-ID).
 
 #### Example Data
 The example below shows the IDs necessary for querying a holding record in
 the first column. All other columns may contain any data that is necessary
 for understanding when analyzed intellectually or for defining contents of
-data updates via `db_read.get_value_from_csv_json`.
+data updates via `db_read.get_value_from_source_csv`.
 
 In case of a holding record the first column should include one string with both
 the MMS-ID and the holding-ID, where the MMS-ID is listed before the holding-ID.
@@ -178,6 +177,9 @@ This script needs to be **run only once** when starting to
 use the package, as it creates all necessary tables in the
 database.
 
+To get an idea of which tables will be created and what contents they have,
+take a look at the module `setup_db`.
+
 ### Usage example
 
 ```bash
@@ -190,7 +192,7 @@ Usually you will not need to directly access the module `setup_rest`.
 You might find `test_calls_remaining_today` useful though, as it creates a message
 with the number of remaining API calls. It's perfect for a first call to the API
 as it requires no parameters at all and provides information you will need
-in the future. It returns the number of left calls and logs them to the log file.
+in the future. It returns the number of left calls and adds info to a logger.
 
 **Note:** The function itself makes a call to /bibs/test and will be counted as an API call.
 
@@ -221,34 +223,31 @@ otherwise "error". For all calls other than GET a second request per
 alma-id is done for the action specified, so there will be two
 lines in `job_status_per_id` for those function calls per alma\_id.
 
+**Note:**  Currently there are no GET calls before POST calls.
+
 The successfully retrieved records will be saved to the table
 `fetched_records`, where the whole API response content is saved
 in the xml column `alma_record`. Records sent to the API for
 PUT and POST calls will additionally be saved to `sent_records`.
 Responses to PUT and POST calls are saved to `put_post_responses`.
 
-When a record is updated, data in `sent_records` will be compared
-to `put_post_responses`. If this comparison fails it produces
-an ERROR log entry, but will do nothing else, as these cases will
-need to be analyzed intellectually anyways.
-
 **Note:** If you call the api for a record multiple times there will be a
-separate row for each call in all of the aforementioned tables. These
+separate row for each call in all mentioned tables. These
 rows can be distinguished by the `job_timestamp` set when the `almapipo`
 module is imported.
 
 ### Usage Examples Python Console
 
-First parameter of the function is list of ids to make the calls for. Then
+First parameter of the function is a list of ids to make the calls for. Then
 follow the API that needs to be called and what kind of record it
-should be called for. Final parameter is the method.
+should be called for. The final parameter is the method.
 
-#### Using a tsv File as Input
+#### Using a tsv File as Input: call\_api\_for\_list
 
 The following will import the CSV lines to the table `source_csv` and
-create a generator of alma\_ids. If you want to make sure you are handling, 
-valid alma\_ids only, set `validation` in CsvHelper, which checks 
-whether the first column contained a valid `almaid`. Defaults to False.
+create a generator of alma\_ids. If you want to make sure you are handling
+valid alma\_ids only, set `validation` to true in CsvHelper, which checks 
+whether the first column contained a valid `almaid`. It defaults to false.
 
 ```python
 from almapipo import almapipo, db_connect, input_helpers
@@ -261,16 +260,16 @@ with db_connect.DBSession() as dbsession:
     almapipo.call_api_for_list(csv_helper.extract_almaids(), 'bibs', 'holdings', 'GET', dbsession)
 ```
 
-#### Using a Set as Input
+#### Using a Set as Input: call\_api\_for\_set
 
 The function `call_api_for_set` will add a line to `job_status_per_id` for
 the given `set_id`. If the function `rest_conf.retrieve_set_member_almaids`
 does not return the expected Iterable, the status within
 `job_status_per_id` will be updated to `error`. This will
-happen if the set is empty or does not exist. Otherwise the status for the
+happen if the set is empty or does not exist, otherwise the status for the
 `set_id` will be set to `done`.
 
-Please note that `call_api_for_set` makes use of `call_api_for_list`.
+**Note:** `call_api_for_set` makes use of `call_api_for_list`.
 
 ```python
 from almapipo import almapipo, db_connect
@@ -290,8 +289,8 @@ record from the table `fetched_records`.
 
 ### Usage Example Python Console
 
-The following extracts the XML of one holding record and returns it
-as an xml.etree Element:
+The following extracts the XML of the most recent version of one holding
+record and returns it as an xml.etree Element:
 
 ```python
 from almapipo import db_connect, xml_extract
@@ -346,9 +345,9 @@ in env var `ALMA_REST_ID_INSTITUTIONAL_SUFFIX` is crucial here.
 
 Can be used to do the following:
 
-* Get a list of IDs for a specific `action` (e. g. 'GET'), `job_timestamp` and `job_status`
+* Get a list of IDs for a specific `action` (e.g. 'GET'), `job_timestamp` and `job_status`
 * Retrieve information from CSV columns
-* Extract xml from `fetched records`
+* Extract xml from table `fetched\_records`
 * Check if data sent equals data received for PUT and POST
 
 Please note that this script uses **SQLAlchemy**. If the env variable
@@ -360,7 +359,7 @@ more transparent.
 ## Retrieve Information from CSV-Column
 
 If you need to make an update with the information from a specific column of
-the CSV/TSV file, you can make use of the function `get_value_from_csv_json`.
+the CSV/TSV file, you can make use of the function `get_value_from_source_csv`.
 
 ### Usage Example Python
 
@@ -398,7 +397,7 @@ to your PATH variable.
 
 This is only necessary for the initial Setup of a newly defined database. You
 will have to run this for both databases you use for production and sandbox
-API calls - it is highly recommended to keep these in separate databases!
+API calls - it is highly recommended keeping these in separate databases!
 
 ## Delete Holdings: `delete_hol`
 
@@ -407,12 +406,6 @@ holdings. The CSV file needs to have a heading.
 
 The holdings will be fetched first to have a backup in the database in
 case of erroneous deletions.
-
-## Extract MARC as TSV: `fetched_records_to_tsv`
-
-This will work only for records that have prior been fetched via GET.
-
-Currently work in progress, more documentation soon.
 
 ## Check File Validity From Commandline: `input_check`
 
@@ -426,13 +419,22 @@ on how the according regular expression came into existence have a look at SvG's
 ## Export Locations: `locations_export`
 
 For all libraries of an institution retrieve all locations and build an XML file
-that contains all of the retrieved information. The resulting XML file
+that contains the retrieved information. The resulting XML file
 can be opened in Excel.
 
 ### Usage Example Bash
 
 ```bash
 input_check ../input/testsample.csv
+```
+
+## Update Element by XPATH in a set of records: `update_record_element`
+
+For a given Alma set, update one record element's text.
+
+### Usage Example Bash
+```bash
+update_record_element 123123123 'bibs' 'items' 'item/data_description' 'New description'
 ```
 
 ## Create All Necessary DB Tables
