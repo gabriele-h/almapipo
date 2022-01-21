@@ -411,10 +411,10 @@ case of erroneous deletions.
 
 When used from commandline with csv-path as argv1 the script will check file validity.
 It will check if the first column is a valid Alma ID. For further information
-on how the according regular expression came into existence have a look at SvG's very useful
-[Alma record number cheat sheet][1].
+on how the according regular expression came into existence have a look at the
+[Knowledge Center documentation on Alma Record Numbers][1].
 
-[1]: https://knowledge.exlibrisgroup.com/Alma/Community_Knowledge/How_to_-_A_cheat_sheet_for_Alma_record_numbers
+[1]: https://knowledge.exlibrisgroup.com/Alma/Product_Documentation/010Alma_Online_Help_(English)/Metadata_Management/005Introduction_to_Metadata_Management/020Record_Numbers
 
 ## Export Locations: `locations_export`
 
