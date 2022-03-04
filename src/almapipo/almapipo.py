@@ -55,7 +55,7 @@ def call_api_for_alma_set(
     :return: Success of set retrieval
     """
     primary_key = db_write.add_almaid_to_job_status_per_id(
-        "GET", set_id, job_timestamp, db_session
+        set_id, 'GET', job_timestamp, db_session
     )
     almaid_list = rest_conf.retrieve_set_member_almaids(set_id)
 
