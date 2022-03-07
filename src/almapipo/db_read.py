@@ -175,7 +175,7 @@ def get_most_recent_fetched_xml(almaid: str, db_session: Session):
         setup_db.FetchedRecords.job_timestamp.desc()
     ).limit(1)
 
-    return record_query.first()
+    return record_query.first().alma_record
 
 
 def get_list_of_ids_by_status_and_method(
