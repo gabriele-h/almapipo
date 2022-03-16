@@ -178,7 +178,7 @@ def add_parameters(url: str, parameters: dict) -> str:
     :return:
     """
 
-    logger.info(f"Additional parameters provided: {parameters}.")
+    logger.debug(f"Additional parameters provided: {parameters}.")
 
     url_parameters = parse.urlencode(parameters)
     full_url = f"{url}?{url_parameters}"
