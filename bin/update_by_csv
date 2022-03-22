@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+"""
+For a CSV-file of the following format:
+
+* header column 1 = which kinds of IDs are listed (e.g. 'bibs,holdings')
+* header column 2 = which xpath in these records to manipulate
+* content column 1 = comma-separated list of IDs for update
+* content column 2 = text to write to xpath element
+
+Assume the action is 'PUT' and manipulate the records
+with the given IDs in a way, where searching by the xpath
+given in heading of column two, values of column to are set
+as the elements text (use --append if you do not want to replace
+any existing text).
+
+Please note that you will need to provide all ancestors the first column. So
+if for example you want to update items, you will need to provide IDs in the
+format 'mms-id,holding-id,item-id' and make the header of the column
+'bibs,holdings,items'.
+"""
