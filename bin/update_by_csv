@@ -18,3 +18,98 @@ if for example you want to update items, you will need to provide IDs in the
 format 'mms-id,holding-id,item-id' and make the header of the column
 'bibs,holdings,items'.
 """
+
+from argparse import ArgumentParser
+from logging import getLogger
+from multiprocessing import Pool
+from pathlib import Path
+from xml.etree.ElementTree import tostring, fromstring
+
+from almapipo import (
+    almapipo,
+    db_connect,
+    input_helpers,
+    setup_logfile,
+    xml_modify
+)
+
+# timestamp
+job_timestamp = almapipo.job_timestamp
+
+# Logfile
+logger = getLogger("update_by_csv")
+setup_logfile.log_to_stdout(logger)
+
+# provide -h information on the script
+parser = ArgumentParser(
+    description="Based on a CSV/TSV file containing almaids and values to "
+                "set on a specific XML-element, update the records.",
+    epilog="")
+parser.add_argument(
+    "input_file",
+    type=Path,
+    help="File containing a first column with almaids, where the heading "
+         "identifies which kinds of almaids are listed and a second column "
+         "where the heading must be an xpath and the values given are "
+         "the text to set for matching elements."
+)
+parser.add_argument(
+    "--append",
+    action="store_true",
+    help="Use this optional parameter if you want to only append the given "
+         "values to the XML element. Note that this does not include any "
+         "prefixes, so make sure to add them if you need them (like a "
+         "leading space or any other delimiter)."
+)
+
+
+def put_manipulated_xml(
+        csv_line: dict):
+    """
+    Get information from csv-line and send PUT accordingly.
+    """
+    almaid_names = list(csv_line.keys())[0]
+    api = almaid_names[0]
+    record_type = almaid_names[:-1]
+    almaid = list(csv_line.values())[0]
+    col2heading = list(csv_line.keys())[1]
+    col2value = list(csv_line.values())[1]
+
+    def manipulate_xml(recordid, record_data):
+        try:
+            xml = fromstring(record_data)
+        except ValueError:
+            logger.warning(
+                f"Could not call fromstring on record for {recordid}.")
+        else:
+            logger.info(
+                f"Sending PUT for {recordid}, changing '{col2heading}'s "
+                f"text to '{col2value}'."
+            )
+            xml = xml_modify.update_element(
+                xml, col2heading, None, col2value)
+
+            return tostring(xml)
+
+    with db_connect.DBSession() as session:
+        almapipo.call_api_for_record(
+            almaid,
+            api,
+            record_type,
+            "PUT",
+            session,
+            manipulate_xml
+        )
+
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    csv = input_helpers.CsvHelper(str(args.input_file))
+    csv_lines = csv.csv_line_list
+
+    with db_connect.DBSession() as db_session:
+
+        csv.add_to_source_csv_table(job_timestamp, db_session)
+
+    with Pool() as p:
+        p.map(put_manipulated_xml, csv_lines)
