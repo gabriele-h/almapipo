@@ -16,6 +16,7 @@ setup(
         'bin/delete_hol',
         'bin/input_check',
         'bin/locations_export',
+        'bin/update_by_csv',
         'bin/update_record_element',
     ],
     classifiers=[
