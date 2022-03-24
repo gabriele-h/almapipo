@@ -20,6 +20,7 @@ format 'mms-id,holding-id,item-id' and make the header of the column
 """
 
 from argparse import ArgumentParser
+from functools import partial
 from logging import getLogger
 from multiprocessing import Pool
 from pathlib import Path
@@ -63,33 +64,20 @@ parser.add_argument(
 )
 
 
-def put_manipulated_xml(
-        csv_line: dict):
+def put_manipulated_xml(csv_line: dict) -> None:
     """
-    Get information from csv-line and send PUT accordingly.
+    Get information from csv-line and send PUT accordingly. Intended for
+    use with multiprocessing.Pool.
+
+    :param csv_line: Row from the input csv file as a dict
+    :return: None
     """
     almaid_names = list(csv_line.keys())[0]
     api = almaid_names[0]
     record_type = almaid_names[:-1]
     almaid = list(csv_line.values())[0]
-    col2heading = list(csv_line.keys())[1]
-    col2value = list(csv_line.values())[1]
 
-    def manipulate_xml(recordid, record_data):
-        try:
-            xml = fromstring(record_data)
-        except ValueError:
-            logger.warning(
-                f"Could not call fromstring on record for {recordid}.")
-        else:
-            logger.info(
-                f"Sending PUT for {recordid}, changing '{col2heading}'s "
-                f"text to '{col2value}'."
-            )
-            xml = xml_modify.update_element(
-                xml, col2heading, None, col2value)
-
-            return tostring(xml)
+    manipulate_xml = partial(manipulate_by_row, csv_line)
 
     with db_connect.DBSession() as session:
         almapipo.call_api_for_record(
@@ -100,6 +88,36 @@ def put_manipulated_xml(
             session,
             manipulate_xml
         )
+
+
+def manipulate_by_row(csv_line: dict, recordid: str, record_data: str) -> str:
+    """
+    Since we need to have more parameters than
+    almapipo.call_api_for_record.manipulate_xml would offer, we make use
+    of functools.partial. This function takes three arguments of which
+    the first will be made static via partial().
+
+    :param csv_line: Dict of row contents from input csv file
+    :param recordid: Comma-separated string of record-ids, most specific last
+    :param record_data: String containing XML data as retrieved via GET
+    :return: String of manipulated XML
+    """
+    col2heading = list(csv_line.keys())[1]
+    col2value = list(csv_line.values())[1]
+    try:
+        xml = fromstring(record_data)
+    except ValueError:
+        logger.warning(
+            f"Could not call fromstring on record for {recordid}.")
+    else:
+        logger.info(
+            f"Sending PUT for {recordid}, changing '{col2heading}'s "
+            f"text to '{col2value}'."
+        )
+        xml = xml_modify.update_element(
+            xml, col2heading, None, col2value)
+
+        return tostring(xml)
 
 
 if __name__ == "__main__":
