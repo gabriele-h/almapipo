@@ -29,17 +29,11 @@ from xml.etree.ElementTree import tostring, fromstring
 from almapipo import (
     almapipo,
     db_connect,
+    db_read,
     input_helpers,
     setup_logfile,
     xml_modify
 )
-
-# timestamp
-job_timestamp = almapipo.job_timestamp
-
-# Logfile
-logger = getLogger("update_by_csv")
-setup_logfile.log_to_stdout(logger)
 
 # provide -h information on the script
 parser = ArgumentParser(
@@ -121,13 +115,23 @@ def manipulate_by_row(csv_line: dict, recordid: str, record_data: str) -> str:
 
 
 if __name__ == "__main__":
+    # timestamp
+    job_timestamp = almapipo.job_timestamp
+
+    # Logfile
+    logger = getLogger("update_by_csv")
+    setup_logfile.log_to_stdout(logger)
+
     args = parser.parse_args()
     csv = input_helpers.CsvHelper(str(args.input_file))
     csv_lines = csv.csv_line_list
 
     with db_connect.DBSession() as db_session:
-
         csv.add_to_source_csv_table(job_timestamp, db_session)
 
     with Pool() as p:
         p.map(put_manipulated_xml, csv_lines)
+
+    with db_connect.DBSession() as db_session:
+        db_read.log_success_rate('GET', job_timestamp, db_session)
+        db_read.log_success_rate('PUT', job_timestamp, db_session)
