@@ -1,0 +1,168 @@
+#!/usr/bin/env python
+"""
+For a CSV-file of the following format:
+
+* header column 1 = which kinds of IDs are listed (e.g. 'bibs,holdings')
+* header column 2 = which xpath in these records to manipulate
+* content column 1 = comma-separated list of IDs for update
+* content column 2 = text to write to xpath element
+
+Assume the action is 'PUT' and manipulate the records
+with the given IDs in a way, where searching by the xpath
+given in heading of column two, values of column to are set
+as the elements text (use --append if you do not want to replace
+any existing text).
+
+Please note that you will need to provide all ancestors the first column. So
+if for example you want to update items, you will need to provide IDs in the
+format 'mms-id,holding-id,item-id' and make the header of the column
+'bibs,holdings,items'.
+"""
+
+from argparse import ArgumentParser
+from functools import partial
+from logging import getLogger
+from multiprocessing import Pool
+from pathlib import Path
+from xml.etree.ElementTree import tostring, fromstring
+
+from almapipo import (
+    almapipo,
+    db_connect,
+    db_read,
+    input_helpers,
+    setup_logfile,
+    xml_modify
+)
+
+# provide -h information on the script
+parser = ArgumentParser(
+    description="Based on a CSV/TSV file containing almaids and values to "
+                "set on a specific XML-element, update the records.",
+    epilog="")
+parser.add_argument(
+    "input_file",
+    type=Path,
+    help="File containing a first column with almaids, where the heading "
+         "identifies which kinds of almaids are listed and a second column "
+         "where the heading must be an xpath and the values given are "
+         "the text to set for matching elements."
+)
+parser.add_argument(
+    "--append",
+    action="store_true",
+    help="Use this optional parameter if you want to only append the given "
+         "values to the XML element. Note that this does not include any "
+         "prefixes, so make sure to add them if you need them (like a "
+         "leading space or any other delimiter)."
+)
+parser.add_argument(
+    "--prepend",
+    action="store_true",
+    help="Like append, but prepend."
+)
+
+
+def put_manipulated_xml(affix: str, csv_line: dict) -> None:
+    """
+    Get information from csv-line and send PUT accordingly. Intended for
+    use with multiprocessing.Pool.
+
+    :param affix: None if replacing text, otherwise "append" or "prepend"
+    :param csv_line: Row from the input csv file as a dict
+    :return: None
+    """
+    almaid_names = list(csv_line.keys())[0].split(',')
+    api = almaid_names[0]
+    record_type = almaid_names[-1]
+    almaid = list(csv_line.values())[0]
+    logger.debug(
+        f"Using almaid '{almaid}', api '{api}' and record_type "
+        f"'{record_type}' from csv_line '{csv_line}'."
+    )
+
+    manipulate_xml = partial(manipulate_by_row, csv_line, affix)
+
+    with db_connect.DBSession() as session:
+        almapipo.call_api_for_record(
+            almaid,
+            api,
+            record_type,
+            "PUT",
+            session,
+            manipulate_xml
+        )
+
+
+def manipulate_by_row(
+        csv_line: dict,
+        affix: str,
+        recordid: str,
+        record_data: str) -> str:
+    """
+    Since we need to have more parameters than
+    almapipo.call_api_for_record.manipulate_xml would offer, we make use
+    of functools.partial. This function takes three arguments of which
+    the first will be made static via partial().
+
+    :param csv_line: Dict of row contents from input csv file
+    :param affix: None if replacing text, otherwise "append" or "prepend"
+    :param recordid: Comma-separated string of record-ids, most specific last
+    :param record_data: String containing XML data as retrieved via GET
+    :return: String of manipulated XML
+    """
+    col2heading = list(csv_line.keys())[1]
+    col2value = list(csv_line.values())[1]
+    try:
+        xml = fromstring(record_data)
+    except ValueError:
+        logger.warning(
+            f"Could not call fromstring on record for {recordid}.")
+    else:
+        logger.info(
+            f"Sending PUT for {recordid}, changing '{col2heading}'s "
+            f"text to '{col2value}'."
+        )
+
+        if affix=="append":
+            manipulated_xml = xml_modify.update_element(
+                xml, col2heading, None, col2value, None, None, True, False)
+        elif affix=="prepend":
+            manipulated_xml = xml_modify.update_element(
+                xml, col2heading, None, col2value, None, None, False, True)
+        else:
+            manipulated_xml = xml_modify.update_element(
+                xml, col2heading, None, col2value)
+
+        return tostring(manipulated_xml)
+
+
+if __name__ == "__main__":
+    # timestamp
+    job_timestamp = almapipo.job_timestamp
+
+    # Logfile
+    logger = getLogger("update_by_csv")
+    setup_logfile.log_to_stdout(logger)
+
+    args = parser.parse_args()
+    csv = input_helpers.CsvHelper(str(args.input_file))
+    csv_lines = csv.csv_line_list
+
+    with db_connect.DBSession() as db_session:
+        csv.add_to_source_csv_table(job_timestamp, db_session)
+
+    with Pool() as p:
+        if args.append:
+            pool_put = partial(put_manipulated_xml, 'append')
+        elif args.prepend:
+            pool_put = partial(put_manipulated_xml, 'prepend')
+        else:
+            pool_put = partial(put_manipulated_xml, None)
+        p.map(pool_put, csv_lines)
+
+    setup_logfile.log_to_stdout(db_read.logger)
+
+    with db_connect.DBSession() as db_session:
+        db_read.log_success_rate('GET', job_timestamp, db_session)
+        db_read.log_success_rate('PUT', job_timestamp, db_session)

@@ -428,6 +428,28 @@ can be opened in Excel.
 input_check ../input/testsample.csv
 ```
 
+## Update by CSV-contents: `update_by_csv`
+
+This is script will take a CSV-file with a specific layout, try to interpret
+its contents and make API-updates accordingly. For example with the following
+CSV:
+
+```csv
+"bibs,holdings,items";"item_data/description"
+991234000003123,221234000003123,231234000003123;"2nd Edition"
+994321000003123,224321000003123,234321000003123;"1.2020"
+```
+
+The script will assume the following things:
+* Update the record ("PUT")
+* API is "bibs", record type is "items"
+* Element to update has the X-path "item\_data/description"
+* First column contains necessary Alma-IDs for the update
+* Second column contains contents to **replace** the text of
+the x-path element by
+* **Optional:** Provide --append or --prepend to change existing text 
+instead of replacing it
+
 ## Update Element by XPATH in a set of records: `update_record_element`
 
 For a given Alma set, update one record element's text.
@@ -436,11 +458,6 @@ For a given Alma set, update one record element's text.
 ```bash
 update_record_element 123123123 'bibs' 'items' 'item/data_description' 'New description'
 ```
-
-## Create All Necessary DB Tables
-
-See above "Initial Setup" for information on this script. Should be used for initial setup of
-the Postgres database only.
 
 # So you want to query the database
 

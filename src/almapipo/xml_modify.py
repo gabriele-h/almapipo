@@ -69,7 +69,9 @@ def update_element(
         old_element_text: str = None,
         new_element_text: str = None,
         old_element_attributes: dict = None,
-        new_element_attributes: dict = None) -> ElementTree:
+        new_element_attributes: dict = None,
+        append: bool = False,
+        prepend: bool = False) -> ElementTree:
     """
     In an xml given as an ElementTree, replace one element by another.
     Please note that you will have to provide all attributes of the element
@@ -84,6 +86,8 @@ def update_element(
     :param new_element_text: Text of the new element
     :param old_element_attributes: Attributes of the element to be replaced
     :param new_element_attributes: Attributes of the new element
+    :param append: Instead of replacing the text, append to existing
+    :param prepend: Like append, but prepend
     :return: ElementTree of the manipulated xml
     """
 
@@ -95,6 +99,13 @@ def update_element(
     for element in list_of_elements:
 
         if new_element_text:
+
+            if append or prepend:
+                existing_text = element.text or ''
+                if append:
+                    new_element_text = existing_text + new_element_text
+                elif prepend:
+                    new_element_text = new_element_text + existing_text
 
             element.text = new_element_text
 
