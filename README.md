@@ -443,11 +443,12 @@ CSV:
 The script will assume the following things:
 * Update the record ("PUT")
 * API is "bibs", record type is "items"
-* Element to update has the X-path "item_data/description"
+* Element to update has the X-path "item\_data/description"
 * First column contains necessary Alma-IDs for the update
 * Second column contains contents to **replace** the text of
 the x-path element by
-* **Optional:** Provide --append to apend to existing text
+* **Optional:** Provide --append or --prepend to change existing text 
+instead of replacing it
 
 ## Update Element by XPATH in a set of records: `update_record_element`
 

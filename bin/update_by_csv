@@ -56,13 +56,19 @@ parser.add_argument(
          "prefixes, so make sure to add them if you need them (like a "
          "leading space or any other delimiter)."
 )
+parser.add_argument(
+    "--prepend",
+    action="store_true",
+    help="Like append, but prepend."
+)
 
 
-def put_manipulated_xml(csv_line: dict) -> None:
+def put_manipulated_xml(affix: str, csv_line: dict) -> None:
     """
     Get information from csv-line and send PUT accordingly. Intended for
     use with multiprocessing.Pool.
 
+    :param affix: None if replacing text, otherwise "append" or "prepend"
     :param csv_line: Row from the input csv file as a dict
     :return: None
     """
@@ -75,7 +81,7 @@ def put_manipulated_xml(csv_line: dict) -> None:
         f"'{record_type}' from csv_line '{csv_line}'."
     )
 
-    manipulate_xml = partial(manipulate_by_row, csv_line)
+    manipulate_xml = partial(manipulate_by_row, csv_line, affix)
 
     with db_connect.DBSession() as session:
         almapipo.call_api_for_record(
@@ -88,7 +94,11 @@ def put_manipulated_xml(csv_line: dict) -> None:
         )
 
 
-def manipulate_by_row(csv_line: dict, recordid: str, record_data: str) -> str:
+def manipulate_by_row(
+        csv_line: dict,
+        affix: str,
+        recordid: str,
+        record_data: str) -> str:
     """
     Since we need to have more parameters than
     almapipo.call_api_for_record.manipulate_xml would offer, we make use
@@ -96,6 +106,7 @@ def manipulate_by_row(csv_line: dict, recordid: str, record_data: str) -> str:
     the first will be made static via partial().
 
     :param csv_line: Dict of row contents from input csv file
+    :param affix: None if replacing text, otherwise "append" or "prepend"
     :param recordid: Comma-separated string of record-ids, most specific last
     :param record_data: String containing XML data as retrieved via GET
     :return: String of manipulated XML
@@ -112,8 +123,16 @@ def manipulate_by_row(csv_line: dict, recordid: str, record_data: str) -> str:
             f"Sending PUT for {recordid}, changing '{col2heading}'s "
             f"text to '{col2value}'."
         )
-        manipulated_xml = xml_modify.update_element(
-            xml, col2heading, None, col2value)
+
+        if affix=="append":
+            manipulated_xml = xml_modify.update_element(
+                xml, col2heading, None, col2value, None, None, True, False)
+        elif affix=="prepend":
+            manipulated_xml = xml_modify.update_element(
+                xml, col2heading, None, col2value, None, None, False, True)
+        else:
+            manipulated_xml = xml_modify.update_element(
+                xml, col2heading, None, col2value)
 
         return tostring(manipulated_xml)
 
@@ -134,7 +153,13 @@ if __name__ == "__main__":
         csv.add_to_source_csv_table(job_timestamp, db_session)
 
     with Pool() as p:
-        p.map(put_manipulated_xml, csv_lines)
+        if args.append:
+            pool_put = partial(put_manipulated_xml, 'append')
+        elif args.prepend:
+            pool_put = partial(put_manipulated_xml, 'prepend')
+        else:
+            pool_put = partial(put_manipulated_xml, None)
+        p.map(pool_put, csv_lines)
 
     setup_logfile.log_to_stdout(db_read.logger)
 
