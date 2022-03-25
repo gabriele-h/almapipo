@@ -66,9 +66,11 @@ def put_manipulated_xml(csv_line: dict) -> None:
     :param csv_line: Row from the input csv file as a dict
     :return: None
     """
-    almaid_names = list(csv_line.keys())[0]
+    almaid_names = list(csv_line.keys())[0].split(',')
     api = almaid_names[0]
-    record_type = almaid_names[:-1]
+    logger.info(f'api: {api}')
+    record_type = almaid_names[-1]
+    logger.info(f'record_type: {record_type}')
     almaid = list(csv_line.values())[0]
 
     manipulate_xml = partial(manipulate_by_row, csv_line)
