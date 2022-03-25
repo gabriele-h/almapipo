@@ -112,10 +112,10 @@ def manipulate_by_row(csv_line: dict, recordid: str, record_data: str) -> str:
             f"Sending PUT for {recordid}, changing '{col2heading}'s "
             f"text to '{col2value}'."
         )
-        xml = xml_modify.update_element(
+        manipulated_xml = xml_modify.update_element(
             xml, col2heading, None, col2value)
 
-        return tostring(xml)
+        return tostring(manipulated_xml)
 
 
 if __name__ == "__main__":
