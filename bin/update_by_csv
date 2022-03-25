@@ -68,10 +68,12 @@ def put_manipulated_xml(csv_line: dict) -> None:
     """
     almaid_names = list(csv_line.keys())[0].split(',')
     api = almaid_names[0]
-    logger.info(f'api: {api}')
     record_type = almaid_names[-1]
-    logger.info(f'record_type: {record_type}')
     almaid = list(csv_line.values())[0]
+    logger.debug(
+        f"Using almaid '{almaid}', api '{api}' and record_type "
+        f"'{record_type}' from csv_line '{csv_line}'."
+    )
 
     manipulate_xml = partial(manipulate_by_row, csv_line)
 
@@ -133,6 +135,8 @@ if __name__ == "__main__":
 
     with Pool() as p:
         p.map(put_manipulated_xml, csv_lines)
+
+    setup_logfile.log_to_stdout(db_read.logger)
 
     with db_connect.DBSession() as db_session:
         db_read.log_success_rate('GET', job_timestamp, db_session)
