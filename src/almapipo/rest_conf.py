@@ -181,7 +181,13 @@ def retrieve_set_total_record_count(set_id: str) -> int:
     members_in_set = setup_rest.call_api(
         f"/conf/sets/{set_id}/members?limit=1", "GET", 200
     )
-    response_xml = fromstring(members_in_set)
-    num_members = response_xml.attrib["total_record_count"]
+    try:
+        response_xml = fromstring(members_in_set)
+    except TypeError:
+        logger.error(
+            f"API call for {set_id} failed. See log for details."
+        )
+    else:
+        num_members = response_xml.attrib["total_record_count"]
 
-    return int(num_members)
+        return int(num_members)
