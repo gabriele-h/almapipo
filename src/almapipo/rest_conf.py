@@ -189,5 +189,6 @@ def retrieve_set_total_record_count(set_id: str) -> int:
         )
     else:
         num_members = response_xml.attrib["total_record_count"]
+        logger.info(f"Number of members for set {set_id} is: {num_members}.")
 
         return int(num_members)
