@@ -89,17 +89,30 @@ curious make use of python's `help`-function.
 Please make use of a virtual environment.
 See https://docs.python.org/3/library/venv.html for further info.
 
+The venv should be inside a folder where you intend to write
+scripts making use of the almapipo package.
+
 ## Install almapipo
 
 The requirements are defined within `setup.py`.
-Installing almapipo via pip will install the
-requirements as defined in `setup.py` automatically.
+Installing almapipo via pip will automatically also install the
+requirements as defined in `setup.py`.
 
-**The following is only necessary if you got the code directly via Github:**
+After activating the venv within the folder containing your scripts,
+you can do `pip install` followed by the path where you put the almapipo
+package (workaround as long as almapipo is not public on pypi).
 
-```bash
-pip install -r requirements.txt
-```
+**Note:**
+* psycopg2 is among the requirements. See
+[Build prerequisites](
+https://www.psycopg.org/docs/install.html#build-prerequisites
+)
+for further info or refer to
+[Quick Install](https://www.psycopg.org/docs/install.html#quick-install)
+on the same page.
+* Python's standard xml package has some [XML vulnerabilities](
+https://docs.python.org/3/library/xml.html#xml-vulnerabilities
+), so make sure to only use trusted data as input.
 
 ## env Variables
 
