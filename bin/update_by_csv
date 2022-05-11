@@ -20,9 +20,9 @@ format 'mms-id,holding-id,item-id' and make the header of the column
 """
 
 from argparse import ArgumentParser
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from logging import getLogger
-from multiprocessing import Pool
+from logging import basicConfig, getLogger
 from pathlib import Path
 from xml.etree.ElementTree import tostring, fromstring
 
@@ -66,7 +66,7 @@ parser.add_argument(
 def put_manipulated_xml(affix: str, csv_line: dict) -> None:
     """
     Get information from csv-line and send PUT accordingly. Intended for
-    use with multiprocessing.Pool.
+    use with multithreading.
 
     :param affix: None if replacing text, otherwise "append" or "prepend"
     :param csv_line: Row from the input csv file as a dict
@@ -144,6 +144,10 @@ if __name__ == "__main__":
     # Logfile
     logger = getLogger("update_by_csv")
     setup_logfile.log_to_stdout(logger)
+    basicConfig(
+        format='%(asctime)s - %(name)s %(threadName)s - %(levelname)s - '
+               '%(message)s'
+    )
 
     args = parser.parse_args()
     csv = input_helpers.CsvHelper(str(args.input_file))
@@ -152,7 +156,7 @@ if __name__ == "__main__":
     with db_connect.DBSession() as db_session:
         csv.add_to_source_csv_table(job_timestamp, db_session)
 
-    with Pool() as p:
+    with ThreadPoolExecutor() as p:
         if args.append:
             pool_put = partial(put_manipulated_xml, 'append')
         elif args.prepend:

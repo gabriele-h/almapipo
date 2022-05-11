@@ -6,12 +6,12 @@ Please mind that this expects a set with a single kind of record.
 If you have a set with both portfolios and items, you should
 look for a different way to make the change!
 
-Makes use of multiprocessing.
+Makes use of multithreading.
 """
 
 from argparse import ArgumentParser
-from logging import getLogger
-from multiprocessing import Pool
+from concurrent.futures import ThreadPoolExecutor
+from logging import basicConfig, getLogger
 from xml.etree.ElementTree import tostring, fromstring
 
 from almapipo import (
@@ -22,13 +22,6 @@ from almapipo import (
     setup_logfile,
     xml_modify,
 )
-
-# timestamp
-job_timestamp = almapipo.job_timestamp
-
-# Logfile
-logger = getLogger("update_record_element")
-setup_logfile.log_to_stdout(logger)
 
 # provide -h information on the script
 parser = ArgumentParser(
@@ -94,10 +87,20 @@ def call_api_for_pool(almaid: str):
 
 
 if __name__ == "__main__":
+    # timestamp
+    job_timestamp = almapipo.job_timestamp
+
+    # Logfile
+    logger = getLogger("update_record_element")
+    setup_logfile.log_to_stdout(logger)
+    basicConfig(
+        format='%(asctime)s - %(name)s %(threadName)s - %(levelname)s - '
+               '%(message)s'
+    )
 
     with db_connect.DBSession() as db_session:
 
-        with Pool() as p:
+        with ThreadPoolExecutor() as p:
             p.map(call_api_for_pool, almaid_generator)
 
         db_read.log_success_rate('GET', job_timestamp, db_session)
