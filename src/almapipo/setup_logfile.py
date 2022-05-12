@@ -4,12 +4,16 @@ import logging
 from os import environ
 from pathlib import Path
 
+from almapipo import config
+
 log_format_string = "%(asctime)s - %(name)s - %(threadName)s - " \
                     "%(levelname)s - %(message)s"
 log_formatter = logging.Formatter(log_format_string)
 
+timestamp_suffix = config.job_timestamp.strftime('%Y-%m-%dT%H%M%S.%fZ')
+
 logfile_dir_path = Path(environ["ALMA_REST_LOGFILE_DIR"])
-logfile_path = logfile_dir_path / "almapipo.log"
+logfile_path = logfile_dir_path / f"almapipo_{timestamp_suffix}.log"
 
 logging.basicConfig(
     format=log_format_string,
