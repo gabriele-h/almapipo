@@ -28,6 +28,7 @@ from xml.etree.ElementTree import tostring, fromstring
 
 from almapipo import (
     almapipo,
+    config,
     db_connect,
     db_read,
     input_helpers,
@@ -139,7 +140,7 @@ def manipulate_by_row(
 
 if __name__ == "__main__":
     # timestamp
-    job_timestamp = almapipo.job_timestamp
+    job_timestamp = config.job_timestamp
 
     # Logfile
     logger = getLogger("update_by_csv")

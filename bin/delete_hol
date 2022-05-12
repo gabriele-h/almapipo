@@ -11,6 +11,7 @@ from pathlib import Path
 
 from almapipo import (
     almapipo,
+    config,
     db_connect,
     db_read,
     input_helpers,
@@ -48,7 +49,7 @@ def call_api_for_pool(almaid: str):
 
 if __name__ == "__main__":
     # timestamp
-    job_timestamp = almapipo.job_timestamp
+    job_timestamp = config.job_timestamp
 
     # Logfile
     logger = getLogger("delete_hol")

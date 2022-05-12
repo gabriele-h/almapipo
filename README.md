@@ -263,12 +263,12 @@ valid alma\_ids only, set `validation` to true in CsvHelper, which checks
 whether the first column contained a valid `almaid`. It defaults to false.
 
 ```python
-from almapipo import almapipo, db_connect, input_helpers
+from almapipo import almapipo, config, db_connect, input_helpers
 
 with db_connect.DBSession() as dbsession:
 
     csv_helper = input_helpers.CsvHelper('./test_hols.tsv')
-    csv_helper.add_to_source_csv_table(almapipo.job_timestamp, dbsession)
+    csv_helper.add_to_source_csv_table(config.job_timestamp, dbsession)
     
     almapipo.call_api_for_list(csv_helper.extract_almaids(), 'bibs', 'holdings', 'GET', dbsession)
 ```

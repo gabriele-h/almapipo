@@ -9,7 +9,6 @@ This will import the other modules and do the following:
     * If there is an error to "error"
 """
 
-from datetime import datetime, timezone
 from logging import getLogger
 from typing import Callable, Iterable
 from xml.etree.ElementTree import fromstring
@@ -17,6 +16,7 @@ from xml.etree.ElementTree import fromstring
 from sqlalchemy.orm import Session
 
 from . import (
+    config,
     db_read,
     db_write,
     rest_acq,
@@ -27,8 +27,7 @@ from . import (
     rest_users,
 )
 
-# Timestamp as inserted in the database
-job_timestamp = datetime.now(timezone.utc)
+job_timestamp = config.job_timestamp
 
 # Logfile
 logger = getLogger(__name__)
