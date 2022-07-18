@@ -1,3 +1,13 @@
+# FIRST AND FINAL VERSION - please fork!
+
+This package was created during my employment at the Vienna Universtiy
+Library and **will not be maintained by me personally**. It is open
+source though, so please fork the project if you are interested in
+in amending and/or changing the code!
+
+Remember when forking that, since this code is licensed under GPL3,
+you will need to publish any forks under GPL3 as well.
+
 # About *almapipo*
 
 almapipo is short for "ALMa API Client with POstgres".
