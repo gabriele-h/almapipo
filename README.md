@@ -1,8 +1,8 @@
 # FIRST AND FINAL VERSION - please fork!
 
 This package was created during my employment at the Vienna Universtiy
-Library and **will not be maintained by me personally**. It is open
-source though, so please fork the project if you are interested in
+Library and *will not be maintained by me personally*. It is open
+source though, so please fork the project if you are interested
 in amending and/or changing the code!
 
 Remember when forking that, since this code is licensed under GPL3,
