@@ -10,15 +10,14 @@ you will need to publish any forks under GPL3 as well.
 
 # About *almapipo*
 
-almapipo is short for "ALMa API Client with POstgres".
+almapipo is short for "ALMa API client with POstgres".
 
-The intention of having an implementation with a Postgres DB is to store
+The intention of having an implementation with a Postgres database is to store
 the following information:
 * List of IDs for which an API call was made
-* Were the calls successful
-* Responses for all successful calls
+* Were the calls successful?
+* Response contents for all successful calls (except DELETE, as there are no contents)
 * Request content sent to the API for successful PUT/POST calls
-* Response content received from the API for successful PUT/POST calls
 * CSV files that were used as an input for the API calls
 
 This way it should be easy to determine which API calls need to be
@@ -54,7 +53,7 @@ In a **Postgres database** the **status of the api call** and - where applicable
 the input data used are saved on a per-line or per-record basis.
 Records will be retrieved before any change to have both the possibility to do
 a before and after analysis and to possibly do a rollback. A
-**copy of each record before the action** will be saved to the database.
+**copy of each record before changing actions** (retrieved via GET) will be saved to the database.
 **Responses to PUT and POST** requests will be saved too.
 
 Another module of the package will handle the actual **api calls**.
@@ -76,10 +75,10 @@ Alma APIs seem to be implemented xml-first.
 At the time I write this: A lot!
 
 I am not implementing all the APIs with some kind of grand
-scheme, but as I need them. If you want and are able to contribute, I
-will be happy to receive your pull requests. Or you can try using the
-generic functions included in `setup_rest.py`. If both is not an option:
-Get in touch!
+scheme, but as I need them. If you want and are able <s>to contribute, I
+will be happy to receive your pull requests</s> please fork the project or
+see if there is already a well-maintained fork to contribute to. Or you can try using the
+generic functions included in `setup_rest.py`.
 
 ## What Is *Not* Covered in This README
 Modules that are not meant for day-to-day use will not be covered by
@@ -104,13 +103,12 @@ scripts making use of the almapipo package.
 
 ## Install almapipo
 
-The requirements are defined within `setup.py`.
-Installing almapipo via pip will automatically also install the
-requirements as defined in `setup.py`.
+The requirements are defined within `setup.py`. Currently this package
+is not listed on https://pypi.org/, as this is the first and final version.
 
-After activating the venv within the folder containing your scripts,
-you can do `pip install` followed by the path where you put the almapipo
-package (workaround as long as almapipo is not public on pypi).
+After activating the venv within the folder where you want to put your according scripts,
+you can do `pip install` followed by the path where you put the git download of the
+almapipo package (workaround as long as almapipo is not public on pypi).
 
 **Note:**
 * psycopg2 is among the requirements. See
@@ -132,8 +130,8 @@ The following env variables need to be set:
 export ALMA_REST_LOGFILE_DIR=             # where you want your logs saved
 export ALMA_REST_ID_INSTITUTIONAL_SUFFIX= # the last four digits of your Alma IDs
 export ALMA_REST_DB=                      # name of your database
-export ALMA_REST_DB_USER=                 # name of your user
-export ALMA_REST_DB_PW=                   # password of your user
+export ALMA_REST_DB_USER=                 # name of your database user
+export ALMA_REST_DB_PW=                   # password of your database user
 export ALMA_REST_DB_URL=                  # url if your database is remote, set 'localhost' otherwise
 export ALMA_REST_DB_VERBOSE=              # enable (1) or suppress (0) logging of SQLAlchemy, suppressed by default
 export ALMA_REST_API_KEY=                 # API key as per developers.exlibrisgroup.com
@@ -217,7 +215,8 @@ with the number of remaining API calls. It's perfect for a first call to the API
 as it requires no parameters at all and provides information you will need
 in the future. It returns the number of left calls and adds info to a logger.
 
-**Note:** The function itself makes a call to /bibs/test and will be counted as an API call.
+**Note:** The function itself makes a call to /bibs/test and will be counted as an API call,
+possibly triggering your threshold-limits.
 
 ```python
 from almapipo import setup_rest
@@ -265,7 +264,7 @@ First parameter of the function is a list of ids to make the calls for. Then
 follow the API that needs to be called and what kind of record it
 should be called for. The final parameter is the method.
 
-#### Using a tsv File as Input: call\_api\_for\_list
+#### Using a csv File as Input: call\_api\_for\_list
 
 The following will import the CSV lines to the table `source_csv` and
 create a generator of alma\_ids. If you want to make sure you are handling
@@ -439,23 +438,33 @@ on how the according regular expression came into existence have a look at the
 
 [1]: https://knowledge.exlibrisgroup.com/Alma/Product_Documentation/010Alma_Online_Help_(English)/Metadata_Management/005Introduction_to_Metadata_Management/020Record_Numbers
 
-## Export Locations: `locations_export`
-
-For all libraries of an institution retrieve all locations and build an XML file
-that contains the retrieved information. The resulting XML file
-can be opened in Excel.
-
 ### Usage Example Bash
 
 ```bash
 input_check ../input/testsample.csv
 ```
 
+## Export Locations: `locations_export`
+
+For all libraries of an institution retrieve all locations and build an XML file
+that contains the retrieved information. The resulting XML file
+can be opened in Excel.
+
+It has one required and one kind of optional argument: the path to the output file and
+the language(s) to make the export for. en_US will always be exported and any further
+language(s) provided will be appended.
+
+### Usage Example Bash
+
+```bash
+locations_export output_of_almapipo_locations_export.xml --addLang=de_DE --addLang=fr_FR
+```
+
 ## Update by CSV-contents: `update_by_csv`
 
-This is script will take a CSV-file with a specific layout, try to interpret
-its contents and make API-updates accordingly. For example with the following
-CSV:
+This script will take a CSV-file with a specific layout, try to interpret
+its contents and make API-updates accordingly - USE WITH CARE.
+For example with the following CSV:
 
 ```csv
 "bibs,holdings,items";"item_data/description"
@@ -464,14 +473,12 @@ CSV:
 ```
 
 The script will assume the following things:
-* Update the record ("PUT")
-* API is "bibs", record type is "items"
-* Element to update has the X-path "item\_data/description"
+* Update the record ("PUT") - this is always standard
+* API is "bibs", record type is "items" - set in the heading of the first column
+* Element to update has the X-path "item\_data/description" - set in the heading of the second column
 * First column contains necessary Alma-IDs for the update
-* Second column contains contents to **replace** the text of
-the x-path element by
-* **Optional:** Provide --append or --prepend to change existing text 
-instead of replacing it
+* Second column contains contents to **replace** the text of the x-path element by, if neither --append nor --prepend were set
+* **Optional:** Provide --append or --prepend to change existing text instead of replacing it
 
 ## Update Element by XPATH in a set of records: `update_record_element`
 
